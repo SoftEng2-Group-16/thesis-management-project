@@ -1,0 +1,1 @@
+This repo contains all the work related to the Software Engineering 2 Project "Thesis Management" made by Group 16 @PolitecnicoDiTorino
