@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom
 import MessageContext from './messageCtx.jsx';
 import API from './API';
 import { LoginForm } from './components/AuthComponents';
-import Home from './components/Home';
+import Home from './components/Proposals.jsx';
 
 function App() {
 

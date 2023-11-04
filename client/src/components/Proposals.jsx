@@ -11,10 +11,10 @@ import { LoadingLayout } from './PageLayout.jsx';
 here we can implement the home, the home shows the thesis;
 if role:
  professor -> shows all active thesis, show edit botton for those related to it
- student -> show all the thesis COMPATIBLE with the student plus functionalities
+ student -> show all the thesis COMPATIBLE with the student plus functionalities to apply - show more infos - collapse/expand row
 */
 
-function Home(props) {
+function Proposals(props) {
   const { handleErrors } = useContext(MessageContext);
   const [services, setServices] = useState([]); // List of services with their information
   const [loading, setLoading] = useState(true);
