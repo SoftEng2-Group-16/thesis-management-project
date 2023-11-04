@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
 import { LogoutButton } from './AuthComponents';
 import User from '../assets/user.png';
+
 function NavHeader(props) {
   return (
   <Navbar className="d-flex justify-content-around" bg="primary" variant="dark">
