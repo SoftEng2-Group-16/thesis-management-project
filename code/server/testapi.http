@@ -13,33 +13,3 @@ content-type: application/json
 }
 
 
-###
-GET http://localhost:3001/api/services
-
-###
-GET http://localhost:3001/api/nextcustomer/2
-
-###
-PUT http://localhost:3001/api/assignticket/0
-content-type: application/json
-
-{
-    "counterId":2,
-    "employeeId":5
-}
-
-###
-PUT http://localhost:3001/api/closeticket/0
-
-###
-POST http://localhost:3001/api/ticket 
-content-type: application/json
-
-{
-    "serviceType": "shipping",
-    "ts":"23-10-2023 15:00:00",
-    "status":"pending"
-}
-
-###
-DELETE http://localhost:3001/api/tickets/30

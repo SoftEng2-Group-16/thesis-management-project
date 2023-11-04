@@ -11,7 +11,7 @@ const { check } = require('express-validator');
  * Query the database and check whether the username exists and the password
  * hashes to the correct value.
  * If so, return an object with full user information.
- * @param {string} username 
+ * @param {string} email 
  * @param {string} password 
  * @returns {Promise} a Promise that resolves to the full information about the current user, if the password matches
  * @throws the Promise rejects if any errors are encountered
@@ -19,6 +19,7 @@ const { check } = require('express-validator');
 
 // USER SECTION
 
+//TODO the dao methods for users needs to be tweaked according to the new specs
 
 exports.getUser = (username, password) => { // this is used by passport see line 32 in index.js
   return new Promise((resolve, reject) => {
@@ -75,128 +76,6 @@ exports.getUsers = () => {
     });
   });
 }
-
-
-
-//API SECTION
-
-exports.getServices = () => {
-  return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM services";
-    db.all(sql, [], (err, rows) => {
-      if (err) { reject(err); }
-      //if not find anything
-      if (rows.length == 0) {
-        resolve({ error: 'services not found' });
-      }
-      else {
-        const services = rows.map((row) => new Service(row.id, row.type, row.description, row.service_time)); 
-        resolve(services);
-      }
-    });
-  });
-};
-
-exports.getServicesForCounter = (counterId) => {
-  return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM counters WHERE id=?";
-    db.get(sql, [counterId], (err, row) => {
-      if(err) { reject(err); }
-      else {
-        resolve(row.services.split(','));
-      }
-    });
-  });
-}
-
-exports.getTicketsForService = (serviceType) => {
-  return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM tickets WHERE service_type=? AND status!=?";
-    db.all(sql, [serviceType,"closed"], (err,rows) => {
-      if(err) { reject(err); }
-      if(rows.length == 0) {
-        resolve({error: `Problem while retrieving queue for service ${serviceType}`});
-      } else {
-        const tickets = rows.map( (row) =>
-          new Ticket(
-          row.id,
-          row.counterid,
-          row.timestamp_created,
-          row.timestamp_finished,
-          row.service_type,
-          row.employeeid,
-          row.status,
-        ));
-        resolve(tickets);
-      }
-    })
-  })
-}
-
-exports.getServiceTime = (serviceType) => {
-  return new Promise((resolve, reject) => {
-    const sql = "SELECT service_time FROM services WHERE type=?";
-    db.get(sql, [serviceType], (err, row) => {
-      if(err) { reject(err); }
-      else {
-        resolve(row.service_time);
-      }
-    });
-  });
-}
-
-exports.createTicket = (serviceType,ts,status) => {
-  return new Promise((resolve, reject) => {
-    const sql ="INSERT INTO tickets (counterid, timestamp_created, timestamp_finished, service_type, employeeid, status) values (?,?,?,?,?,?)";
-
-    db.run(sql, [null,ts,null,serviceType,null,status], function (err) {
-      if (err) {
-        reject(err);
-      }
-      resolve(this.lastID);
-    });
-  });
-}
-
-exports.closeTicket= (ticketId,ts) => {
-  return new Promise((resolve,reject) => {
-    const sql="UPDATE tickets SET status=?, timestamp_finished=? WHERE id=?"
-
-    db.run(sql,["closed",ts,ticketId], function(err) {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(this.changes);
-      }
-    });
-  });
-}
-
-exports.assignTicket = (ticketId, employeeId, counterId) => {
-  return new Promise((resolve,reject) => {
-    const sql="UPDATE tickets SET employeeid=?, counterid=? WHERE id=?";
-    db.run(sql,[employeeId, counterId, ticketId], function(err) {
-      if(err) { reject(err)}
-      else{
-        resolve(this.changes);
-      }
-    });
-  });
-}
-
-exports.deleteTicket = (ticketId) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'DELETE FROM tickets where id=?' ;  
-    db.run(sql, [ticketId], function (err) {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(this.changes);  // return the number of affected rows
-    });
-  });
-}
-
 
 
 
