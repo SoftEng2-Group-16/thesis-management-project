@@ -12,4 +12,6 @@ content-type: application/json
     "password": "password3"
 }
 
-
+###
+DELETE http://localhost:3001/api/sessions/current HTTP/1.1
+content-type: application/json
