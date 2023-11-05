@@ -1,7 +1,11 @@
 'use strict';
 
+
+
 const express = require('express');
 const dayjs = require('dayjs');
+//import router
+const router =require('./routes/router.js');
 
 // init express
 const app = new express();
@@ -73,6 +77,7 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
 
 
 /* ROUTERS */
+app.use('/api', router);
 
 
 // activate the server
