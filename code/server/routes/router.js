@@ -3,13 +3,12 @@ const auth = require('./auth/auth.js');
 
 const router = express.Router();
 
-// POST /api/sessions
+/*session routes*/
+
 router.post('/sessions', auth.login);
-
-// GET /api/sessions/current
 router.get('/sessions/current', auth.getCurrentSession);
-
-// DELETE /api/sessions/current
 router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
+
+/*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 
 module.exports = router;
