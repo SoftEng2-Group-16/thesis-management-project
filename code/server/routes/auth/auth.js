@@ -1,13 +1,13 @@
 const passport = require('passport');
 
-export const isLoggedIn = (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
   return res.status(401).json({ error: 'Not authorized' });
 };
 
-export const login = (req, res, next) => {
+const login = (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err)
       return next(err);
@@ -26,7 +26,7 @@ export const login = (req, res, next) => {
   })(req, res, next);
 };
 
-export const getCurrentSession = (req, res) => {
+const getCurrentSession = (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json(req.user);
   } else {
@@ -34,10 +34,18 @@ export const getCurrentSession = (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+const logout = (req, res) => {
   req.logout(() => {
     res.sendStatus(204);
   });
 };
 
+module.exports = {
+  isLoggedIn,
+  login,
+  getCurrentSession,
+  logout,
+};
 
+
+  

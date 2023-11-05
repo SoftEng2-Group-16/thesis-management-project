@@ -13,9 +13,6 @@ const dao = require('./dao');
 
 const { check, validationResult, } = require('express-validator'); // validation middleware
 
-//router imports
-const authRouter = require('./routes/auth/auth.js');
-
 // Passport-related imports
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -76,9 +73,6 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
 
 
 /* ROUTERS */
-
-app.use('/api/sessions', authRouter)
-
 
 
 // activate the server
