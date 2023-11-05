@@ -65,6 +65,7 @@ app.use(passport.authenticate('session'));
 
 // SESSION ROUTES
 // loggedin middleware
+
 //! see logout sintax to check how this middleware can be used to protect routes
 
 
