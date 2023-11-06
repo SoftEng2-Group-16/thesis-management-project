@@ -7,7 +7,7 @@ const isLoggedIn = (req, res, next) => {
   return res.status(401).json({ error: 'Not authorized' });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err)
       return next(err);

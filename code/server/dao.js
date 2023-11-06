@@ -21,7 +21,9 @@ const { check } = require('express-validator');
 
 //TODO the dao methods for users needs to be tweaked according to the new specs
 
-exports.getUser = (email, password) => { 
+exports.getUser = (email, password) => 
+{
+  console.log(email,password) 
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM auth WHERE email = ?';
 
