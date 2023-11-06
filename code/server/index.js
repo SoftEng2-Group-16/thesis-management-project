@@ -35,7 +35,9 @@ app.use(cors(corsOptions));
 // Passport: set up local strategy
 // Later the strategy will be changed to SAML2
 
-passport.use(new LocalStrategy(async function verify(username, password, cb) {
+passport.use(new LocalStrategy({  usernameField: 'email', //redefining passport internal fields
+passwordField: 'password' //same thing here
+},async function verify(username, password, cb) {
   try {
     const userDAO = await dao.getUser(username, password);
     const user = { id: userDAO.id }
