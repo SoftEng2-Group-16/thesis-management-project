@@ -8,8 +8,8 @@ POST http://localhost:3001/api/sessions/ HTTP/1.1
 content-type: application/json
 
 {
-    "username": "MRossi",
-    "password": "password3"
+    "email": "maria.rossi@polito.it",
+    "password": "268553"
 }
 
 ###
