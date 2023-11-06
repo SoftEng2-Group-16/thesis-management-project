@@ -40,7 +40,7 @@ passwordField: 'password' //same thing here
 },async function verify(username, password, cb) {
   try {
     const userDAO = await dao.getUser(username, password);
-    const user = { id: userDAO.id }
+    const user = { id: userDAO.id, email: userDAO.email, role: userDAO.role }
     console.log(user)
     if (!user)
       return cb(null, false, 'Incorrect username or password.');

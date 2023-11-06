@@ -19,7 +19,7 @@ const { check } = require('express-validator');
 
 // USER SECTION
 
-//TODO the dao methods for users needs to be tweaked according to the new specs
+//! the dao methods for users needs to be tweaked according to the new specs
 
 exports.getUser = (email, password) => 
 {
@@ -39,7 +39,6 @@ exports.getUser = (email, password) =>
           const hashedPassword = crypto.scryptSync(pass, salt, 64).toString('hex');
 
           if (hashedPassword === row.password) {
-            console.log(row)
             resolve(row);
           } else {
             reject('Invalid email or password');
