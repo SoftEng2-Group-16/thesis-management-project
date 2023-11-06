@@ -34,8 +34,9 @@ exports.getUser = (email, password) =>
         if (!row) {
           reject('Invalid email or password');
         } else {
+          const pass = password;
           const salt = row.salt;
-          const hashedPassword = crypto.scryptSync(password, salt, 64).toString('hex');
+          const hashedPassword = crypto.scryptSync(pass, salt, 64).toString('hex');
 
           if (hashedPassword === row.password) {
             console.log(row)
