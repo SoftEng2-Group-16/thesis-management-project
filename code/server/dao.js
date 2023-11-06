@@ -21,16 +21,16 @@ const { check } = require('express-validator');
 
 //TODO the dao methods for users needs to be tweaked according to the new specs
 
-exports.getUser = (username, password) => { // this is used by passport see line 32 in index.js
+exports.getUser = (email, password) => { 
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM users WHERE username = ?';
+    const sql = 'SELECT * FROM auth WHERE email = ?';
 
-    db.get(sql, [username], (err, row) => {
+    db.get(sql, [email], (err, row) => {
       if (err) {
         reject(err);
       } else {
         if (!row) {
-          reject('Invalid username or password');
+          reject('Invalid email or password');
         } else {
           const salt = row.salt;
           const hashedPassword = crypto.scryptSync(password, salt, 64).toString('hex');
@@ -39,7 +39,7 @@ exports.getUser = (username, password) => { // this is used by passport see line
             console.log(row)
             resolve(row);
           } else {
-            reject('Invalid username or password');
+            reject('Invalid email or password');
           }
         }
       }
@@ -49,7 +49,7 @@ exports.getUser = (username, password) => { // this is used by passport see line
 
 // FOR SINGLE FETCH
 
-exports.getUserByUsername = (username) => {
+/* exports.getUserByUsername = (username) => {
   return new Promise((resolve, reject) => {
     const query = `SELECT * FROM users WHERE username = ?`;
     db.get(query, [username], (error, row) => {
@@ -60,11 +60,11 @@ exports.getUserByUsername = (username) => {
       }
     });
   });
-}
+} */
 
 // FOR SINGLE FETCH
 
-exports.getUsers = () => {
+/* exports.getUsers = () => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT username FROM users';
     db.all(sql, [], (err, rows) => {
@@ -76,6 +76,6 @@ exports.getUsers = () => {
     });
   });
 }
-
+ */
 
 
