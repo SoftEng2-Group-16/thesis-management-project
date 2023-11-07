@@ -25,4 +25,8 @@ Insert here any links to your old projects that can be usefull to the current pr
 
 ### To build and run the project:
 
+
+1) Open two different terminals from vscode
+2) (cd code/client ; npm install; npm run dev) in the first one, this will start up the client
+3) (cd code/server ; npm install; nodemon index.js) in the other one, this will boot up the server listening to the port of the client (NOTE: nodemon should be installed system wide, use `npm install -g nodemon`; if you don't care about server monitoring and just need a quick start, you can run it as a normal JS file with `node index.js`)
 ### Running the test suites:
