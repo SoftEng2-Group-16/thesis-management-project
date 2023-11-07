@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom
 import MessageContext from './messageCtx.jsx';
 import API from './API';
 import { LoginForm } from './components/AuthComponents';
-import Home from './components/Proposals.jsx';
+import ThesisProposals from './components/ThesisProposals.jsx';
 
 function App() {
 
@@ -87,7 +87,7 @@ function App() {
             </>
           }
         >
-          <Route path="/" element={<Home />} ></Route>
+          <Route path="/" element={<ThesisProposals/>} ></Route>
           <Route path="*" element={<NotFoundLayout  />} />
           <Route path="/login" element={loggedIn ? <Navigate replace to="/employee" /> : <LoginForm login={handleLogin} />}/>
         </Route>

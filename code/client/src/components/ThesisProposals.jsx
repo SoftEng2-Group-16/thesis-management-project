@@ -14,11 +14,39 @@ if role:
  student -> show all the thesis COMPATIBLE with the student plus functionalities to apply - show more infos - collapse/expand row
 */
 
-function Proposals(props) {
+
+function ThesisProposals(props) {
+  const [user, setUser] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
   const { handleErrors } = useContext(MessageContext);
-  const [services, setServices] = useState([]); // List of services with their information
-  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+        try {
+          const user = await API.getUserInfo();
+            setUser({ 
+              id: user.id,
+              email: user.email,
+              role: user.role,
+            })
+
+            setLoggedIn(true);
+        } catch { (err) => { return null; } }
+      
+    }
+    checkAuth();
+  }, [loggedIn]);
+
+  return (
+    <>
+    {loggedIn ? (
+      {user.role == "student"}
+      
+    )}
+
+    </>
+  );
 }
 
 
-export default Home;
+export default ThesisProposals;

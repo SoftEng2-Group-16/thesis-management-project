@@ -24,7 +24,7 @@ and can be tested with its relative counterpart tool https://www.browserling.com
 
 ### SESSIONS
 
-The session is currently initialized with all the data related to the user that is been serialized.
+
 ```
 {
   id: 200001,
