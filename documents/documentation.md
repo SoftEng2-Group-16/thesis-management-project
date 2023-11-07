@@ -33,6 +33,7 @@ The session is currently initialized with all the data related to the user that 
 
 }
 ```
+This is a test.
 
 The session is initialized with these user data.
 
