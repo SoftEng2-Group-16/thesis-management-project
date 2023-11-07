@@ -30,12 +30,11 @@ and can be tested with its relative counterpart tool https://www.browserling.com
   id: 200001,
   email: 'mario.rossi@studenti.polito.it',
   role: 'student',
-  password: '78a9b43f33c457b3f12446c7cc4ab6150498ad85c832ec81321ade572350aedfe5903e2cd6252db2b154a747d3a6c2e60a1db3f4578c1f53ccdc96fafcbd9df5',
-  salt: 'e8a1ea50eeaaa38f'
+
 }
 ```
 
-This is **WRONG** and needs to be fixed, the serialization should not include sensitive information, but only name surname username and role.
+The session is initialized with these user data.
 
 ## Database Structure
 
