@@ -6,7 +6,7 @@ import { NotFoundLayout, LoadingLayout } from './components/PageLayout';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import MessageContext from './messageCtx.jsx';
-import API from './API';
+import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
 import ThesisProposals from './components/ThesisProposals.jsx';
 

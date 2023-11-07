@@ -1,10 +1,8 @@
 /* eslint-disable react/prop-types */
-import { Card, Button, Row, Col, Container, Modal } from 'react-bootstrap';
 import { useContext, useEffect, useState } from 'react';
-import CardGroup from 'react-bootstrap/CardGroup';
 
 import MessageContext from '../messageCtx.jsx';
-import API from '../API.js';
+import API from '../apis/generalAPI.js';
 import { LoadingLayout } from './PageLayout.jsx';
 
 /*
@@ -16,7 +14,7 @@ if role:
 
 
 function ThesisProposals(props) {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const { handleErrors } = useContext(MessageContext);
 
@@ -29,20 +27,21 @@ function ThesisProposals(props) {
               email: user.email,
               role: user.role,
             })
-
             setLoggedIn(true);
         } catch { (err) => { return null; } }
-      
     }
     checkAuth();
   }, [loggedIn]);
 
   return (
     <>
-    {loggedIn ? (
-      {user.role == "student"}
-      
-    )}
+    {loggedIn && user.role == "student" ? (
+      <div> Logged in as a student!</div> //TODO: Insert here code to the user page
+      ) :
+      (
+        <div>Logged in a professor!</div> //TODO: Insert here code to the professor page
+      )
+    }
 
     </>
   );
