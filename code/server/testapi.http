@@ -8,7 +8,7 @@ POST http://localhost:3001/api/sessions/ HTTP/1.1
 content-type: application/json
 
 {
-    "email": "mario.rossi@gmail.com",
+    "email": "mario.rossi@studenti.polito.it",
     "password": "200001"
 }
 

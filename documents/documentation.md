@@ -1,4 +1,4 @@
-## SUMMARY 
+## SUMMARY
 
 
 
@@ -12,10 +12,10 @@ and can be tested with its relative counterpart tool https://www.browserling.com
 
 |   Email                     |   Password    |   Role   |
 |-----------------------------|---------------|---------|
-| mario.rossi@gmail.com       | 200001        | student |
-| maria.bianchi@gmail.com     | 200002        | student |
-| luigi.ferrari@gmail.com     | 200003        | student |
-| giulia.russo@gmail.com      | 200004        | student |
+| mario.rossi@studenti.polito.it       | 200001        | student |
+| maria.bianchi@studenti.polito.it     | 200002        | student |
+| luigi.ferrari@studenti.polito.it     | 200003        | student |
+| giulia.russo@studenti.polito.it      | 200004        | student |
 | maria.rossi@polito.it       | 268553        | teacher |
 | luigi.bianchi@polito.it     | 268554        | teacher |
 | giovanna.ferrari@polito.it  | 268555        | teacher |
@@ -28,7 +28,7 @@ The session is currently initialized with all the data related to the user that 
 ```
 {
   id: 200001,
-  email: 'mario.rossi@gmail.com',
+  email: 'mario.rossi@studenti.polito.it',
   role: 'student',
   password: '78a9b43f33c457b3f12446c7cc4ab6150498ad85c832ec81321ade572350aedfe5903e2cd6252db2b154a747d3a6c2e60a1db3f4578c1f53ccdc96fafcbd9df5',
   salt: 'e8a1ea50eeaaa38f'
@@ -39,6 +39,31 @@ This is **WRONG** and needs to be fixed, the serialization should not include se
 
 ## Database Structure
 
+STUDENTS
+| id  | surname  | name | gender | nationality | email | degree_code | enrollment_year
+|---  |---    |---  |--- |--- |--- |--- |---
+200001 | Rossi | Mario | M | Italian | <mario.rossi@studenti.polito.it> | LM-1 | 2010
+
+TEACHERS
+| id  | surname  | name | email | group_code | department_code
+|---  |---    |---  |--- |--- |---
+268553 | Rossi | Maria | <maria.rossi@polito.it> | AI | DAD
+
+CAREERS
+| student_id  | course_code  | course_title | cfu | garde | date_registered
+|---  |---    |---  |--- |--- |---
+200023 | 02PQRST | Physics | 19 | 30L | 20-10-2018
+
+DEGREES
+| degree_code | degree_title
+|---  |---
+LM-1 | Computer Engineering
+
+THESIS_PROPOSALS
+| id  | title  | supervisor | cosupervisors | keywords | type | groups | description | requirements | notes | expiration | level | cds
+|---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
+0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
+
 
 *If you need a tool to explore the DB, you can try 'DB Browser for SQLITE' for Windows Desktop*
 
@@ -47,7 +72,7 @@ This is **WRONG** and needs to be fixed, the serialization should not include se
 
 ## API Server
 
-## Template for API Desription 
+## Template for API Desription
 
 - POST `/api/sessions`
   - Description: request for login
@@ -88,3 +113,4 @@ This is **WRONG** and needs to be fixed, the serialization should not include se
   
 
 This utility function is helpful when working with API requests, ensuring that you can handle HTTP responses in a consistent manner, whether they represent success or errors.
+
