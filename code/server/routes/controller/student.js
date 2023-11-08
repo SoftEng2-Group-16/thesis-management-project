@@ -8,7 +8,7 @@ const insertNewApplication = async (req, res) => {
     const status = 'pending';
 
     try {
-        const changes = await dao.addApplicationForThesis(studentId, proposalId, timestamp, status);
+        const changes = await dao.addApplicationForThesis(proposalId, studentId, timestamp, status);
         return res.status(200).json(changes);
     } catch(e) {
         if(e.message.includes("SQLITE_CONSTRAINT")) {
