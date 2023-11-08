@@ -49,13 +49,13 @@ passport.use(new LocalStrategy({
     let fetch;
     let user;
     
-    if (userDAO.role === "professor") {
+    if (userDAO.role === "teacher") {
       fetch = await dao.getProfessorById(userDAO.id);
-      user = {id:fetch.id, surname: fetch.surname, name: fetch.surname,role: userDAO.role, email: fetch.email, group_code: fetch.group_code, department_code: fetch.department_code}
+      user = {id:fetch.id, surname: fetch.surname, name: fetch.name,role: userDAO.role, email: fetch.email, group_code: fetch.group_code, department_code: fetch.department_code}
 
     } else if (userDAO.role === "student") {
       fetch = await dao.getStudentById(userDAO.id);
-      user = {id:fetch.id, surname: fetch.surname, name: fetch.surname,role: userDAO.role, email: fetch.email, gender: fetch.gender, nationality: fetch.nationality, degree_code: fetch.degree_code, enrollment_year: fetch.enrollment_year }
+      user = {id:fetch.id, surname: fetch.surname, name: fetch.name,role: userDAO.role, email: fetch.email, gender: fetch.gender, nationality: fetch.nationality, degree_code: fetch.degree_code, enrollment_year: fetch.enrollment_year }
 
     }
     
