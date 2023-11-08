@@ -11,6 +11,9 @@ const insertNewApplication = async (req, res) => {
         const changes = await dao.addApplicationForThesis(studentId, proposalId, timestamp, status);
         return res.status(200).json(changes);
     } catch(e) {
+        if(e.message.includes("SQLITE_CONSTRAINT")) {
+            e.message = 'Application already submitted, wait for professor response'
+;        }
         return res.status(500).json(e.message);
     }
 }
