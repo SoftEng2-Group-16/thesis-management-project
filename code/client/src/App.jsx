@@ -26,15 +26,17 @@ function App() {
     setMessage(msg);
   }
 
+  //TODO the login method should not returns the row in the auth table but should query again against student or professor table to get all the info
+  //! generalAPI exports a 'API' and not 'generalAPI' for the time being
   useEffect(() => {
     const checkAuth = async () => {
       if (loggedIn) {
         try {
           const user = await API.getUserInfo(); // we have the user info here 
           if (user) {
-            setUser({
+            setUser({ //TODO this needs to be changed to set the new info
               id: user.id,
-              username: user.username,
+              username: user.role, //for now role?
             })
 
             setLoggedIn(true);
@@ -86,8 +88,9 @@ function App() {
               
             </>
           }
-        >
-          <Route path="/" element={<ThesisProposals/>} ></Route>
+        > 
+          <Route path="/" element={<Navigate to="/thesis" />} ></Route>
+          <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} role={user.role}/> : <Navigate replace to="/login" />} ></Route>
           <Route path="*" element={<NotFoundLayout  />} />
           <Route path="/login" element={loggedIn ? <Navigate replace to="/employee" /> : <LoginForm login={handleLogin} />}/>
         </Route>

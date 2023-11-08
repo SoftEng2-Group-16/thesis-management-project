@@ -14,32 +14,21 @@ if role:
 
 
 function ThesisProposals(props) {
-  const [user, setUser] = useState(null);
+
   const [loggedIn, setLoggedIn] = useState(false);
   const { handleErrors } = useContext(MessageContext);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-        try {
-          const user = await API.getUserInfo();
-            setUser({ 
-              id: user.id,
-              email: user.email,
-              role: user.role,
-            })
-            setLoggedIn(true);
-        } catch { (err) => { return null; } }
-    }
-    checkAuth();
-  }, [loggedIn]);
+ 
 
   return (
     <>
     {loggedIn && user.role == "student" ? (
       <div> Logged in as a student!</div> //TODO: Insert here code to the user page
-      ) :
-      (
+      ) : loggedIn && user.role == "student" ?(
         <div>Logged in a professor!</div> //TODO: Insert here code to the professor page
+      ):(
+        <div>You need to LOGIN!</div> //TODO: Insert here code to the professor page
+
       )
     }
 
