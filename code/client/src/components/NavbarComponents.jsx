@@ -9,7 +9,7 @@ function NavHeader(props) {
   return (
   <Navbar className="d-flex justify-content-around" bg="primary" variant="dark">
     <Container>
-      <Navbar.Brand href='/' className='navbar-brand'>
+      <Navbar.Brand  className='navbar-brand'>
       Shitty Thesis Management
       </Navbar.Brand>
       <Nav className="me-auto">

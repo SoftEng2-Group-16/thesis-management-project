@@ -22,12 +22,12 @@ function ThesisProposals(props) {
 
   return (
     <>
-    {loggedIn && user.role == "student" ? (
+    {props.loggedIn && props.user.role === "student" ? (
       <div> Logged in as a student!</div> //TODO: Insert here code to the user page
-      ) : loggedIn && user.role == "student" ?(
-        <div>Logged in a professor!</div> //TODO: Insert here code to the professor page
+      ) : props.loggedIn && props.user.role === "professor" ?(
+        <div>Logged in as a professor!</div> //TODO: Insert here code to the professor page
       ):(
-        <div>You need to LOGIN!</div> //TODO: Insert here code to the professor page
+        <div>You need to LOGIN!</div> 
 
       )
     }

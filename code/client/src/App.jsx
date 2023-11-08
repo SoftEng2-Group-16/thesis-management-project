@@ -36,7 +36,7 @@ function App() {
           if (user) {
             setUser({ //TODO this needs to be changed to set the new info
               id: user.id,
-              username: user.role, //for now role?
+              role: user.role, //for now role?
             })
 
             setLoggedIn(true);
@@ -52,7 +52,7 @@ function App() {
     try {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
-      setMessage({ msg: `Welcome, ${user.username}!`, type: 'success' });
+      setMessage({ msg: `Welcome, ${user.role}!`, type: 'success' });
     } catch (err) {
       setMessage({ msg: err, type: 'danger' });
     }
@@ -62,6 +62,7 @@ function App() {
     await API.logOut();
     setLoggedIn(false);
     // clean up everything
+
     setMessage('');
   };
 
@@ -90,9 +91,9 @@ function App() {
           }
         > 
           <Route path="/" element={<Navigate to="/thesis" />} ></Route>
-          <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} role={user.role}/> : <Navigate replace to="/login" />} ></Route>
+          <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
           <Route path="*" element={<NotFoundLayout  />} />
-          <Route path="/login" element={loggedIn ? <Navigate replace to="/employee" /> : <LoginForm login={handleLogin} />}/>
+          <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />}/>
         </Route>
       </Routes>
       </MessageContext.Provider>
