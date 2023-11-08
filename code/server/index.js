@@ -40,11 +40,18 @@ passwordField: 'password' //same thing here
 },async function verify(username, password, cb) {
   try {
     const userDAO = await dao.getUser(username, password);
-    const user = { id: userDAO.id, email: userDAO.email, role: userDAO.role }
-    console.log(user)
-    if (!user)
-      return cb(null, false, 'Incorrect username or password.');
+    const authId = userDAO.id;
 
+    if (!authId){
+      return cb(null, false, 'Incorrect username or password.');
+    }
+    
+    //todo here, let's fetch the right data
+    if(auth.role === "student"){
+      let user = dao.getStudent(authId);
+    }else if(auth.role === "professor") {
+      let user = dao.getProfessor(authId);
+    }
     return cb(null, user);
   } catch {
     return cb(null, false, 'Incorrect username or password.');
