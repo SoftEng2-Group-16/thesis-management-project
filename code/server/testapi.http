@@ -15,3 +15,7 @@ content-type: application/json
 ###
 DELETE http://localhost:3001/api/sessions/current HTTP/1.1
 content-type: application/json
+
+###
+#test the API for getting proposals
+GET http://localhost:3001/api/proposals/LM-1
