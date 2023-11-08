@@ -19,7 +19,7 @@ function NavHeader(props) {
       <Navbar.Text>
         
       <img src={User} style={{ width: '45px', height: 'auto', fill: 'white' }} alt="User:" />
-        <span className="text-light me-3 username">{props.user.username}</span>
+        <span className="text-light me-3 username">{props.user.role}</span>
       </Navbar.Text>
         <LogoutButton logout={props.handleLogout} />
         </> :
