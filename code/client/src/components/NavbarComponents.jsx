@@ -13,7 +13,7 @@ function NavHeader(props) {
       Shitty Thesis Management
       </Navbar.Brand>
       <Nav className="me-auto">
-        <Nav.Link href='/ticketing'>Thesis</Nav.Link>
+        <Nav.Link href='#'>Thesis</Nav.Link>
       </Nav>
       {props.loggedIn ? <>
       <Navbar.Text>
