@@ -53,10 +53,10 @@ exports.getUser = (email, password) =>
 
 // FOR SINGLE FETCH
 
-/* exports.getUserByUsername = (username) => {
+ exports.getStudentById = (id) => {
   return new Promise((resolve, reject) => {
-    const query = `SELECT * FROM users WHERE username = ?`;
-    db.get(query, [username], (error, row) => {
+    const query = `SELECT * FROM students WHERE id = ?`;
+    db.get(query, [id], (error, row) => {
       if (error) {
         reject(error);
       } else {
@@ -64,7 +64,20 @@ exports.getUser = (email, password) =>
       }
     });
   });
-} */
+} 
+exports.getProfessorById = (id) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM teachers WHERE id = ?`;
+    db.get(query, [id], (error, row) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+} 
+
 
 // FOR SINGLE FETCH
 

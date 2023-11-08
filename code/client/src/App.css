@@ -40,3 +40,53 @@
 .read-the-docs {
   color: #888;
 }
+
+.login-form-container {
+  width: 95%;
+  max-width: 350px;
+  margin: auto;
+
+  padding-bottom: 80px;
+  overflow: hidden;
+  background-color: #F7F7F7;
+  padding: 20px 40px;
+  box-sizing: initial;
+
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.login-form-label {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.form-element {
+  width: 100%;
+  padding: 13px 12px;  
+  border: none;
+  font-size: 14px;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+}
+
+.form-button {
+  background: #B61601;
+  color: #ffffff;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.form-padding {
+  padding-bottom: 12px;
+}
+
+.form-button:hover {
+  background: #FF6400;
+} 
+
