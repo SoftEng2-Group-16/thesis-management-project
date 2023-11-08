@@ -67,7 +67,7 @@ exports.getUser = (email, password) =>
 } 
 exports.getProfessorById = (id) => {
   return new Promise((resolve, reject) => {
-    const query = `SELECT * FROM professor WHERE id = ?`;
+    const query = `SELECT * FROM teachers WHERE id = ?`;
     db.get(query, [id], (error, row) => {
       if (error) {
         reject(error);
