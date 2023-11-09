@@ -163,16 +163,7 @@ const ProposalForm = (props) => {
                     />
                 </Form.Group>
 
-                <div className="dropdown-container">
-                    <Select
-                        options={optionList}
-                        placeholder="Select color"
-                        value={selectedOptions}
-                        onChange={handleSelect}
-                        isSearchable={true}
-                        isMulti
-                    />
-                </div>
+
 
                 <Form.Group as={Row} className="mb-3 mt-3" controlId="supervisor">
                     <Form.Label column >Supervisor:</Form.Label>
@@ -304,7 +295,22 @@ const ProposalForm = (props) => {
                 <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
                     Submit
                 </Button>
+
+
+                <div className="dropdown-container">
+                    <Select
+                        options={optionList}
+                        placeholder="Select color"
+                        value={selectedOptions}
+                        onChange={handleSelect}
+                        isSearchable={true}
+                        isMulti
+
+                    />
+                </div>
             </Form>
+
+
         </>
     );
 }
