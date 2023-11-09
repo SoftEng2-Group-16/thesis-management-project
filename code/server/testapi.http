@@ -18,4 +18,8 @@ content-type: application/json
 
 ###
 #test API for getting cosupervisors list
-GET http://localhost:3001/api/cosupervisors/ HTTP/1.1
+GET http://localhost:3001/api/cosupervisors HTTP/1.1
+
+###
+# test api for getting degrees info
+GET http://localhost:3001/api/degrees HTTP/1.1

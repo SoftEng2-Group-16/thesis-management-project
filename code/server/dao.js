@@ -50,3 +50,23 @@ exports.getExternals = () => {
     );
   });
 }
+
+exports.getDegrees = () => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT degree_code, degree_title FROM degrees';
+    db.all(
+      sql,
+      [],
+      (err,rows) => {
+        if(err) {
+          reject(err);
+        } else if(rows.length == 0) {
+          resolve({error: 'Problems while retrieving degrees info'});
+        } else {
+          const degrees = rows.map((row) => (`${row.degree_code}  ${row.degree_title}`));
+          resolve(degrees);
+        }
+      }
+    );
+  });
+}

@@ -11,6 +11,7 @@ router.get('/sessions/current', auth.getCurrentSession);
 router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
-router.get('/cosupervisors', professor.getPossibleCosupervisors)
+router.get('/cosupervisors', professor.getPossibleCosupervisors);
+router.get('/degrees', professor.getDegreesInfo);
 
 module.exports = router;
