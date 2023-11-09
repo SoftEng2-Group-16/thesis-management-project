@@ -15,9 +15,9 @@ function NavHeader(props) {
           Shitty Thesis Management
         </Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link href='#'>Thesis</Nav.Link>
+          <Nav.Link as={Link} to="/thesis">Thesis</Nav.Link>
           {props.loggedIn && props.user.role === "teacher" && (
-            <Nav.Link href="/proposal">Create Proposal</Nav.Link>
+            <Nav.Link as={Link} to="/proposal">Create Proposal</Nav.Link>
           )}
 
         </Nav>

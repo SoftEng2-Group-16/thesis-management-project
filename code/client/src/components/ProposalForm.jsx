@@ -15,30 +15,12 @@ import { useState } from "react";
 import { Alert, Button, Col, Form, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Select from "react-select";
 
 
 const ProposalForm = (props) => {
-
-    //const [proposal, setProposal] = useState(undefined);
-
-    // const cosupervisorsList=props.cosupervisorsList
-
-    const [selectedOptions, setSelectedOptions] = useState();
-    const optionList = [
-        { value: "red", label: "Red" },
-        { value: "green", label: "Green" },
-        { value: "yellow", label: "Yellow" },
-        { value: "blue", label: "Blue" },
-        { value: "white", label: "White" }
-    ];
-
-    function handleSelect(data) {
-        setSelectedOptions(data);
-    }
-
+  
     const [title, setTitle] = useState('');
-    const [supervisor, setSupervisor] = useState('');
+    const [supervisor, setSupervisor] = useState(props.user.name);
     const [cosupervisors, setCosupervisors] = useState(['']);
     const [keywords, setKeywords] = useState('');
     const [type, setType] = useState('');
@@ -55,11 +37,6 @@ const ProposalForm = (props) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        console.log(cosupervisors);
-        console.log(supervisor);
-        console.log(groups);
-        console.log(level);
 
         // Esegui la convalida dei dati qui
         const errors = {};
@@ -105,7 +82,7 @@ const ProposalForm = (props) => {
             errors.expiration = 'Expiration date is required';
         } else {
             const dateParts = expiration.split('-');//format dd-mm-yyyy
-            const year = parseInt(dateParts[3]);
+            const year = parseInt(dateParts[2]);
             const month = parseInt(dateParts[1]);
             const day = parseInt(dateParts[0]);
             const currentDate = new Date();
@@ -142,8 +119,8 @@ const ProposalForm = (props) => {
                 level: level,
                 cds: cds,
             };
-
-            props.setProposal(proposal);
+            //maybe call api POST
+            //props.setProposal(proposal);
         }
     }
 
@@ -297,17 +274,6 @@ const ProposalForm = (props) => {
                 </Button>
 
 
-                <div className="dropdown-container">
-                    <Select
-                        options={optionList}
-                        placeholder="Select color"
-                        value={selectedOptions}
-                        onChange={handleSelect}
-                        isSearchable={true}
-                        isMulti
-
-                    />
-                </div>
             </Form>
 
 
