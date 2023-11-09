@@ -8,13 +8,14 @@ import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom
 import MessageContext from './messageCtx.jsx';
 import API from './API';
 import { LoginForm } from './components/AuthComponents';
-import Home from './components/Proposals.jsx';
+import ProposalForm from './components/ProposalForm.jsx';
 
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
+  const [proposal, setProposal] = useState(false);
 
   //the error message
   const [message, setMessage] = useState('');
@@ -87,7 +88,7 @@ function App() {
             </>
           }
         >
-          <Route path="/" element={<Home />} ></Route>
+          <Route path="/" element={<ProposalForm proposal={proposal} setProposal={setProposal}/>} ></Route>
           <Route path="*" element={<NotFoundLayout  />} />
           <Route path="/login" element={loggedIn ? <Navigate replace to="/employee" /> : <LoginForm login={handleLogin} />}/>
         </Route>

@@ -15,19 +15,24 @@ import { useState } from "react";
 import { Alert, Button, Col, Form, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+ 
 
 const ProposalForm = (props) => {
 
     //const [proposal, setProposal] = useState(undefined);
 
+    // const cosupervisorsList=props.cosupervisorsList
+  
+    
+
+
 
     const [title, setTitle] = useState('');
     const [supervisor, setSupervisor] = useState('');
-    const [cosupervisors, setCosupervisors] = useState('');
+    const [cosupervisors, setCosupervisors] = useState(['']);
     const [keywords, setKeywords] = useState('');
     const [type, setType] = useState('');
-    const [groups, setGroups] = useState('');
+    const [groups, setGroups] = useState(['']);
     const [description, setDescription] = useState('');
     const [requirements, setRequirements] = useState('');
     const [notes, setNotes] = useState('');
@@ -41,7 +46,11 @@ const ProposalForm = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        console.log(title);
+        console.log(cosupervisors);
+        console.log(supervisor);
+        console.log(groups);
+        console.log(level);
+
         // Esegui la convalida dei dati qui
         const errors = {};
 
@@ -53,7 +62,7 @@ const ProposalForm = (props) => {
             errors.supervisor = 'Supervisor is required';
         }
 
-        if (!cosupervisors || cosupervisors.trim() === '') {
+        if (cosupervisors.length===0) {
             errors.cosupervisors = 'Cosupervisors are required';
         }
 
@@ -65,9 +74,10 @@ const ProposalForm = (props) => {
             errors.type = 'Type is required';
         }
 
-        if (!groups || groups.trim() === '') {
-            errors.groups = 'Groups are required';
+        if (groups.length===0 ) {
+            errors.groups = 'one group is required';
         }
+        
 
         if (!description || description.trim() === '') {
             errors.description = 'Description is required';
@@ -132,70 +142,66 @@ const ProposalForm = (props) => {
         <>
             {errorMsg ? <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible>{errorMsg}</Alert> : false}
             <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="title">
-                    <Form.Label>Title:</Form.Label>
+                <Form.Group controlId="title" className="custom-form">
+                    <Form.Label column="lg">Title:</Form.Label>
                     <Form.Control
                         type="text"
                         name="title"
                         value={(props.proposal && props.proposal.title) ? props.proposal.title : title}
                         onChange={ev => setTitle(ev.target.value)}
+                        
                     />
                 </Form.Group>
-                <Row>
-                    <Form.Group as={Col} controlId="supervisor">
-                        <Form.Label>supervisor:</Form.Label>
+
+
+                <Form.Group as={Row} className="mb-3 mt-3" controlId="supervisor">
+                    <Form.Label column >Supervisor:</Form.Label>
+                    <Col sm={10}>
                         <Form.Control
                             type="text"
                             name="supervisor"
                             value={(props.proposal && props.proposal.supervisor) ? props.proposal.supervisor : supervisor}
                             onChange={ev => setSupervisor(ev.target.value)}
                         />
-                    </Form.Group>
+                    </Col>
+                </Form.Group>
 
-                    <Form.Group as={Col} controlId="cosupervisors">
-                        <Form.Label>Cosupervisors:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="cosupervisors"
-                            value={(props.proposal && props.proposal.cosupervisors) ? props.proposal.cosupervisors : cosupervisors}
-                            onChange={ev => setCosupervisors(ev.target.value)}
+                <CosupervisorsForm cosupervisors={cosupervisors} setCosupervisors={setCosupervisors}  proposal={props.proposal} />
 
-                        >
-                        </Form.Control>
-                    </Form.Group>
-                </Row>
+
+                <GroupsForm groups={groups} setGroups={setGroups} proposal={props.proposal}/>
 
                 <Row>
-                    <Form.Group as={Col} controlId="keywords">
-                        <Form.Label>Keywords:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="keywords"
-                            value={(props.proposal && props.proposal.keywords) ? props.proposal.keywords : keywords}
-                            onChange={ev => setKeywords(ev.target.value)}
-                        />
-                    </Form.Group>
+                    <Col>
+                        <Form.Group as={Row} className="mb-3 mt-3" controlId="keywords">
+                            <Form.Label column>Keywords:</Form.Label>
+                            <Col sm={10}>
+                                <Form.Control
+                                    type="text"
+                                    name="keywords"
+                                    value={(props.proposal && props.proposal.keywords) ? props.proposal.keywords : keywords}
+                                    onChange={ev => setKeywords(ev.target.value)}
+                                />
+                            </Col>
+                        </Form.Group>
+                    </Col>
 
-                    <Form.Group as={Col} controlId="type">
-                        <Form.Label>Type:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="type"
-                            value={(props.proposal && props.proposal.type) ? props.proposal.type : type}
-                            onChange={ev => setType(ev.target.value)}
-                        />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId="groups">
-                        <Form.Label>Groups:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="groups"
-                            value={(props.proposal && props.proposal.groups) ? props.proposal.groups : groups}
-                            onChange={ev => setGroups(ev.target.value)}
-                        />
-                    </Form.Group>
+                    <Col>
+                        <Form.Group as={Row} className="mb-3 mt-3" controlId="type">
+                            <Form.Label column>Type:</Form.Label>
+                            <Col sm={10}>
+                                <Form.Control
+                                    type="text"
+                                    name="type"
+                                    value={(props.proposal && props.proposal.type) ? props.proposal.type : type}
+                                    onChange={ev => setType(ev.target.value)}
+                                />
+                            </Col>
+                        </Form.Group>
+                    </Col>
                 </Row>
+
+
                 <Form.Group controlId="description">
                     <Form.Label>Description:</Form.Label>
                     <Form.Control
@@ -227,25 +233,31 @@ const ProposalForm = (props) => {
                 </Form.Group>
 
                 <Row>
-                    <Form.Group as={Col} controlId="level">
-                        <Form.Label>Level:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="level"
-                            value={(props.proposal && props.proposal.level) ? props.proposal.level : level}
-                            onChange={ev => setLevel(ev.target.value)}
-                        />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId="cds">
-                        <Form.Label>CDS:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="cds"
-                            value={(props.proposal && props.proposal.cds) ? props.proposal.cds : cds}
-                            onChange={ev => setCds(ev.target.value)}
-                        />
-                    </Form.Group>
+                    <Col>
+                        <Form.Group as={Row} className="mb-3 mt-3" controlId="level">
+                            <Form.Label column>Level:</Form.Label>
+                            <Col sm={10}>
+                                <Form.Select value={level} onChange={ev => setLevel(ev.target.value)}>
+                                    <option>select the level</option>
+                                    <option value="bachelor">bachelor</option>
+                                    <option value="master">master</option>
+                                </Form.Select>
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group as={Row} className="mb-3 mt-3" controlId="cds">
+                            <Form.Label column>CDS:</Form.Label>
+                            <Col sm={10}>
+                                <Form.Control
+                                    type="text"
+                                    name="cds"
+                                    value={(props.proposal && props.proposal.cds) ? props.proposal.cds : cds}
+                                    onChange={ev => setCds(ev.target.value)}
+                                />
+                            </Col>
+                        </Form.Group>
+                    </Col>
                 </Row>
 
                 <Form.Group controlId="expiration">
@@ -268,10 +280,91 @@ const ProposalForm = (props) => {
                     </Row>
                 </Form.Group>
 
+
                 <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
                     Submit
                 </Button>
             </Form>
+        </>
+    );
+}
+
+
+function GroupsForm({groups,setGroups,proposal}) {
+    
+    if(proposal && proposal.groups){
+        const list=proposal.groups.split(",");
+        setGroups(list);
+    }
+
+    const addGroup = () => {
+        setGroups([...groups, '']); // Add a new empty field for groups
+    };
+
+    const handleGroupChange = (index, value) => {
+        const updatedGroups = [...groups];
+        updatedGroups[index] = value;
+        setGroups(updatedGroups);
+    };
+
+    return (
+        <>
+            {groups.map((group, index) => (
+                <Form.Group as={Row} className="mb-3 mt-3" controlId={`groups-${index}`} key={index}>
+                    <Form.Label column>Group {index + 1}:</Form.Label>
+                    <Col sm={10}>
+                        <Form.Control
+                            type="text"
+                            value={group}
+                            onChange={(e) => handleGroupChange(index, e.target.value)}
+                        />
+                    </Col>
+                </Form.Group>
+            ))}
+
+            <Button variant="secondary" onClick={addGroup}>
+                Add Group
+            </Button>
+        </>
+    );
+}
+
+
+function CosupervisorsForm({cosupervisors,setCosupervisors,proposal}) {
+
+    if(proposal && proposal.cosupervisors){
+        const list=proposal.cosupervisors.split(",");
+        setCosupervisors(list);
+    }
+
+    const addCosupervisor = () => {
+        setCosupervisors([...cosupervisors, '']); // Aggiungi un nuovo campo vuoto per i cosupervisori
+    };
+
+    const handleCosupervisorChange = (index, value) => {
+        const updatedCosupervisors = [...cosupervisors];
+        updatedCosupervisors[index] = value;
+        setCosupervisors(updatedCosupervisors);
+    };
+
+    return (
+        <>
+            {cosupervisors.map((cosupervisor, index) => (
+                <Form.Group as={Row} className="mb-3 mt-3" controlId={`cosupervisors-${index}`} key={index}>
+                    <Form.Label column>Cosupervisor {index + 1}:</Form.Label>
+                    <Col sm={10}>
+                        <Form.Control
+                            type="text"
+                            value={cosupervisor}
+                            onChange={(e) => handleCosupervisorChange(index, e.target.value)}
+                        />
+                    </Col>
+                </Form.Group>
+            ))}
+
+            <Button variant="secondary" onClick={addCosupervisor}>
+                Aggiungi Cosupervisor
+            </Button>
         </>
     );
 }
