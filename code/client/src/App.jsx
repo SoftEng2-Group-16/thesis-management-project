@@ -6,9 +6,9 @@ import { NotFoundLayout, LoadingLayout } from './components/PageLayout';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import MessageContext from './messageCtx.jsx';
-import API from './API';
+import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
-import ProposalForm from './components/ProposalForm.jsx';
+import ThesisProposals from './components/ThesisProposals.jsx';
 
 function App() {
 
@@ -27,15 +27,17 @@ function App() {
     setMessage(msg);
   }
 
+  //TODO the login method should not returns the row in the auth table but should query again against student or professor table to get all the info
+  //! generalAPI exports a 'API' and not 'generalAPI' for the time being
   useEffect(() => {
     const checkAuth = async () => {
       if (loggedIn) {
         try {
           const user = await API.getUserInfo(); // we have the user info here 
           if (user) {
-            setUser({
+            setUser({ //TODO this needs to be changed to set the new info
               id: user.id,
-              username: user.username,
+              role: user.role, //for now role?
             })
 
             setLoggedIn(true);
@@ -51,7 +53,7 @@ function App() {
     try {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
-      setMessage({ msg: `Welcome, ${user.username}!`, type: 'success' });
+      setMessage({ msg: `Welcome, ${user.role}!`, type: 'success' });
     } catch (err) {
       setMessage({ msg: err, type: 'danger' });
     }
@@ -61,6 +63,7 @@ function App() {
     await API.logOut();
     setLoggedIn(false);
     // clean up everything
+
     setMessage('');
   };
 
@@ -87,10 +90,11 @@ function App() {
               
             </>
           }
-        >
-          <Route path="/" element={<ProposalForm proposal={proposal} setProposal={setProposal}/>} ></Route>
+        > 
+          <Route path="/" element={<Navigate to="/thesis" />} ></Route>
+          <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
           <Route path="*" element={<NotFoundLayout  />} />
-          <Route path="/login" element={loggedIn ? <Navigate replace to="/employee" /> : <LoginForm login={handleLogin} />}/>
+          <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />}/>
         </Route>
       </Routes>
       </MessageContext.Provider>
