@@ -91,7 +91,6 @@ exports.getGroupForTeacherById = (id) => {
 }
 
 exports.saveNewProposal = (proposal) => {
-  console.log(proposal);
   return new Promise((resolve, reject) => {
     const sql = "INSERT INTO thesis_proposals (title, supervisor, cosupervisors, keywords, " +
               "type, groups, description, requirements, notes, expiration, level, cds) " +

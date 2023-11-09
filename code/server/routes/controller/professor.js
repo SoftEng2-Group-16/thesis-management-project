@@ -50,8 +50,7 @@ const insertNewProposal = async (req, res) => {
             }
         } 
     }
-    console.log(cosupervisors)
-
+    
     let proposal = new models.ThesisProposal(
         -1, //can be whatever, DB handles autoincrement id
         req.body.title,
