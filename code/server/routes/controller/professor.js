@@ -53,13 +53,13 @@ const insertNewProposal = async (req, res) => {
     console.log(cosupervisors)
 
     let proposal = new models.ThesisProposal(
-        -1,
+        -1, //can be whatever, DB handles autoincrement id
         req.body.title,
         req.body.supervisor,
-        cosupervisors.join(' - '),
+        cosupervisors.join('-'),
         req.body.keywords,
         req.body.type,
-        groups.join(' - '),
+        groups.join('-'),
         req.body.description,
         req.body.requirements,
         req.body.notes,
