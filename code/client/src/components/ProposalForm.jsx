@@ -78,27 +78,27 @@ const ProposalForm = (props) => {
 
     }, []);
 
-/*
-    useEffect(() => {
-
-        professorAPI.getPossibleCosupervisors()
-            .then((cosupervisors) => {
-                setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
-                setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
-
-            })
-            .catch((err) => { handleErrors(err); });
-
-        professorAPI.getDegreesInfo()
-            .then((degreesInfo) => {
-                setCdsList(degreesInfo.map(str => ({ value: str.split(" ")[0], label: str })));
-            })
-            .catch((err) => { handleErrors(err); });
-
-
-    }, []);
-
-    */
+    /*
+        useEffect(() => {
+    
+            professorAPI.getPossibleCosupervisors()
+                .then((cosupervisors) => {
+                    setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
+                    setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
+    
+                })
+                .catch((err) => { handleErrors(err); });
+    
+            professorAPI.getDegreesInfo()
+                .then((degreesInfo) => {
+                    setCdsList(degreesInfo.map(str => ({ value: str.split(" ")[0], label: str })));
+                })
+                .catch((err) => { handleErrors(err); });
+    
+    
+        }, []);
+    
+        */
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -182,8 +182,14 @@ const ProposalForm = (props) => {
                 cds: cds.value,
             };
             //maybe call api POST
-            //props.setProposal(proposal);
+            insertProposal(proposal);
         }
+    }
+
+    const insertProposal = (proposal) => {
+        professorAPI.insertProposal(proposal)
+            .then(() => { })
+            .catch(err => { handleErrors(err); })
     }
 
     const handleLevelChange = (ev) => {
@@ -409,21 +415,21 @@ const ProposalForm = (props) => {
 
 /*
 function CdsForm({ cdsList, setCds, proposal }) {
-
+ 
     if (proposal && proposal.cds) {
         setCds(proposal.cds);
     }
-
+ 
     const addGroup = () => {
         setGroups([...groups, '']); // Add a new empty field for groups
     };
-
+ 
     const handleGroupChange = (index, value) => {
         const updatedGroups = [...groups];
         updatedGroups[index] = value;
         setGroups(updatedGroups);
     };
-
+ 
     return (
         <>
             {groups.map((group, index) => (
@@ -438,7 +444,7 @@ function CdsForm({ cdsList, setCds, proposal }) {
                     </Col>
                 </Form.Group>
             ))}
-
+ 
             <Button variant="secondary" onClick={addGroup}>
                 Add Group
             </Button>
