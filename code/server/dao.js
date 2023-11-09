@@ -70,3 +70,42 @@ exports.getDegrees = () => {
     );
   });
 }
+
+exports.getGroupForTeacherById = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT group_code FROM teachers WHERE id=?'
+    db.get(
+      sql,
+      [id],
+      (err, row) => {
+        if(err){
+          reject(err);
+        } else if (row == null) {
+          resolve({error: `Prolem while retrieving group info for teacher ${id}`});
+        } else {
+          resolve(row.group_code);
+        }
+      }
+    )
+  });
+}
+
+exports.saveNewProposal = (proposal) => {
+  console.log(proposal);
+  return new Promise((resolve, reject) => {
+    const sql = "INSERT INTO thesis_proposals (title, supervisor, cosupervisors, keywords, " +
+              "type, groups, description, requirements, notes, expiration, level, cds) " +
+              "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+  db.run(
+    sql, 
+    [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+    function(err) {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(this.lastID);
+      }
+    }
+  );
+  });
+}

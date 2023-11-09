@@ -23,3 +23,23 @@ GET http://localhost:3001/api/cosupervisors HTTP/1.1
 ###
 # test api for getting degrees info
 GET http://localhost:3001/api/degrees HTTP/1.1
+
+###
+#test api for inserting a new proposal
+POST http://localhost:3001/api/newproposal HTTP/1.1
+content-type: application/json
+
+{
+    "title": "test title",
+    "supervisor": "268556",
+    "cosupervisors": ["Maria Rossi, 268553, DAD", "Marco Rossi, REPLY", "Stefano Mariani, 268565, DAT"],
+    "keywords": "test1, test2",
+    "type": "Abroad Thesis",
+    "groups": [],
+    "description": "test description",
+    "requirements": "test requirements",
+    "notes": "test notes",
+    "expiration": "22/10/2028",
+    "level": "Bachelor",
+    "cds": "LM-1"
+}

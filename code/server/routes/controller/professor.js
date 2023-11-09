@@ -1,4 +1,5 @@
 const dao = require('../../dao');
+const models = require('../../model');
 
 const getPossibleCosupervisors = async (req, res) => {
     try {
@@ -28,27 +29,53 @@ const getDegreesInfo = async (req,res) => {
         } else {
             return res.status(200).json(degrees);
         }
-    } catch(err) {
-        return res.status(500).json(err.message);
+    } catch(e) {
+        return res.status(500).json(e.message);
     }
 }
 
 const insertNewProposal = async (req, res) => {
-    const title =  req.body.title;
-    const supervisor = req.body.supervisor;
     const cosupervisors = req.body.cosupervisors;
-    const keywords = req.body.keywords;
-    const type = req.body.type;
-    const description = req.body.description;
-    const requirements = req.body.requirements;
-    const notes = req.body.notes;
-    const expiration = req.body.expiration;
-    const level = req.body.level;
-    const cds = req.body.cds;
+    let groups = [];
 
+    for (c of cosupervisors) {
+        const splitted = c.split(" ");
+        if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
+            let [name, surname, id, departmentCode] = [...splitted];
+            surname = surname.replace(',', '');
+            id = id.replace(',', '');
+            const group = await dao.getGroupForTeacherById(id);
+            if(!groups.includes(group)){
+                groups.push(group);
+            }
+        } 
+    }
+    console.log(cosupervisors)
 
+    let proposal = new models.ThesisProposal(
+        -1,
+        req.body.title,
+        req.body.supervisor,
+        cosupervisors.join(' - '),
+        req.body.keywords,
+        req.body.type,
+        groups.join(' - '),
+        req.body.description,
+        req.body.requirements,
+        req.body.notes,
+        req.body.expiration,
+        req.body.level,
+        req.body.cds
+    );
+
+    try {
+        const lastId = await dao.saveNewProposal(proposal);
+        return res.status(200).json(lastId);
+    } catch(e) {
+        return res.status(503).json(e.message);
+
+    }
 }
-
 
 
 
