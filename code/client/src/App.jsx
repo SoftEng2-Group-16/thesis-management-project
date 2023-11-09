@@ -16,7 +16,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
-  const [proposal, setProposal] = useState(false);
+  
 
   //the error message
   const [message, setMessage] = useState('');
@@ -39,6 +39,8 @@ function App() {
             setUser({ //TODO this needs to be changed to set the new info
               id: user.id,
               role: user.role, //for now role?
+              name:user.name,
+              surname:user.surname,
             })
 
             setLoggedIn(true);

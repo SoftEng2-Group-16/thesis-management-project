@@ -10,34 +10,100 @@
  */
 
 
+import MessageContext from "../messageCtx.jsx"
 
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert, Button, Col, Form, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import Select from "react-select";
+import professorAPI from "../apis/professorAPI";
 
 const ProposalForm = (props) => {
-  
+
+    const { handleErrors } = useContext(MessageContext);
+
+
     const [title, setTitle] = useState('');
-    const [supervisor, setSupervisor] = useState(props.user.name);
-    const [cosupervisors, setCosupervisors] = useState(['']);
+    const [supervisor, setSupervisor] = useState(props.user.name + " " + props.user.surname);
+    const [cosupervisorsInt, setCosupervisorsInt] = useState([]); //to save the choice
+    const [cosupervisorsExt, setCosupervisorsExt] = useState([]); //to save the choice
     const [keywords, setKeywords] = useState('');
     const [type, setType] = useState('');
-    const [groups, setGroups] = useState(['']);
+    //const [groups, setGroups] = useState(['']);
     const [description, setDescription] = useState('');
     const [requirements, setRequirements] = useState('');
     const [notes, setNotes] = useState('');
     const [expiration, setExpiration] = useState('');
     const [level, setLevel] = useState('');
-    const [cds, setCds] = useState('');
+    const [cds, setCds] = useState(undefined);
 
     const [errorMsg, setErrorMsg] = useState('');
 
 
+
+
+    const [cosupervisorsInternal, setCosupervisorsInternal] = useState([]);  //[{value:"", label:""}]
+    const [cosupervisorsExternal, setCosupervisorsExternal] = useState([]);
+
+
+
+    const [cdsList, setCdsList] = useState()
+    const [filteredCDS, setFilteredCDS] = useState([]);
+    const [cdsIsDisabled, setCdsDisabled] = useState(true);
+
+    const cosups = {
+        internals: ["Nome Cognome, ID, Cod", "Nome2 Cognome2, ID2, Cod2", "Nome3 Cognome3, ID3, Cod3"],
+        externals: ["Nome4 Cognome4, ID4, Cod4", "Nome5 Cognome5, ID5, Cod5"]
+    };
+
+
+
+    const internalsObjects = cosups.internals.map(str => ({ value: str, label: str }));
+    const externalsObjects = cosups.externals.map(str => ({ value: str, label: str }));
+
+    const listcds = ["LM adha", "LT ucx"];
+    const cdsss = listcds.map(str => ({
+        value: str.split(" ")[0],
+        label: str
+    }));
+
+
+    useEffect(() => {
+        setCosupervisorsExternal(externalsObjects);
+        setCosupervisorsInternal(internalsObjects);
+
+        setCdsList(cdsss);
+
+
+    }, []);
+
+/*
+    useEffect(() => {
+
+        professorAPI.getPossibleCosupervisors()
+            .then((cosupervisors) => {
+                setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
+                setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
+
+            })
+            .catch((err) => { handleErrors(err); });
+
+        professorAPI.getDegreesInfo()
+            .then((degreesInfo) => {
+                setCdsList(degreesInfo.map(str => ({ value: str.split(" ")[0], label: str })));
+            })
+            .catch((err) => { handleErrors(err); });
+
+
+    }, []);
+
+    */
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        const cosupervisors = cosupervisorsExt.concat(cosupervisorsInt)
+        console.log(cds);
         // Esegui la convalida dei dati qui
         const errors = {};
 
@@ -59,10 +125,6 @@ const ProposalForm = (props) => {
 
         if (!type || type.trim() === '') {
             errors.type = 'Type is required';
-        }
-
-        if (groups.length === 0) {
-            errors.groups = 'one group is required';
         }
 
 
@@ -96,7 +158,7 @@ const ProposalForm = (props) => {
             errors.level = 'Level is required';
         }
 
-        if (!cds || cds.trim() === '') {
+        if (!cds || cds === undefined) {
             errors.cds = 'CDS is required';
         }
 
@@ -108,20 +170,39 @@ const ProposalForm = (props) => {
             const proposal = {
                 title: title,
                 supervisor: supervisor,
-                cosupervisors: cosupervisors,
+                cosupervisors: cosupervisors.map(obj => obj.value),
                 keywords: keywords,
                 type: type,
-                groups: groups,
+                groups: [""],
                 description: description,
                 requirements: requirements,
                 notes: notes,
                 expiration: expiration,
                 level: level,
-                cds: cds,
+                cds: cds.value,
             };
             //maybe call api POST
             //props.setProposal(proposal);
         }
+    }
+
+    const handleLevelChange = (ev) => {
+        setLevel(ev.target.value);
+        setCds("");
+        if (ev.target.value === 'master') {
+            setFilteredCDS(cdsList.filter(cds => cds.value.startsWith("LM")))
+            setCdsDisabled(false);
+        }
+        else if (ev.target.value === 'bachelor') {
+
+            setFilteredCDS(cdsList.filter(cds => cds.value.startsWith("LT")));
+            setCdsDisabled(false);
+
+        }
+        else {
+            setCdsDisabled(true);
+        }
+
     }
 
 
@@ -140,8 +221,6 @@ const ProposalForm = (props) => {
                     />
                 </Form.Group>
 
-
-
                 <Form.Group as={Row} className="mb-3 mt-3" controlId="supervisor">
                     <Form.Label column >Supervisor:</Form.Label>
                     <Col sm={10}>
@@ -154,10 +233,44 @@ const ProposalForm = (props) => {
                     </Col>
                 </Form.Group>
 
-                <CosupervisorsForm cosupervisors={cosupervisors} setCosupervisors={setCosupervisors} proposal={props.proposal} />
+                <Row>
+                    <Col>
+                        <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
+                            <Form.Label column>Select internal Cosupervisors</Form.Label>
+                            <Col sm={7}>
+                                <Select
+                                    defaultValue={[]}
+                                    isMulti
+                                    name="colors"
+                                    options={cosupervisorsInternal}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={selectedOptions => setCosupervisorsInt(selectedOptions)}
 
+                                />
+                            </Col>
 
-                <GroupsForm groups={groups} setGroups={setGroups} proposal={props.proposal} />
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
+                            <Form.Label column>Select external Cosupervisors</Form.Label>
+                            <Col sm={7}>
+                                <Select
+                                    defaultValue={[]}
+                                    isMulti
+                                    name="colors"
+                                    options={cosupervisorsExternal}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={selectedOptions => setCosupervisorsExt(selectedOptions)}
+
+                                />
+                            </Col>
+
+                        </Form.Group>
+                    </Col>
+                </Row>
 
                 <Row>
                     <Col>
@@ -225,7 +338,7 @@ const ProposalForm = (props) => {
                         <Form.Group as={Row} className="mb-3 mt-3" controlId="level">
                             <Form.Label column>Level:</Form.Label>
                             <Col sm={10}>
-                                <Form.Select value={level} onChange={ev => setLevel(ev.target.value)}>
+                                <Form.Select value={level} onChange={handleLevelChange}>
                                     <option>select the level</option>
                                     <option value="bachelor">bachelor</option>
                                     <option value="master">master</option>
@@ -235,13 +348,16 @@ const ProposalForm = (props) => {
                     </Col>
                     <Col>
                         <Form.Group as={Row} className="mb-3 mt-3" controlId="cds">
-                            <Form.Label column>CDS:</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    type="text"
+                            <Form.Label column>Select cds:</Form.Label>
+                            <Col sm={8}>
+                                <Select
+                                    value={cds}
                                     name="cds"
-                                    value={(props.proposal && props.proposal.cds) ? props.proposal.cds : cds}
-                                    onChange={ev => setCds(ev.target.value)}
+                                    options={filteredCDS}
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    onChange={selectedOption => { setCds(selectedOption); }}
+                                    isDisabled={cdsIsDisabled}
                                 />
                             </Col>
                         </Form.Group>
@@ -269,9 +385,18 @@ const ProposalForm = (props) => {
                 </Form.Group>
 
 
+
+
                 <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
                     Submit
                 </Button>
+
+
+
+
+
+
+
 
 
             </Form>
@@ -282,11 +407,11 @@ const ProposalForm = (props) => {
 }
 
 
-function GroupsForm({ groups, setGroups, proposal }) {
+/*
+function CdsForm({ cdsList, setCds, proposal }) {
 
-    if (proposal && proposal.groups) {
-        const list = proposal.groups.split(",");
-        setGroups(list);
+    if (proposal && proposal.cds) {
+        setCds(proposal.cds);
     }
 
     const addGroup = () => {
@@ -320,8 +445,7 @@ function GroupsForm({ groups, setGroups, proposal }) {
         </>
     );
 }
-
-
+*/
 function CosupervisorsForm({ cosupervisors, setCosupervisors, proposal }) {
 
     if (proposal && proposal.cosupervisors) {
