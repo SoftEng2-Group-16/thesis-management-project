@@ -15,17 +15,27 @@ import { useState } from "react";
 import { Alert, Button, Col, Form, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
- 
+import Select from "react-select";
+
 
 const ProposalForm = (props) => {
 
     //const [proposal, setProposal] = useState(undefined);
 
     // const cosupervisorsList=props.cosupervisorsList
-  
-    
 
+    const [selectedOptions, setSelectedOptions] = useState();
+    const optionList = [
+        { value: "red", label: "Red" },
+        { value: "green", label: "Green" },
+        { value: "yellow", label: "Yellow" },
+        { value: "blue", label: "Blue" },
+        { value: "white", label: "White" }
+    ];
 
+    function handleSelect(data) {
+        setSelectedOptions(data);
+    }
 
     const [title, setTitle] = useState('');
     const [supervisor, setSupervisor] = useState('');
@@ -62,7 +72,7 @@ const ProposalForm = (props) => {
             errors.supervisor = 'Supervisor is required';
         }
 
-        if (cosupervisors.length===0) {
+        if (cosupervisors.length === 0) {
             errors.cosupervisors = 'Cosupervisors are required';
         }
 
@@ -74,10 +84,10 @@ const ProposalForm = (props) => {
             errors.type = 'Type is required';
         }
 
-        if (groups.length===0 ) {
+        if (groups.length === 0) {
             errors.groups = 'one group is required';
         }
-        
+
 
         if (!description || description.trim() === '') {
             errors.description = 'Description is required';
@@ -142,17 +152,27 @@ const ProposalForm = (props) => {
         <>
             {errorMsg ? <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible>{errorMsg}</Alert> : false}
             <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="title" className="custom-form">
+                <Form.Group controlId="title" >
                     <Form.Label column="lg">Title:</Form.Label>
                     <Form.Control
                         type="text"
                         name="title"
                         value={(props.proposal && props.proposal.title) ? props.proposal.title : title}
                         onChange={ev => setTitle(ev.target.value)}
-                        
+
                     />
                 </Form.Group>
 
+                <div className="dropdown-container">
+                    <Select
+                        options={optionList}
+                        placeholder="Select color"
+                        value={selectedOptions}
+                        onChange={handleSelect}
+                        isSearchable={true}
+                        isMulti
+                    />
+                </div>
 
                 <Form.Group as={Row} className="mb-3 mt-3" controlId="supervisor">
                     <Form.Label column >Supervisor:</Form.Label>
@@ -166,10 +186,10 @@ const ProposalForm = (props) => {
                     </Col>
                 </Form.Group>
 
-                <CosupervisorsForm cosupervisors={cosupervisors} setCosupervisors={setCosupervisors}  proposal={props.proposal} />
+                <CosupervisorsForm cosupervisors={cosupervisors} setCosupervisors={setCosupervisors} proposal={props.proposal} />
 
 
-                <GroupsForm groups={groups} setGroups={setGroups} proposal={props.proposal}/>
+                <GroupsForm groups={groups} setGroups={setGroups} proposal={props.proposal} />
 
                 <Row>
                     <Col>
@@ -290,10 +310,10 @@ const ProposalForm = (props) => {
 }
 
 
-function GroupsForm({groups,setGroups,proposal}) {
-    
-    if(proposal && proposal.groups){
-        const list=proposal.groups.split(",");
+function GroupsForm({ groups, setGroups, proposal }) {
+
+    if (proposal && proposal.groups) {
+        const list = proposal.groups.split(",");
         setGroups(list);
     }
 
@@ -330,10 +350,10 @@ function GroupsForm({groups,setGroups,proposal}) {
 }
 
 
-function CosupervisorsForm({cosupervisors,setCosupervisors,proposal}) {
+function CosupervisorsForm({ cosupervisors, setCosupervisors, proposal }) {
 
-    if(proposal && proposal.cosupervisors){
-        const list=proposal.cosupervisors.split(",");
+    if (proposal && proposal.cosupervisors) {
+        const list = proposal.cosupervisors.split(",");
         setCosupervisors(list);
     }
 
