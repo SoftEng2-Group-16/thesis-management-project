@@ -1,85 +1,52 @@
-const crypto = require('crypto');
 const db = require('./db');
-const { check } = require('express-validator');
 
 
-//const { Service, Counter, Ticket } = require("./model");
-
-//all the code here needs to be modified according to the new db
-
-/**
- * Query the database and check whether the username exists and the password
- * hashes to the correct value.
- * If so, return an object with full user information.
- * @param {string} email 
- * @param {string} password 
- * @returns {Promise} a Promise that resolves to the full information about the current user, if the password matches
- * @throws the Promise rejects if any errors are encountered
- */
-
-// USER SECTION
-
-//! the dao methods for users needs to be tweaked according to the new specs
-
-exports.getUser = (email, password) => 
-{
-  console.log(email,password) 
+// PROFESSOR SECTION
+exports.getProfessors = () => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM auth WHERE email = ?';
-
-    db.get(sql, [email], (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (!row) {
-          reject('Invalid email or password');
+    const sql = 'SELECT id, name, surname, department_code FROM teachers'
+    db.all(
+      sql,
+      [],
+      (err,rows) => {
+        if(err) {
+          reject(err);
+        } else if(rows.length == 0) {
+          resolve({error: 'Problems while retrieving possible internal cosupervisors'});
         } else {
-          
-          const pass = password;
-          const salt = row.salt;
-          const hashedPassword = crypto.scryptSync(pass, salt, 64).toString('hex');
-          console.log(row.password);
-          if (hashedPassword === row.password) {
-            console.log(row);
-            resolve(row);
-          } else {
-            reject('Invalid email or password');
-          }
+          const internals = rows.map(row => ({
+            id: row.id,
+            name: row.name,
+            surname: row.surname,
+            department_code: row.department_code
+          }));
+          resolve(internals);
         }
       }
-    });
+    );
   });
 }
 
-// FOR SINGLE FETCH
-
-/* exports.getUserByUsername = (username) => {
+exports.getExternals = () => {
   return new Promise((resolve, reject) => {
-    const query = `SELECT * FROM users WHERE username = ?`;
-    db.get(query, [username], (error, row) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(row);
+    const sql = 'SELECT name, surname, company FROM external_cosupervisors'
+    db.all(
+      sql,
+      [],
+      (err,rows) => {
+        if(err) {
+          reject(err);
+        } else if(rows.length == 0) {
+          resolve({error: 'Problems while retrieving possible external cosupervisors'});
+        } else {
+          const externals = rows.map(row => ({
+            name: row.name,
+            surname: row.surname,
+            company: row.company
+          }));
+          resolve(externals);
+        }
       }
-    });
-  });
-} */
-
-// FOR SINGLE FETCH
-
-/* exports.getUsers = () => {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT username FROM users';
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
+    );
   });
 }
- */
-
-
