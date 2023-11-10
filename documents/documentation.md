@@ -96,6 +96,15 @@ THESIS_PROPOSALS
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
+- GET `/api/proposals/:degreeCode`
+  - Description: retrieves all the thesis proposals a student can view (based on student's degree code)
+  - Request param: `degreeCode`, the degree of the study course of the student
+  - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
+  - Response body: an array of objects, each containing a thesis proposal
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` } 
+
+
 ## Utility functions
 ### `getJson(httpResponsePromise)`
 - **Description**: A utility function for parsing HTTP responses.
