@@ -96,6 +96,13 @@ THESIS_PROPOSALS
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
+- POST `/api/newapplication`
+  - Description: inserts a new application for a thesis proposal (student)
+  - Request body: object containing the id of the student applying and the id of the thesis proposal
+    - object{`studentId`, `proposalId`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
+  - Response body: number, indicating the number of applications inserted (should always be 1)
+
 ## Utility functions
 ### `getJson(httpResponsePromise)`
 - **Description**: A utility function for parsing HTTP responses.
