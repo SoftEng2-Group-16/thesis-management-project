@@ -69,9 +69,9 @@ const insertNewProposal = async (req, res) => {
 
     try {
         const lastId = await dao.saveNewProposal(proposal);
-        return res.status(200).json(lastId);
+        return res.status(201).json(lastId);
     } catch(e) {
-        return res.status(503).json(e.message);
+        return res.status(500).json(e.message);
 
     }
 }
