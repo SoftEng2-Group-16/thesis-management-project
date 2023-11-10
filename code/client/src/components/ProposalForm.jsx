@@ -36,7 +36,7 @@ const ProposalForm = (props) => {
     const [notes, setNotes] = useState('');
     const [expiration, setExpiration] = useState('');
     const [level, setLevel] = useState('');
-    const [cds, setCds] = useState(undefined);
+    const [cds, setCds] = useState([]);
 
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -62,7 +62,7 @@ const ProposalForm = (props) => {
     const internalsObjects = cosups.internals.map(str => ({ value: str, label: str }));
     const externalsObjects = cosups.externals.map(str => ({ value: str, label: str }));
 
-    const listcds = ["LM adha", "LT ucx"];
+    const listcds = ["LM adha", "LT ucx", "LT asasd"];
     const cdsss = listcds.map(str => ({
         value: str.split(" ")[0],
         label: str
@@ -102,8 +102,7 @@ const ProposalForm = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const cosupervisors = cosupervisorsExt.concat(cosupervisorsInt)
-        console.log(cds);
+        const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt
         // Esegui la convalida dei dati qui
         const errors = {};
 
@@ -121,8 +120,12 @@ const ProposalForm = (props) => {
 
         if (!keywords || keywords.trim() === '') {
             errors.keywords = 'Keywords are required';
+        } else {
+            setKeywords(
+                [...new Set(keywords.split(',').map(word => word.trim()))].join(', ') //removes duplicates
+            );
         }
-
+        
         if (!type || type.trim() === '') {
             errors.type = 'Type is required';
         }
@@ -265,7 +268,7 @@ const ProposalForm = (props) => {
                                 <Select
                                     defaultValue={[]}
                                     isMulti
-                                    name="colors"
+                                    name="cosupervisors"
                                     options={cosupervisorsExternal}
                                     className="basic-multi-select"
                                     classNamePrefix="select"
@@ -357,12 +360,13 @@ const ProposalForm = (props) => {
                             <Form.Label column>Select cds:</Form.Label>
                             <Col sm={8}>
                                 <Select
-                                    value={cds}
+                                    defaultValue={[]}
+                                    isMulti
                                     name="cds"
                                     options={filteredCDS}
-                                    className="basic-single"
+                                    className="basic-multi-select"
                                     classNamePrefix="select"
-                                    onChange={selectedOption => { setCds(selectedOption); }}
+                                    onChange={selectedOptions => setCds(selectedOptions)}
                                     isDisabled={cdsIsDisabled}
                                 />
                             </Col>
@@ -413,82 +417,6 @@ const ProposalForm = (props) => {
 }
 
 
-/*
-function CdsForm({ cdsList, setCds, proposal }) {
- 
-    if (proposal && proposal.cds) {
-        setCds(proposal.cds);
-    }
- 
-    const addGroup = () => {
-        setGroups([...groups, '']); // Add a new empty field for groups
-    };
- 
-    const handleGroupChange = (index, value) => {
-        const updatedGroups = [...groups];
-        updatedGroups[index] = value;
-        setGroups(updatedGroups);
-    };
- 
-    return (
-        <>
-            {groups.map((group, index) => (
-                <Form.Group as={Row} className="mb-3 mt-3" controlId={`groups-${index}`} key={index}>
-                    <Form.Label column>Group {index + 1}:</Form.Label>
-                    <Col sm={10}>
-                        <Form.Control
-                            type="text"
-                            value={group}
-                            onChange={(e) => handleGroupChange(index, e.target.value)}
-                        />
-                    </Col>
-                </Form.Group>
-            ))}
- 
-            <Button variant="secondary" onClick={addGroup}>
-                Add Group
-            </Button>
-        </>
-    );
-}
-*/
-function CosupervisorsForm({ cosupervisors, setCosupervisors, proposal }) {
 
-    if (proposal && proposal.cosupervisors) {
-        const list = proposal.cosupervisors.split(",");
-        setCosupervisors(list);
-    }
-
-    const addCosupervisor = () => {
-        setCosupervisors([...cosupervisors, '']); // Aggiungi un nuovo campo vuoto per i cosupervisori
-    };
-
-    const handleCosupervisorChange = (index, value) => {
-        const updatedCosupervisors = [...cosupervisors];
-        updatedCosupervisors[index] = value;
-        setCosupervisors(updatedCosupervisors);
-    };
-
-    return (
-        <>
-            {cosupervisors.map((cosupervisor, index) => (
-                <Form.Group as={Row} className="mb-3 mt-3" controlId={`cosupervisors-${index}`} key={index}>
-                    <Form.Label column>Cosupervisor {index + 1}:</Form.Label>
-                    <Col sm={10}>
-                        <Form.Control
-                            type="text"
-                            value={cosupervisor}
-                            onChange={(e) => handleCosupervisorChange(index, e.target.value)}
-                        />
-                    </Col>
-                </Form.Group>
-            ))}
-
-            <Button variant="secondary" onClick={addCosupervisor}>
-                Aggiungi Cosupervisor
-            </Button>
-        </>
-    );
-}
 
 export default ProposalForm;

@@ -25,7 +25,7 @@ const getDegreesInfo = async () => {
 };
 
 const insertProposal = async (proposal) => {
-    const response = await fetch(SERVER_URL + '/api/proposal', {
+    const response = await fetch(SERVER_URL + '/api/newProposal', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
