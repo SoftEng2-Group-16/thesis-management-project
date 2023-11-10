@@ -64,7 +64,7 @@ const insertNewProposal = async (req, res) => {
         req.body.notes,
         req.body.expiration,
         req.body.level,
-        req.body.cds
+        req.body.cds.join(',')
     );
 
     try {
