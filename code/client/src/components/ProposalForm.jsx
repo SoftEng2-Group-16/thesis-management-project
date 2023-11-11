@@ -11,18 +11,20 @@
 
 
 import MessageContext from "../messageCtx.jsx"
-
+import { useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from "react";
-import { Alert, Button, Col, Form, Row } from "react-bootstrap";
-import DatePicker from "react-datepicker";
+
 import "react-datepicker/dist/react-datepicker.css";
+import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
+import DatePicker from "react-datepicker";
 import Select from "react-select";
+
 import professorAPI from "../apis/professorAPI";
 
 const ProposalForm = (props) => {
 
     const { handleErrors } = useContext(MessageContext);
-
+    const navigate=useNavigate();
 
     const [title, setTitle] = useState('');
     const [supervisor, setSupervisor] = useState(props.user.name + " " + props.user.surname);
@@ -52,58 +54,32 @@ const ProposalForm = (props) => {
     const [filteredCDS, setFilteredCDS] = useState([]);
     const [cdsIsDisabled, setCdsDisabled] = useState(true);
 
-    const cosups = {
-        internals: ["Nome Cognome, ID, Cod", "Nome2 Cognome2, ID2, Cod2", "Nome3 Cognome3, ID3, Cod3"],
-        externals: ["Nome4 Cognome4, ID4, Cod4", "Nome5 Cognome5, ID5, Cod5"]
-    };
 
-
-
-    const internalsObjects = cosups.internals.map(str => ({ value: str, label: str }));
-    const externalsObjects = cosups.externals.map(str => ({ value: str, label: str }));
-
-    const listcds = ["LM adha", "LT ucx", "LT asasd"];
-    const cdsss = listcds.map(str => ({
-        value: str.split(" ")[0],
-        label: str
-    }));
-
+ 
 
     useEffect(() => {
-        setCosupervisorsExternal(externalsObjects);
-        setCosupervisorsInternal(internalsObjects);
 
-        setCdsList(cdsss);
+        professorAPI.getPossibleCosupervisors()
+            .then((cosupervisors) => {
+                setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
+                setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
+            })
+            .catch((err) => { handleErrors(err); });
 
+        professorAPI.getDegreesInfo()
+            .then((degreesInfo) => {
+                setCdsList(degreesInfo.map(str => ({ value: str, label: str })));
+            })
+            .catch((err) => { handleErrors(err); });
 
     }, []);
 
-    /*
-        useEffect(() => {
-    
-            professorAPI.getPossibleCosupervisors()
-                .then((cosupervisors) => {
-                    setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
-                    setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
-    
-                })
-                .catch((err) => { handleErrors(err); });
-    
-            professorAPI.getDegreesInfo()
-                .then((degreesInfo) => {
-                    setCdsList(degreesInfo.map(str => ({ value: str.split(" ")[0], label: str })));
-                })
-                .catch((err) => { handleErrors(err); });
-    
-    
-        }, []);
-    
-        */
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt
-        // Esegui la convalida dei dati qui
+        const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt;
+        
         const errors = {};
 
         if (!title || title.trim() === '') {
@@ -122,10 +98,10 @@ const ProposalForm = (props) => {
             errors.keywords = 'Keywords are required';
         } else {
             setKeywords(
-                [...new Set(keywords.split(',').map(word => word.trim()))].join(', ') //removes duplicates
+                [...new Set(keywords.split(',').map(word => word.trim()))].join(',') //removes duplicates
             );
         }
-        
+
         if (!type || type.trim() === '') {
             errors.type = 'Type is required';
         }
@@ -166,8 +142,15 @@ const ProposalForm = (props) => {
         }
 
         if (Object.keys(errors).length !== 0) {
-            const errorString = Object.values(errors).join('\n');
-            setErrorMsg(errorString);
+            const errorList = Object.entries(errors).map(([key, value]) => (
+                <li key={key}>{value}</li>
+            ));
+            setErrorMsg(
+                <div>
+                    <p>Please fix the following errors:</p>
+                    <ul>{errorList}</ul>
+                </div>
+            );
         } else {
             // Send data
             const proposal = {
@@ -182,22 +165,24 @@ const ProposalForm = (props) => {
                 notes: notes,
                 expiration: expiration,
                 level: level,
-                cds: cds.value,
+                cds: cds.map(obj => obj.value),
             };
             //maybe call api POST
             insertProposal(proposal);
+            navigate("/");            
+
         }
     }
 
     const insertProposal = (proposal) => {
         professorAPI.insertProposal(proposal)
-            .then(() => { })
+            .then(() => {})
             .catch(err => { handleErrors(err); })
     }
 
     const handleLevelChange = (ev) => {
         setLevel(ev.target.value);
-        setCds("");
+        setCds([]);
         if (ev.target.value === 'master') {
             setFilteredCDS(cdsList.filter(cds => cds.value.startsWith("LM")))
             setCdsDisabled(false);
@@ -216,7 +201,8 @@ const ProposalForm = (props) => {
 
 
     return (
-        <>
+
+        <Container>
             {errorMsg ? <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible>{errorMsg}</Alert> : false}
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="title" >
@@ -346,7 +332,7 @@ const ProposalForm = (props) => {
                     <Col>
                         <Form.Group as={Row} className="mb-3 mt-3" controlId="level">
                             <Form.Label column>Level:</Form.Label>
-                            <Col sm={10}>
+                            <Col sm={8}>
                                 <Form.Select value={level} onChange={handleLevelChange}>
                                     <option>select the level</option>
                                     <option value="bachelor">bachelor</option>
@@ -358,8 +344,9 @@ const ProposalForm = (props) => {
                     <Col>
                         <Form.Group as={Row} className="mb-3 mt-3" controlId="cds">
                             <Form.Label column>Select cds:</Form.Label>
-                            <Col sm={8}>
+                            <Col sm={10}>
                                 <Select
+                                    value={cds}
                                     defaultValue={[]}
                                     isMulti
                                     name="cds"
@@ -395,24 +382,13 @@ const ProposalForm = (props) => {
                 </Form.Group>
 
 
-
-
                 <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
                     Submit
                 </Button>
 
-
-
-
-
-
-
-
-
             </Form>
+        </Container>
 
-
-        </>
     );
 }
 
