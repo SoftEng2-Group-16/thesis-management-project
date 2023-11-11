@@ -126,6 +126,30 @@ THESIS_PROPOSALS
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
+- GET `/api/cosupervisors`
+  - Description: retrieves all possible co-supervisors for a new thesis proposals 
+  - Response: `200 OK` (success), `404 Not Found` (in case of no internal or external co-supervisors found),  `500 Internal Server Error` (generic error)
+  - Response body: an object containing two lists of strings, one for internal co-supervisors (other professors), one for external co-supervisors (for example company employees cooperating with the university)
+    - { `internals`: [...], `externals`: [...] } 
+
+- GET `/api/degrees`
+- Description: retrieves all possible degrees a professore can insert a new thesis proposal for
+  - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
+  - Response body: an array containing all the possible degrees
+
+- POST `/api/newproposal`
+- Description: inserts a new thesis proposal
+  - Request body: an object describing the proposal to insert
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` } 
+    - Notes: 
+      - The server automatically finds the right groups for the proposal (based on the supervisor and internal co-supervisor's groups), so an empty array can be passed for the groups field
+      - The id is generated automatically, so any number can be passed for the id field
+  - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
+  - Response body: the id of the newly created proposal
+
+
+
 ## Utility functions
 ### `getJson(httpResponsePromise)`
 - **Description**: A utility function for parsing HTTP responses.

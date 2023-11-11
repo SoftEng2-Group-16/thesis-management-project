@@ -1,27 +1,19 @@
 "use strict";
 
-
-function Service(id, type, description, serviceTime) {
+function ThesisProposal(id, title, supervisor, cosupervisors, keywords, type, groups, descritpion, requirements, notes, expiration, level, cds) {
     this.id = id;
+    this.title = title;
+    this.supervisor = supervisor;
+    this.cosupervisors = cosupervisors;
+    this.keywords = keywords;
     this.type = type;
-    this.description = description;
-    this.serviceTime = serviceTime;
+    this.groups = groups;
+    this.description = descritpion;
+    this.requirements = requirements;
+    this.notes = notes;
+    this.expiration = expiration;
+    this.level = level;
+    this.cds = cds;   
 }
 
-function Counter(id, services) {
-    this.id = id;
-    this.services = services;
-}
-
-function Ticket(id, counterId, timestampCreated,timestampFinished,serviceType,employeeId,status) {
-    this.id = id;
-    this.counterId = counterId;
-    this.timestampCreated = timestampCreated;
-    this.timestampFinished = timestampFinished;
-    this.serviceType = serviceType;
-    this.employeeId = employeeId;
-    this.status = status;
-}
-
-
-module.exports = { Service,Counter,Ticket};
+module.exports = {ThesisProposal};
