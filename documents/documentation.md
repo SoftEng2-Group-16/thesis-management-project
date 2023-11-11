@@ -92,6 +92,7 @@ THESIS_PROPOSALS
 ## React Client Application Routes
 
 - Route `/thesis`: main page with the list of thesis. Different views for students and teachers
+- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
 - Route `/login`: to perform login
 - Route `*`: for non existing pages
 
