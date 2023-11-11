@@ -9,17 +9,17 @@ function NavHeader(props) {
   return (
   <Navbar className="d-flex justify-content-around" bg="primary" variant="dark">
     <Container>
-      <Navbar.Brand href='/' className='navbar-brand'>
+      <Navbar.Brand  className='navbar-brand'>
       Shitty Thesis Management
       </Navbar.Brand>
       <Nav className="me-auto">
-        <Nav.Link href='/ticketing'>Thesis</Nav.Link>
+        <Nav.Link href='#'>Thesis</Nav.Link>
       </Nav>
       {props.loggedIn ? <>
       <Navbar.Text>
         
       <img src={User} style={{ width: '45px', height: 'auto', fill: 'white' }} alt="User:" />
-        <span className="text-light me-3 username">{props.user.username}</span>
+        <span className="text-light me-3 username">{props.user.role}</span>
       </Navbar.Text>
         <LogoutButton logout={props.handleLogout} />
         </> :

@@ -9,6 +9,8 @@ The authentication it's realized with passport framework, email and password are
 The Credentials have been generated using https://www.browserling.com/tools/scrypt
 and can be tested with its relative counterpart tool https://www.browserling.com/tools/scrypt-check
 
+The login is performed with email and password, the system check if there is a related email in the *auth* table that has a correspondant hashed password, then, afther authentication succeds, fetch all the info of the user from the tables *student* or *teachers*, based on the role.
+
 
 |   Email                     |   Password    |   Role   |
 |-----------------------------|---------------|---------|
@@ -24,18 +26,35 @@ and can be tested with its relative counterpart tool https://www.browserling.com
 
 ### SESSIONS
 
-The session is currently initialized with all the data related to the user that is been serialized.
+The session is initialized with these user data.
 ```
+student:
 {
   id: 200001,
-  email: 'mario.rossi@studenti.polito.it',
+  surname: 'Rossi',
+  name: 'Mario',
   role: 'student',
-
+  email: 'mario.rossi@studenti.polito.it',
+  gender: 'M',
+  nationality: 'Italian',
+  degree_code: 'LM-1',
+  enrollment_year: '2010'
 }
-```
-This is a test.
 
-The session is initialized with these user data.
+professor:
+{
+  id: 268554,
+  surname: 'Bianchi',
+  name: 'Luigi',
+  role: 'teacher',
+  email: 'luigi.bianchi@polito.it',
+  group_code: 'SO',
+  department_code: 'DAUIN'
+}
+
+```
+
+
 
 ## Database Structure
 
@@ -69,6 +88,9 @@ THESIS_PROPOSALS
 
 
 ## Useful ideas and future development needs
+
+## Main Component
+`Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
 
 ## API Server
 

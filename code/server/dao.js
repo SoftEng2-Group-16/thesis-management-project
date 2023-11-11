@@ -1,3 +1,4 @@
+
 const db = require('./db');
 
 
@@ -108,3 +109,4 @@ exports.saveNewProposal = (proposal) => {
   );
   });
 }
+
