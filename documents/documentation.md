@@ -89,8 +89,17 @@ THESIS_PROPOSALS
 
 ## Useful ideas and future development needs
 
+## React Client Application Routes
+
+- Route `/thesis`: main page with the list of thesis. Different views for students and teachers
+- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
+- Route `/login`: to perform login
+- Route `*`: for non existing pages
+
 ## Main Component
-`Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
+- `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
+- `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
+
 
 ## API Server
 
