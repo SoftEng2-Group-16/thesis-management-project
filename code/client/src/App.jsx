@@ -66,6 +66,18 @@ function App() {
     setMessage('');
   };
 
+  const handleDateChange = async (newDate) => {
+    // Placeholder for calling the API with the new date
+    try {
+
+      console.log(`API call to update system date with ${newDate}`);
+    } catch (error) {
+      console.error('Error updating system date:', error);
+    }
+  };
+
+
+
   //the react container uses the outlet feature
 
   return (
@@ -75,7 +87,7 @@ function App() {
         <Route
           element={
             <>
-              <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} />
+              <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} />
               <Container fluid className="mt-3 text-center">
                 {message && (
                   <Row>

@@ -25,7 +25,7 @@ function NavHeader(props) {
       </Nav>
       {props.loggedIn ? <>
       <Navbar.Text>
-      <Clock onDateChange={handleDateChange} />
+      <Clock onDateChange={props.onDateChange} />
       <img src={User} style={{ width: '45px', height: 'auto', fill: 'white' }} alt="User:" />
         <span className="text-light me-3 username">{props.user.role}</span>
       </Navbar.Text>

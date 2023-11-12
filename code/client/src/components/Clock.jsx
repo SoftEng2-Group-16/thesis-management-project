@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { Modal, Button } from 'react-bootstrap';
 
-function Clock({ onDateChange, onConfirm }) {
-  const [currentDate, setCurrentDate] = useState(dayjs().format('DD-MM-YYYY'));
+function Clock({ onDateChange }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
 
-  const handleChange = (event) => {
-    setCurrentDate(event.target.value);
+  const handleDateChange = (date) => {
+    setCurrentDate(date);
   };
 
   const handleConfirm = () => {
@@ -21,20 +23,17 @@ function Clock({ onDateChange, onConfirm }) {
   const handleConfirmModal = () => {
     setShowModal(false);
     if (onDateChange) {
-      onDateChange(currentDate);
-      if (onConfirm) {
-        onConfirm();
-      }
+      onDateChange(dayjs(currentDate).format('DD-MM-YYYY'));
     }
   };
 
   return (
     <div>
-      <input
-        type="date"
-        value={currentDate}
-        onChange={handleChange}
-        style={{ cursor: 'pointer' }}
+      <DatePicker
+        selected={currentDate}
+        onChange={handleDateChange}
+        dateFormat="dd-MM-yyyy"
+        customInput={<input style={{ cursor: 'pointer' }} />}
       />
       <Button variant="primary" onClick={handleConfirm}>
         Change System Time
@@ -45,7 +44,7 @@ function Clock({ onDateChange, onConfirm }) {
           <Modal.Title>Confirm</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {`Do you want to change the system time to ${currentDate}?`}
+          {`Do you want to change the system time to ${dayjs(currentDate).format('DD-MM-YYYY')}?`}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
