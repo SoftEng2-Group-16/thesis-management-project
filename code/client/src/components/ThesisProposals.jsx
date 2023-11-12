@@ -9,6 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Select from 'react-select'
 import { Col, Row } from 'react-bootstrap';
 
 /*
@@ -27,6 +28,11 @@ function ThesisProposals(props) {
   const [thesis, setThesis] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [filter, setFilter] = useState();
+  const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' }
+  ]
 
 
   useEffect(() => {
@@ -157,14 +163,13 @@ function ThesisProposals(props) {
     <>
     {props.loggedIn && props.user.role === "student" ? (
       <div style={{ marginTop: '10px' }}> 
-                <Form className="d-flex">
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              aria-label="Search"
-              onChange={(event) => {setFilter(event.target.value)}}
-            />
+                <Form className="d-flex" onChange={(event) => {setFilter(event.target.value)}}>
+                <Form.Select aria-label="Default select example" style={{ lenght: '10px' }}>
+                  <option value="title">Title</option>
+                  <option value="group">Group</option>
+                  <option value="keyword">Keyword</option>
+                </Form.Select>
+                <Select options={options} />
             <Button variant="outline-success" onClick={()=>filtering()}>Search</Button>
           </Form>
 
