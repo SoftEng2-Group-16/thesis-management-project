@@ -1,50 +1,69 @@
+// server.test.js
 const request = require('supertest');
-import { app } from '../index';
-const sqlite3 = require('sqlite3');
-const { open } = require('sqlite');
+const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 
-let db;
+const { app, server } = require('../index');
 
 beforeAll(async () => {
-  // Create an in-memory SQLite database
-  // db = await open({
-  //   filename: ':memory:',
-  //   driver: sqlite3.Database,
-  // });
-
-  // // Read database file and execute SQL to copy data to the in-memory database
-  // const dbPath = './cleanDB/db_TM.db';
-
-  // const existingDb = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
-  //   if (err) {
-  //     console.error('Error opening the existing database:', err);
-  //   } else {
-  //     // Use the built-in `.backup` method to copy the database to the in-memory database
-  //     existingDb.backup(db, async (err) => {
-  //       if (err) {
-  //         console.error('Error copying the database:', err);
-  //       } else {
-  //         // Additional setup if needed
-  //         existingDb.close(); // Close the existing database connection
-  //       }
-  //     });
-  //   }
-  // });
+  // Set up an in-memory SQLite database for testing
+  const dbPath = ':memory:';
+  const dbData = fs.readFileSync('./db_TM.sql', 'utf8');
+  const db = new sqlite3.Database(dbPath, async (err) => {
+      if (err) {
+        // Cannot open database
+        console.error(err.message)
+        throw err
+      }else{
+        //console.log('Connected to the in-memory SQlite database.')
+        await new Promise((resolve, reject) => {
+          db.exec(dbData, (err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        })
+      }
+  });
+global.__TEST_DB__ = db; // Make the database accessible globally
 });
+
 
 afterAll(async () => {
-  // Close and clean up the in-memory database
- // await db.close();
+await new Promise((resolve, reject) => {
+  global.__TEST_DB__.close((err) => {
+    if (err) reject(err);
+    else{  
+      resolve();
+      server.close();
+    }
+  });
 });
 
-describe('Test fn', () => {
-    test("home ", async () => {
-        //The API request must be awaited as well
-        const response = await request(app).get("/api/sessions/current") 
+});
 
-        expect(response.status).toBe(200)
-    });
+describe('Integration Tests', () => {
+  test('Not logged in user', async () => {
+    const response = await request(app).get('/api/sessions/current');
+    
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Not authenticated");
+  });
 
-  // Add more test cases for your server here
+  test('login: login with success', async () => {
+    const user = {
+      email: 'mario.rossi@studenti.polito.it',
+      password: "200001"
+    };
+    
+    //The API request must be awaited as well
+    const response = await request(app)
+      .post("/api/sessions") 
+      .send({ email: user.email, password: user.password })
+
+      console.log(response.body);
+    expect(response.status).toBe(201) // why success code is 201 instead of 200 ?
+  });
+
+  // Add more integration tests for your server
 });

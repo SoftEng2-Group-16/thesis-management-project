@@ -1,7 +1,7 @@
 "use strict";
 
 
-beforeAll(() => {
+beforeEach(() => {
     jest.clearAllMocks();
 });
 
