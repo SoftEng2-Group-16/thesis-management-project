@@ -43,3 +43,11 @@ content-type: application/json
     "level": "Bachelor",
     "cds": ["LM-1", "LM-2"]
 }
+
+###
+#test api for handling virtual clock changes
+PUT http://localhost:3001/api/clockchanged HTTP/1.1
+
+{
+    "selectedTimestamp": "01-01-2024"
+}
