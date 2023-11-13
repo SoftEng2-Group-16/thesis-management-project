@@ -26,20 +26,25 @@ if role:
 function ThesisProposals(props) {
 
   const { handleErrors } = useContext(MessageContext);
+  //array where we save all the thesis that we fetch
   const [Allthesis, setAllThesis] = useState([]);
+  //this are the thesis that we need to show
   const [thesis, setThesis] = useState([]);
+  //this is the filter type that we selected
   const [filter, setFilter] = useState();
+  //this are all the possible result for a specific filter type
   const [options, setOptions] = useState([]);
+  //this are all the selected results for a specific filter type 
   const [selections, setSelections] = useState([]);
+  //here we save all the data for the specific types
   const [title, setTitle] = useState([])
   const [supervisor, setSupervisor] = useState([])
-  const [cosupervisors, setCosupervisors] = useState([])
   const [keywords, setKeywords] = useState([])
   const [type, setType] = useState([])
-  const [groups, setGroups] = useState([])
   const [level, setLevel] = useState([])
   const [cds, setCds] = useState([])
 
+  //this is used to reset the filter
   const [version, setVersion] = useState(0);
 
   //function to reset the selector
@@ -184,12 +189,32 @@ function ThesisProposals(props) {
 
       listThesis = listThesis.filter((item) => {
 
-        if (filter == item.keywords) return item
-      });
+        if (filter == "title") {if(selections.includes(item.title)) return item}
+        
+        if (filter == "supervisor"){if(selections.includes(item.supervisor)) return item} 
+        if (filter == "type") {if(selections.includes(item.type)) return item} 
+        if (filter == "cds") {if(selections.includes(item.cds)) return item} 
+        if (filter == "level") {if(selections.includes(item.level)) return item} 
+        if (filter == "keywords") {
+          var check = false
+          //iterate two arrays to see if there are elements in common
+          for (let i = 0; i < item.keywords.length; i++) { 
+  
+            for (let j = 0; j < selections.length; j++) { 
+      
+                if (item.keywords[i] === selections[j]) { 
+                    check = true; 
+                } 
+            }
+          }
+          if(check) return item
+        
+      }
       console.log(listThesis)
       setThesis(listThesis)
-    }
+    })
   }
+}
 
   function changeSelection(selection) {
     if (selection.lenght == 0) {
