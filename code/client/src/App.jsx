@@ -14,7 +14,7 @@ import ThesisPage from './components/ThesisPage.jsx';
 
 function App() {
 
-  const [loggedIn, setLoggedIn] = useState();
+  const [loggedIn, setLoggedIn] = useState(null);
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
   
@@ -33,25 +33,23 @@ function App() {
   //! generalAPI exports a 'API' and not 'generalAPI' for the time being
   useEffect(() => {
     const checkAuth = async () => {
-      if (loggedIn) {
-        try {
-          const user = await API.getUserInfo(); // we have the user info here 
-          if (user) {
-            setUser({ //TODO this needs to be changed to set the new info
-              id: user.id,
-              role: user.role, //for now role?
-              name:user.name,
-              surname:user.surname,
-            })
-
-            setLoggedIn(true);
-          }
-        } catch { (err) => { handleErrors(err)} }
-
-      }else {setLoggedIn(false);}
-    }
+      try {
+        const user = await API.getUserInfo();
+        setUser({
+          id: user.id,
+          role: user.role,
+          name: user.name,
+          surname: user.surname,
+        });
+        setLoggedIn(true);
+      } catch (err) {
+        setLoggedIn(false);
+        handleErrors(err);
+      }
+    };
+  
     checkAuth();
-  }, [loggedIn]);
+  }, []);
 
   const handleLogin = async (credentials) => {
     try {
@@ -96,7 +94,8 @@ function App() {
             </>
           }
         > 
-          <Route path="/" element={<Navigate to="/thesis" loggedIn={loggedIn} user={user}/>} ></Route>
+          <Route  path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm login={handleLogin} />)}/>
+
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
           <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user}/> : <ProposalForm user={user}/>}></Route>
           
