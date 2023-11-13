@@ -89,8 +89,17 @@ THESIS_PROPOSALS
 
 ## Useful ideas and future development needs
 
+## React Client Application Routes
+
+- Route `/thesis`: main page with the list of thesis. Different views for students and teachers
+- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
+- Route `/login`: to perform login
+- Route `*`: for non existing pages
+
 ## Main Component
-`Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
+- `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
+- `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
+
 
 ## API Server
 
@@ -117,6 +126,14 @@ THESIS_PROPOSALS
     - Response body: object user
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
+
+- GET `/api/proposals/:degreeCode`
+  - Description: retrieves all the thesis proposals a student can view (based on student's degree code)
+  - Request param: `degreeCode`, the degree of the study course of the student
+  - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
+  - Response body: an array of objects, each containing a thesis proposal
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` } 
 
 - GET `/api/cosupervisors`
   - Description: retrieves all possible co-supervisors for a new thesis proposals 

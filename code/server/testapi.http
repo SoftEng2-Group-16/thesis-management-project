@@ -17,6 +17,9 @@ DELETE http://localhost:3001/api/sessions/current HTTP/1.1
 content-type: application/json
 
 ###
+#test the API for getting proposals
+GET http://localhost:3001/api/proposals/LM-1
+
 #test API for getting cosupervisors list
 GET http://localhost:3001/api/cosupervisors HTTP/1.1
 
@@ -39,7 +42,7 @@ content-type: application/json
     "description": "test description",
     "requirements": "test requirements",
     "notes": "test notes",
-    "expiration": "22/10/2028",
+    "expiration": "22-10-2028",
     "level": "Bachelor",
     "cds": ["LM-1", "LM-2"]
 }
