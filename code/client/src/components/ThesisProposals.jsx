@@ -28,7 +28,6 @@ function ThesisProposals(props) {
   const { handleErrors } = useContext(MessageContext);
   const [Allthesis, setAllThesis] = useState([]);
   const [thesis, setThesis] = useState([]);
-  const [modalShow, setModalShow] = useState(false);
   const [filter, setFilter] = useState();
   const [options, setOptions] = useState([]);
   const [selections, setSelections] = useState([]);
@@ -208,7 +207,7 @@ function ThesisProposals(props) {
 
   return (
     <>
-      {props.loggedIn && props.user.role === "student" ? (
+      {props.loggedIn ? (
         <div style={{ marginTop: '10px' }}>
           <Form className="d-flex" >
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
@@ -259,11 +258,8 @@ function ThesisProposals(props) {
 
 
         </div>
-      ) : props.loggedIn && props.user.role === "teacher" ? (
-        <div>Logged in as a professor!</div> //TODO: Insert here code to the professor page
-      ) : (
+      ):(
         <div>You need to LOGIN!</div>
-
       )
       }
 
