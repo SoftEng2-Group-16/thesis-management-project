@@ -50,5 +50,5 @@ PUT http://localhost:3001/api/clockchanged HTTP/1.1
 content-type: application/json
 
 {
-    "selectedTimestamp": "13-11-2023"
+    "selectedTimestamp": "01-01-2024"
 }
