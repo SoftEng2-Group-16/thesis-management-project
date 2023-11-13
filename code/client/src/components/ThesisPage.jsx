@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
 
-function ThesisPage() {
+function ThesisPage(props) {
+  const navigate = useNavigate();
   const { state } = useLocation();
   const [thesisDetails, setThesisDetails] = useState(null);
 
@@ -16,6 +17,16 @@ function ThesisPage() {
     const thesisDetails = state.thesisDetails;
     setThesisDetails(thesisDetails);
   }, [state]);
+
+  const handleApplyClick = () => {
+    // Add logic to handle the "Apply" button click (e.g., send an application)
+    console.log('Apply button clicked!');
+  };
+
+  const handleGoBackClick = () => {
+    // Navigate back to /thesis
+    navigate('/thesis');
+  };
 
   if (!state || !state.thesisDetails || !thesisDetails) {
     return <div>Data Unavailable</div>;
@@ -34,16 +45,13 @@ function ThesisPage() {
                 <Col md={6}>
                   <Card.Text className="mb-2"><strong>Type:</strong> {thesisDetails.type}</Card.Text>
                   <Card.Text className="mb-2"><strong>Expiration:</strong> {thesisDetails.expiration}</Card.Text>
-                 
                 </Col>
                 <Col md={6}>
                   <Card.Text className="mb-2"><strong>Level:</strong> {thesisDetails.level}</Card.Text>
                   <Card.Text className="mb-2"><strong>Group:</strong> {thesisDetails.group}</Card.Text>
                 </Col>
-             
               </Row>
               <Row className="mb-4">
-                
                 <Col md={6}>
                   <Card.Text className="mb-2"><strong>Supervisors:</strong> {thesisDetails.supervisors}</Card.Text>
                   <Card.Text className="mb-2"><strong>Co-Supervisors:</strong> {thesisDetails.cosupervisors.join(', ')}</Card.Text>
@@ -51,19 +59,28 @@ function ThesisPage() {
               </Row>
 
               {/* Description in a separate card */}
-              <Card >
+              <Card>
                 <Card.Title className="border-bottom pb-2 mb-4">Description:</Card.Title>
                 <Card.Body>
- 
-                  <Card.Text> {thesisDetails.description}</Card.Text>
+                  <Card.Text>{thesisDetails.description}</Card.Text>
                 </Card.Body>
               </Card>
 
-             
-             <Row>
-              <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
+              <Row>
+                <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
               </Row>
-              {/* Additional sections can be added here based on your needs */}
+
+              {/* Apply button (visible only for students) */}
+              {props.user.role === 'student' && (
+                <Button variant="success" className="mt-3" onClick={handleApplyClick}>
+                  Apply
+                </Button>
+              )}
+
+              {/* Go back button */}
+              <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
+                Go Back
+              </Button>
             </Card.Body>
           </Card>
         </Col>

@@ -94,7 +94,7 @@ function App() {
           <Route path="/" element={<Navigate to="/thesis" />} ></Route>
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
           
-          <Route path="/thesis/:id" element={<ThesisPage/>}/>
+          <Route path="/thesis/:id" element={loggedIn? <ThesisPage user={user}/>: <ThesisPage/>}/>
          
           <Route path="*" element={<NotFoundLayout  />} />
           <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />}/>
