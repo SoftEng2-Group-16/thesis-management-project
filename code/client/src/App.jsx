@@ -2,12 +2,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Row, Alert } from 'react-bootstrap';
 import './App.css'
 import NavHeader from './components/NavbarComponents';
-import { NotFoundLayout, LoadingLayout } from './components/PageLayout';
+import { NotFoundLayout } from './components/PageLayout';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import MessageContext from './messageCtx.jsx';
 import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
+import ProposalForm from './components/ProposalForm.jsx';
 import ThesisProposals from './components/ThesisProposals.jsx';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
+  
 
   //the error message
   const [message, setMessage] = useState('');
@@ -23,7 +25,7 @@ function App() {
     let msg = '';
     if (err.error) msg = err.error;
     else msg = "Unknown Error";
-    setMessage(msg);
+    setMessage({msg:msg, type: 'danger' });
   }
 
   //TODO the login method should not returns the row in the auth table but should query again against student or professor table to get all the info
@@ -37,11 +39,13 @@ function App() {
             setUser({ //TODO this needs to be changed to set the new info
               id: user.id,
               role: user.role, //for now role?
+              name:user.name,
+              surname:user.surname,
             })
 
             setLoggedIn(true);
           }
-        } catch { (err) => { return null; } }
+        } catch { (err) => { handleErrors(err)} }
 
       }
     }
@@ -54,6 +58,7 @@ function App() {
       setLoggedIn(true);
       setMessage({ msg: `Welcome, ${user.role}!`, type: 'success' });
     } catch (err) {
+      console.log(err);
       setMessage({ msg: err, type: 'danger' });
     }
   };
@@ -92,6 +97,7 @@ function App() {
         > 
           <Route path="/" element={<Navigate to="/thesis" />} ></Route>
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
+          <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user}/> : <ProposalForm user={user}/>}></Route>
           <Route path="*" element={<NotFoundLayout  />} />
           <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />}/>
         </Route>
