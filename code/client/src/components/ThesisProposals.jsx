@@ -57,10 +57,20 @@ function ThesisProposals(props) {
   //constant to animate the filter selector
   const animatedComponents = makeAnimated();
 
-  function removeDuplicates(array) {
-    return array.filter((element, index, self) => {
-        return self.indexOf(element) === index;
+  function remove(arrayAssociativo) {
+    var uniqueElements = {};
+    Object.keys(arrayAssociativo).forEach(key => {
+        var value = arrayAssociativo[key];
+        uniqueElements[value] = key; // Memorizza solo l'ultima chiave associata al valore
     });
+
+    var uniqueArrayAssociativo = {};
+    Object.keys(uniqueElements).forEach(value => {
+        var key = uniqueElements[value];
+        uniqueArrayAssociativo[key] = value;
+    });
+
+    return uniqueArrayAssociativo;
 }
 
 
@@ -88,13 +98,14 @@ function ThesisProposals(props) {
           if(!levelApp.includes({value: proposals[i].level , label: proposals[i].level}))
             levelApp.push({value: proposals[i].level , label: proposals[i].level})
           cdsApp.push({value: proposals[i].cds , label: proposals[i].cds})
+          //inserting double values
           for(let x = 0; x < proposals[i].keywords.length; x++){
             if(!keywordsApp.includes({value: proposals[i].keywords[x] , label: proposals[i].keywords[x]}))
               keywordsApp.push({value: proposals[i].keywords[x] , label: proposals[i].keywords[x]})
           }
-          for(let x = 0; x < proposals[i].groups.length; x++){
-            if(!keywordsApp.includes({value: proposals[i].groups[x] , label: proposals[i].groups[x]}) )
-              keywordsApp.push({value: proposals[i].groups[x] , label: proposals[i].groups[x]})
+          for(let x = 0; x < proposals[x].groups.length; x++){
+            if(!groupsApp.includes({value: proposals[i].groups[x] , label: proposals[i].groups[x]}) )
+              groupsApp.push({value: proposals[i].groups[x] , label: proposals[i].groups[x]})
           }
          
         }
