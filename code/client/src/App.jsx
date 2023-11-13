@@ -9,6 +9,7 @@ import MessageContext from './messageCtx.jsx';
 import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
 import ThesisProposals from './components/ThesisProposals.jsx';
+import ThesisPage from './components/ThesisPage.jsx';
 
 function App() {
 
@@ -92,6 +93,9 @@ function App() {
         > 
           <Route path="/" element={<Navigate to="/thesis" />} ></Route>
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
+          
+          <Route path="/thesis/:id" element={<ThesisPage/>}/>
+         
           <Route path="*" element={<NotFoundLayout  />} />
           <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />}/>
         </Route>
