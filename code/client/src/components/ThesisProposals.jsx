@@ -58,6 +58,19 @@ function ThesisProposals(props) {
 
 
   useEffect(() => {
+
+    //api fetch
+    if(props.loggedIn){
+    const fetchThesis = async () => {
+      try {
+        const proposals = await API.getThesisProposals();
+      } catch (error) {
+        console.error(error);
+        // Handle error
+      }
+    };
+  }
+
     //This will be deleted when the BE part will be finished
     setAllThesis([{
       id: "1",
