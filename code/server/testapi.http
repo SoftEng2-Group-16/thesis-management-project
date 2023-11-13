@@ -42,7 +42,7 @@ content-type: application/json
     "description": "test description",
     "requirements": "test requirements",
     "notes": "test notes",
-    "expiration": "22/10/2028",
+    "expiration": "22-10-2028",
     "level": "Bachelor",
     "cds": ["LM-1", "LM-2"]
 }
