@@ -15,6 +15,7 @@ import ThesisPage from './components/ThesisPage.jsx';
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(null);
+
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
   
@@ -95,7 +96,6 @@ function App() {
           }
         > 
           <Route  path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm login={handleLogin} />)}/>
-
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
           <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user}/> : <ProposalForm user={user}/>}></Route>
           

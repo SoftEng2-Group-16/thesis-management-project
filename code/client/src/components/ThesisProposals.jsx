@@ -43,6 +43,7 @@ function ThesisProposals(props) {
   const [type, setType] = useState([])
   const [level, setLevel] = useState([])
   const [cds, setCds] = useState([])
+  const [groups, setGroups] = useState([])
 
   //this is used to reset the filter
   const [version, setVersion] = useState(0);
@@ -56,6 +57,12 @@ function ThesisProposals(props) {
   //constant to animate the filter selector
   const animatedComponents = makeAnimated();
 
+  function removeDuplicates(array) {
+    return array.filter((element, index, self) => {
+        return self.indexOf(element) === index;
+    });
+}
+
 
   useEffect(() => {
 
@@ -64,9 +71,49 @@ function ThesisProposals(props) {
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
-        console.log(proposals)
         setAllThesis(proposals)
         setThesis(proposals)
+        var titleApp = []
+        var supervisorApp = []
+        var groupsApp = []
+        var keywordsApp = []
+        var typeApp = []
+        var levelApp = []
+        var cdsApp = []
+        for (let i = 0; i < proposals.length; i++) {
+          if(!titleApp.includes({value: proposals[i].title , label: proposals[i].title})) 
+            titleApp.push({value: proposals[i].title , label: proposals[i].title})
+          supervisorApp.push({value: proposals[i].supervisor , label: proposals[i].supervisor})
+          typeApp.push({value: proposals[i].type , label: proposals[i].type})
+          if(!levelApp.includes({value: proposals[i].level , label: proposals[i].level}))
+            levelApp.push({value: proposals[i].level , label: proposals[i].level})
+          cdsApp.push({value: proposals[i].cds , label: proposals[i].cds})
+          for(let x = 0; x < proposals[i].keywords.length; x++){
+            if(!keywordsApp.includes({value: proposals[i].keywords[x] , label: proposals[i].keywords[x]}))
+              keywordsApp.push({value: proposals[i].keywords[x] , label: proposals[i].keywords[x]})
+          }
+          for(let x = 0; x < proposals[i].groups.length; x++){
+            if(!keywordsApp.includes({value: proposals[i].groups[x] , label: proposals[i].groups[x]}) )
+              keywordsApp.push({value: proposals[i].groups[x] , label: proposals[i].groups[x]})
+          }
+         
+        }
+        titleApp = removeDuplicates(titleApp) 
+        supervisorApp = removeDuplicates(supervisorApp) 
+        keywordsApp = removeDuplicates(keywordsApp) 
+        groupsApp = removeDuplicates(groupsApp) 
+        typeApp = removeDuplicates(typeApp) 
+        levelApp = removeDuplicates(levelApp) 
+        cdsApp = removeDuplicates(cdsApp)
+         
+        setTitle(titleApp)
+        setSupervisor(supervisorApp)
+        setKeywords(keywordsApp)
+        setGroups(groupsApp)
+        setType(typeApp)
+        setLevel(levelApp)
+        setCds(cdsApp)
+        setOptions(titleApp)
 
       } catch (error) {
         console.error(error);
@@ -75,18 +122,7 @@ function ThesisProposals(props) {
     };
     if(props.loggedIn){fetchThesis()}
     
-    setFilter("title")
-
-    setTitle(["Thesis 1", "Thesis 2", "Thesis 3"])
-    setSupervisor(["1001", "1002", "1002"])
-    setKeywords(["AI", "Data Science"])
-    setType(["Company Thesis", "Research Thesis"])
-    setLevel(["Bachelor", "Master"])
-    setCds(["LT-1", "LT-2", "LT-3"])
-    setOptions([
-      { value: "Thesis 1", label: "Thesis 1" },
-      { value: "Thesis 2", label: "Thesis 2" },
-      { value: "Thesis 3", label: "Thesis 3" }])
+    
 
   }, []);
 
@@ -94,9 +130,13 @@ function ThesisProposals(props) {
   function changeParameter(parameter) {
     setFilter(parameter)
     setSelections([])
-    setOptions(options)
+    if(parameter == "title") setOptions(title)
+    if(parameter == "supervisor") setOptions(supervisor)
+    if(parameter == "keywords") setOptions(keywords)
+    if(parameter == "type") setOptions(type)
+    if(parameter == "level") setOptions(level)
+    if(parameter == "cds") setOptions(cds)
     handleReset()
-    console.log(parameter)
     /*
     if(parameter = )
     let array = []
@@ -108,7 +148,6 @@ function ThesisProposals(props) {
 
   function filtering() {
     var listThesis = [...Allthesis]
-    console.log(options)
     if (filter.lenght == 0) {
       setThesis(listThesis)
     } else {
@@ -128,7 +167,7 @@ function ThesisProposals(props) {
   
             for (let j = 0; j < selections.length; j++) { 
       
-                if (item.keywords[i] === selections[j]) { 
+                if (item.keywords[i] == selections[j]) { 
                     check = true; 
                 } 
             }
@@ -136,7 +175,6 @@ function ThesisProposals(props) {
           if(check) return item
         
       }
-      console.log(listThesis)
       setThesis(listThesis)
     })
   }
