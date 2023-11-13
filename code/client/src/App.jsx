@@ -14,7 +14,7 @@ import ThesisPage from './components/ThesisPage.jsx';
 
 function App() {
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState();
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
   
@@ -48,7 +48,7 @@ function App() {
           }
         } catch { (err) => { handleErrors(err)} }
 
-      }
+      }else {setLoggedIn(false);}
     }
     checkAuth();
   }, [loggedIn]);
@@ -96,7 +96,7 @@ function App() {
             </>
           }
         > 
-          <Route path="/" element={<Navigate to="/thesis" />} ></Route>
+          <Route path="/" element={<Navigate to="/thesis" loggedIn={loggedIn} user={user}/>} ></Route>
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
           <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user}/> : <ProposalForm user={user}/>}></Route>
           

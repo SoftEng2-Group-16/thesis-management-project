@@ -9,13 +9,14 @@ function ThesisPage(props) {
   const [thesisDetails, setThesisDetails] = useState(null);
 
   useEffect(() => {
+    console.log(state)
     if (!state || !state.thesisDetails) {
       console.error('Thesis details not available.');
       return;
     }
 
-    const thesisDetails = state.thesisDetails;
-    setThesisDetails(thesisDetails);
+
+    setThesisDetails(state.thesisDetails);
   }, [state]);
 
   const handleApplyClick = () => {
@@ -48,12 +49,12 @@ function ThesisPage(props) {
                 </Col>
                 <Col md={6}>
                   <Card.Text className="mb-2"><strong>Level:</strong> {thesisDetails.level}</Card.Text>
-                  <Card.Text className="mb-2"><strong>Group:</strong> {thesisDetails.group}</Card.Text>
+                  <Card.Text className="mb-2"><strong>Group:</strong> {thesisDetails.groups}</Card.Text>
                 </Col>
               </Row>
               <Row className="mb-4">
                 <Col md={6}>
-                  <Card.Text className="mb-2"><strong>Supervisors:</strong> {thesisDetails.supervisors}</Card.Text>
+                  <Card.Text className="mb-2"><strong>Supervisors:</strong> {thesisDetails.supervisor}</Card.Text>
                   <Card.Text className="mb-2"><strong>Co-Supervisors:</strong> {thesisDetails.cosupervisors.join(', ')}</Card.Text>
                 </Col>
               </Row>

@@ -60,115 +60,28 @@ function ThesisProposals(props) {
   useEffect(() => {
 
     //api fetch
-    if(props.loggedIn){
+
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
+        console.log(proposals)
+        setAllThesis(proposals)
+        setThesis(proposals)
+
       } catch (error) {
         console.error(error);
         // Handle error
       }
     };
-  }
-
-    //This will be deleted when the BE part will be finished
-    setAllThesis([{
-      id: "1",
-      title: "Thesis 1",
-      supervisors: "1001",
-      cosupervisors: ["10001", "10101"],
-      keywords: ["AI"],
-      type: "Company Thesis",
-      group: ["AI Research Group"],
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
-      requirements: "Machine Learning, Medical Science, Data Analysis",
-      notes: "This project focuses on leveraging AI for healthcare advancements.",
-      expiration: "20-11-24",
-      level: "bachelor",
-      cds: "LT-2"
-    }, {
-      id: "2",
-      title: "Thesis 2",
-      supervisors: "1002",
-      cosupervisors: ["10002", "10103"],
-      keywords: ["AI", "Data Science"],
-      type: "Company Thesis",
-      group: ["Data Research Group", "Medical Research Group"],
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
-      requirements: "Machine Learning, Medical Science, Data Analysis",
-      notes: "This project focuses on leveraging AI for healthcare advancements.",
-      expiration: "20-11-24",
-      level: "Master",
-      cds: "LT-2"
-    }, {
-      id: "3",
-      title: "Thesis 3",
-      supervisors: "1003",
-      cosupervisors: ["10002", "10101"],
-      keywords: ["Data Science"],
-      type: "Research Thesis",
-      group: ["AI Research Group", "Medical Research Group"],
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
-      requirements: "Machine Learning, Medical Science, Data Analysis",
-      notes: "This project focuses on leveraging AI for healthcare advancements.",
-      expiration: "20-11-24",
-      level: "bachelor",
-      cds: "LT-2"
-    }]);
-
-    setThesis([{
-      id: "1",
-      title: "Thesis 1",
-      supervisors: "1001",
-      cosupervisors: ["10001", "10101"],
-      keywords: ["AI"],
-      type: "Company Thesis",
-      group: ["AI Research Group"],
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
-      requirements: "Machine Learning, Medical Science, Data Analysis",
-      notes: "This project focuses on leveraging AI for healthcare advancements.",
-      expiration: "20-11-24",
-      level: "bachelor",
-      cds: "LT-2"
-    }, {
-      id: "2",
-      title: "Thesis 2",
-      supervisors: "1002",
-      cosupervisors: ["10002", "10103"],
-      keywords: ["AI", "Data Science"],
-      type: "Company Thesis",
-      group: ["Data Research Group", "Medical Research Group"],
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
-      requirements: "Machine Learning, Medical Science, Data Analysis",
-      notes: "This project focuses on leveraging AI for healthcare advancements.",
-      expiration: "20-11-24",
-      level: "Master",
-      cds: "LT-2"
-    }, {
-      id: "3",
-      title: "Thesis 3",
-      supervisors: "1003",
-      cosupervisors: ["10002", "10101"],
-      keywords: ["Data Science"],
-      type: "Research Thesis",
-      group: ["AI Research Group", "Medical Research Group"],
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
-      requirements: "Machine Learning, Medical Science, Data Analysis",
-      notes: "This project focuses on leveraging AI for healthcare advancements.",
-      expiration: "20-11-24",
-      level: "bachelor",
-      cds: "LT-2"
-    }])
-
+    if(props.loggedIn){fetchThesis()}
+    
     setFilter("title")
 
     setTitle(["Thesis 1", "Thesis 2", "Thesis 3"])
     setSupervisor(["1001", "1002", "1002"])
-    setCosupervisors(["10001", "10002", "10103", "10101"])
     setKeywords(["AI", "Data Science"])
     setType(["Company Thesis", "Research Thesis"])
     setLevel(["Bachelor", "Master"])
-    setGroups(["Data Research Group", "Medical Research Group", "AI Research Group"])
     setCds(["LT-1", "LT-2", "LT-3"])
     setOptions([
       { value: "Thesis 1", label: "Thesis 1" },
@@ -251,7 +164,6 @@ function ThesisProposals(props) {
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
               <option value="title">Title</option>
               <option value="supervisor">Supervisor</option>
-              <option value="cosupervisors">Cosupervisors</option>
               <option value="keywords">Keywords</option>
               <option value="Type">Type</option>
               <option value="groups">Groups</option>
@@ -269,8 +181,8 @@ function ThesisProposals(props) {
                   <tr>
                     <th>Type</th>
                     <th>Title</th>
-                    <th>Group</th>
-                    <th>Supervisors</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
                     <th>Expiration Date</th>
                   </tr>
                 </thead>
@@ -283,8 +195,8 @@ function ThesisProposals(props) {
                           {singleThesis.title}
                         </Link>
                       </td>
-                      <td>{singleThesis.group}</td>
-                      <td>{singleThesis.supervisors}</td>
+                      <td>{singleThesis.groups}</td>
+                      <td>{singleThesis.supervisor}</td>
                       <td>{singleThesis.expiration}</td>
                     </tr>
                   ))}

@@ -1,7 +1,5 @@
 const db = require('./db');
 
-// STUDENT SECTION
-const db = require('./db');
 
 // STUDENT SECTION
 exports.getThesisProposals = (degCode) => {
@@ -24,7 +22,7 @@ exports.getThesisProposals = (degCode) => {
               title: row.title,
               supervisor: row.supervisor,
               cosupervisors: row.cosupervisors.split('-'),
-              keywords: row.keywords,
+              keywords: row.keywords.split(','),
               type: row.type,
               groups: row.groups.split('-'),
               description: row.description,
@@ -44,7 +42,7 @@ exports.getThesisProposals = (degCode) => {
                 title: row.title,
                 supervisor: row.supervisor,
                 cosupervisors: row.cosupervisors.split('-'),
-                keywords: row.keywords,
+                keywords: row.keywords.split(','),
                 type: row.type,
                 groups: row.groups.split('-'),
                 description: row.description,
