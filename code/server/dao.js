@@ -1,7 +1,9 @@
 
 const db = require('./db');
 const dayjs = require('dayjs');
+const customParseFormat = require("dayjs/plugin/customParseFormat")
 
+dayjs.extend(customParseFormat);
 
 // PROFESSOR SECTION
 exports.getProfessors = () => {
@@ -92,6 +94,7 @@ exports.getGroupForTeacherById = (id) => {
   });
 }
 
+//can be used also when virtual clock changes
 exports.saveNewProposal = (proposal) => {
   return new Promise((resolve, reject) => {
     const sql = "INSERT INTO thesis_proposals (title, supervisor, cosupervisors, keywords, " +
@@ -111,9 +114,28 @@ exports.saveNewProposal = (proposal) => {
   });
 }
 
+exports.deleteProposal = (proposalId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM thesis_proposals WHERE id=?'
+    db.run (
+      sql,
+      [proposalId],
+      function(err) {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(this.changes);
+        }
+      }
+    )
+  });
+}
+
+
 
 //VIRTUAL CLOCK ONLY 
 exports.getExpiredProposals = (selectedTimestamp) => {
+  const ts = dayjs(selectedTimestamp, "DD-MM-YYYY");
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * from thesis_proposals'
     db.all(
@@ -127,7 +149,9 @@ exports.getExpiredProposals = (selectedTimestamp) => {
         } else {
           const proposals = rows
             .filter( r => {
-              return r;
+              const pts = dayjs(r.expiration, "DD-MM-YYYY");
+              if(pts.isBefore(ts))
+                return r;
             })
             .map( (row) => (
               {
@@ -147,6 +171,85 @@ exports.getExpiredProposals = (selectedTimestamp) => {
               }
             ));
           resolve(proposals);
+        }
+      }
+    )
+  });
+}
+
+exports.getProposalsToRevive = (selectedTimestamp) => {
+  const ts = dayjs(selectedTimestamp, "DD-MM-YYYY");
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * from archived_thesis_proposals'
+    db.all(
+      sql,
+      [],
+      (err,rows) => {
+        if(err) {
+          reject(err)
+        } else if(rows.length == 0) {
+          resolve({error: `No archived thesis proposals found while changing time`});
+        } else {
+          const proposals = rows
+            .filter( r => {
+              const pts = dayjs(r.expiration, "DD-MM-YYYY");
+              if(pts.isAfter(ts))
+                return r;
+            })
+            .map( (row) => (
+              {
+                id: row.id,
+                title: row.title,
+                supervisor: row.supervisor,
+                cosupervisors: row.cosupervisors.split('-'),
+                keywords: row.keywords,
+                type: row.type,
+                groups: row.groups.split('-'),
+                description: row.description,
+                requirements: row.requirements,
+                notes: row.notes,
+                expiration: row.expiration,
+                level: row.level,
+                cds: row.cds.split(','),
+              }
+            ));
+          resolve(proposals);
+        }
+      }
+    )
+  });
+}
+
+exports.archiveProposal = (proposal) => {
+  return new Promise((resolve, reject) => {
+    const sql = "INSERT INTO archived_thesis_proposals (title, supervisor, cosupervisors, keywords, " +
+              "type, groups, description, requirements, notes, expiration, level, cds) " +
+              "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+  db.run(
+    sql, 
+    [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+    function(err) {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(this.lastID);
+      }
+    }
+  );
+  });
+}
+
+exports.deleteProposalFromArchived = (proposalId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM archived_thesis_proposals WHERE id=?'
+    db.run (
+      sql,
+      [proposalId],
+      function(err) {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(this.changes);
         }
       }
     )

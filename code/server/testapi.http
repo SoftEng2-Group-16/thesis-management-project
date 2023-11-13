@@ -39,7 +39,7 @@ content-type: application/json
     "description": "test description",
     "requirements": "test requirements",
     "notes": "test notes",
-    "expiration": "22/10/2028",
+    "expiration": "31/12/2023",
     "level": "Bachelor",
     "cds": ["LM-1", "LM-2"]
 }
@@ -47,7 +47,8 @@ content-type: application/json
 ###
 #test api for handling virtual clock changes
 PUT http://localhost:3001/api/clockchanged HTTP/1.1
+content-type: application/json
 
 {
-    "selectedTimestamp": "01-01-2024"
+    "selectedTimestamp": "13-11-2023"
 }
