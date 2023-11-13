@@ -1,27 +1,19 @@
 // server.test.js
+process.env.NODE_ENV = 'test';
+
 const request = require('supertest');
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
+const sqlite3 = require('sqlite3');
 
 const { app, server } = require('../index');
 
 beforeAll(async () => {
   // Set up an in-memory SQLite database for testing
-  const dbPath = ':memory:';
-  const dbData = fs.readFileSync('./db_TM.sql', 'utf8');
-  const db = new sqlite3.Database(dbPath, async (err) => {
+  const testDb = ':memory:';
+  const db = new sqlite3.Database(testDb, async (err) => {
       if (err) {
         // Cannot open database
         console.error(err.message)
         throw err
-      }else{
-        //console.log('Connected to the in-memory SQlite database.')
-        await new Promise((resolve, reject) => {
-          db.exec(dbData, (err) => {
-            if (err) reject(err);
-            else resolve();
-          });
-        })
       }
   });
 global.__TEST_DB__ = db; // Make the database accessible globally
@@ -61,7 +53,6 @@ describe('Integration Tests', () => {
       .post("/api/sessions") 
       .send({ email: user.email, password: user.password })
 
-      console.log(response.body);
     expect(response.status).toBe(201) // why success code is 201 instead of 200 ?
   });
 
