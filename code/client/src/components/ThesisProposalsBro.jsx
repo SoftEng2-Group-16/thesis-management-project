@@ -37,6 +37,7 @@ function ThesisProposals(props) {
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
+        console.log(proposals)
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -49,7 +50,7 @@ function ThesisProposals(props) {
         setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
         setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
         setCds(removeDuplicates(proposals.map(item => ({ value: item.cds, label: item.cds }))));
-
+        setFilter("title")
         setOptions(uniqueByTitle);
       } catch (error) {
         console.error(error);
@@ -63,15 +64,13 @@ function ThesisProposals(props) {
   }, [props.loggedIn]);
 
   function handleReset() {
-    setFilter(null);
     setSelections([]);
-    setOptions([]);
     setThesis([...Allthesis]);
-    setVersion(version + 1);
   }
 
   function changeParameter(parameter) {
-    setFilter(parameter);
+    setVersion(version +1)
+    setFilter(parameter)
     setSelections([]);
     if (parameter === "title") setOptions(title);
     if (parameter === "supervisor") setOptions(supervisor);
@@ -79,6 +78,8 @@ function ThesisProposals(props) {
     if (parameter === "type") setOptions(type);
     if (parameter === "level") setOptions(level);
     if (parameter === "cds") setOptions(cds);
+    if (parameter === "groups") setOptions(groups);
+
   }
 
   function filtering() {
@@ -94,6 +95,9 @@ function ThesisProposals(props) {
         if (filter === "keywords") {
           return item.keywords.some((keyword) => selections.includes(keyword));
         }
+        if (filter === "groups") {
+          return item.groups.some((group) => selections.includes(group));
+        }
         return false;
       });
     }
@@ -102,12 +106,12 @@ function ThesisProposals(props) {
   }
 
   function changeSelection(selection) {
-    if (selection.length === 0) {
-      setOptions([]);
-    } else {
-      let array = selection.map(item => item.value);
-      setSelections(array);
-    }
+      let array = []
+      selection.forEach(item => {
+        array.push(item.value)
+      })
+      setSelections(array)
+    
   }
 
   return (

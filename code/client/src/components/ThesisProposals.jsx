@@ -57,7 +57,7 @@ function ThesisProposals(props) {
   //constant to animate the filter selector
   const animatedComponents = makeAnimated();
 
-  function remove(arrayAssociativo) {
+  function removeDuplicates(arrayAssociativo) {
     var uniqueElements = {};
     Object.keys(arrayAssociativo).forEach(key => {
         var value = arrayAssociativo[key];
@@ -147,6 +147,7 @@ function ThesisProposals(props) {
     if(parameter == "type") setOptions(type)
     if(parameter == "level") setOptions(level)
     if(parameter == "cds") setOptions(cds)
+    if(parameter == "groups") setOptions(groups)
     handleReset()
     /*
     if(parameter = )
