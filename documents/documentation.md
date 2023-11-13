@@ -9,6 +9,8 @@ The authentication it's realized with passport framework, email and password are
 The Credentials have been generated using https://www.browserling.com/tools/scrypt
 and can be tested with its relative counterpart tool https://www.browserling.com/tools/scrypt-check
 
+The login is performed with email and password, the system check if there is a related email in the *auth* table that has a correspondant hashed password, then, afther authentication succeds, fetch all the info of the user from the tables *student* or *teachers*, based on the role.
+
 
 |   Email                     |   Password    |   Role   |
 |-----------------------------|---------------|---------|
@@ -24,18 +26,35 @@ and can be tested with its relative counterpart tool https://www.browserling.com
 
 ### SESSIONS
 
-The session is currently initialized with all the data related to the user that is been serialized.
+The session is initialized with these user data.
 ```
+student:
 {
   id: 200001,
-  email: 'mario.rossi@studenti.polito.it',
+  surname: 'Rossi',
+  name: 'Mario',
   role: 'student',
-
+  email: 'mario.rossi@studenti.polito.it',
+  gender: 'M',
+  nationality: 'Italian',
+  degree_code: 'LM-1',
+  enrollment_year: '2010'
 }
-```
-This is a test.
 
-The session is initialized with these user data.
+professor:
+{
+  id: 268554,
+  surname: 'Bianchi',
+  name: 'Luigi',
+  role: 'teacher',
+  email: 'luigi.bianchi@polito.it',
+  group_code: 'SO',
+  department_code: 'DAUIN'
+}
+
+```
+
+
 
 ## Database Structure
 
@@ -70,6 +89,18 @@ THESIS_PROPOSALS
 
 ## Useful ideas and future development needs
 
+## React Client Application Routes
+
+- Route `/thesis`: main page with the list of thesis. Different views for students and teachers
+- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
+- Route `/login`: to perform login
+- Route `*`: for non existing pages
+
+## Main Component
+- `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
+- `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
+
+
 ## API Server
 
 ## Template for API Desription
@@ -103,6 +134,29 @@ THESIS_PROPOSALS
   - Response body: an array of objects, each containing a thesis proposal
     - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
 `cds` } 
+
+- GET `/api/cosupervisors`
+  - Description: retrieves all possible co-supervisors for a new thesis proposals 
+  - Response: `200 OK` (success), `404 Not Found` (in case of no internal or external co-supervisors found),  `500 Internal Server Error` (generic error)
+  - Response body: an object containing two lists of strings, one for internal co-supervisors (other professors), one for external co-supervisors (for example company employees cooperating with the university)
+    - { `internals`: [...], `externals`: [...] } 
+
+- GET `/api/degrees`
+- Description: retrieves all possible degrees a professore can insert a new thesis proposal for
+  - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
+  - Response body: an array containing all the possible degrees
+
+- POST `/api/newproposal`
+- Description: inserts a new thesis proposal
+  - Request body: an object describing the proposal to insert
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` } 
+    - Notes: 
+      - The server automatically finds the right groups for the proposal (based on the supervisor and internal co-supervisor's groups), so an empty array can be passed for the groups field
+      - The id is generated automatically, so any number can be passed for the id field
+  - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
+  - Response body: the id of the newly created proposal
+
 
 
 ## Utility functions
