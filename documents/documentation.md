@@ -127,6 +127,13 @@ THESIS_PROPOSALS
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
+- POST `/api/newapplication`
+  - Description: inserts a new application for a thesis proposal (student)
+  - Request body: object containing the id of the student applying and the id of the thesis proposal
+    - object{`studentId`, `proposalId`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
+  - Response body: number, indicating the number of applications inserted (should always be 1)
+
 - GET `/api/proposals/:degreeCode`
   - Description: retrieves all the thesis proposals a student can view (based on student's degree code)
   - Request param: `degreeCode`, the degree of the study course of the student
@@ -156,7 +163,6 @@ THESIS_PROPOSALS
       - The id is generated automatically, so any number can be passed for the id field
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
-
 
 
 ## Utility functions

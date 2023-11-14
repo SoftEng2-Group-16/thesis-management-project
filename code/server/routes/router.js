@@ -1,6 +1,6 @@
 const express = require('express');
 const auth = require('./auth/auth.js');
-const student = require('./controller/student.js')
+const student = require('./controller/student.js');
 const professor = require('./controller/professor.js')
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/sessions/current', auth.getCurrentSession);
 router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
+router.post('/newapplication', student.insertNewApplication);
 router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
