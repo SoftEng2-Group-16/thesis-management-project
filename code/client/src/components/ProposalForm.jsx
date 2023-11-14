@@ -24,7 +24,7 @@ import professorAPI from "../apis/professorAPI";
 const ProposalForm = (props) => {
 
     const { handleErrors } = useContext(MessageContext);
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
     const [title, setTitle] = useState('');
     const [supervisor, setSupervisor] = useState(props.user.name + " " + props.user.surname);
@@ -42,7 +42,7 @@ const ProposalForm = (props) => {
 
     const [errorMsg, setErrorMsg] = useState('');
 
-
+    const [successMessage, setSuccessMessage] = useState('');
 
 
     const [cosupervisorsInternal, setCosupervisorsInternal] = useState([]);  //[{value:"", label:""}]
@@ -55,12 +55,13 @@ const ProposalForm = (props) => {
     const [cdsIsDisabled, setCdsDisabled] = useState(true);
 
 
- 
+
 
     useEffect(() => {
 
         professorAPI.getPossibleCosupervisors()
             .then((cosupervisors) => {
+
                 setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
                 setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
             })
@@ -79,7 +80,7 @@ const ProposalForm = (props) => {
         e.preventDefault();
 
         const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt;
-        
+
         const errors = {};
 
         if (!title || title.trim() === '') {
@@ -155,7 +156,7 @@ const ProposalForm = (props) => {
             // Send data
             const proposal = {
                 title: title,
-                supervisor: supervisor,
+                supervisor: `${props.user.id}, ${props.user.name} ${props.user.surname}`,
                 cosupervisors: cosupervisors.map(obj => obj.value),
                 keywords: keywords,
                 type: type,
@@ -169,14 +170,14 @@ const ProposalForm = (props) => {
             };
             //maybe call api POST
             insertProposal(proposal);
-            navigate("/");            
-
+            //navigate("/");            
+            setSuccessMessage('Proposal submitted successfully!');
         }
     }
 
     const insertProposal = (proposal) => {
         professorAPI.insertProposal(proposal)
-            .then(() => {})
+            .then(() => { })
             .catch(err => { handleErrors(err); })
     }
 
@@ -204,189 +205,196 @@ const ProposalForm = (props) => {
 
         <Container>
             {errorMsg ? <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible>{errorMsg}</Alert> : false}
-            <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="title" >
-                    <Form.Label column="lg">Title:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="title"
-                        value={(props.proposal && props.proposal.title) ? props.proposal.title : title}
-                        onChange={ev => setTitle(ev.target.value)}
 
-                    />
-                </Form.Group>
-
-                <Form.Group as={Row} className="mb-3 mt-3" controlId="supervisor">
-                    <Form.Label column >Supervisor:</Form.Label>
-                    <Col sm={10}>
+            {successMessage ? (
+                <Alert variant='success' onClose={() => {setSuccessMessage(''); navigate("/") }} dismissible>
+                    {successMessage}
+                </Alert>
+            ) :
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group controlId="title" >
+                        <Form.Label column="lg">Title:</Form.Label>
                         <Form.Control
                             type="text"
-                            name="supervisor"
-                            value={(props.proposal && props.proposal.supervisor) ? props.proposal.supervisor : supervisor}
-                            onChange={ev => setSupervisor(ev.target.value)}
+                            name="title"
+                            value={(props.proposal && props.proposal.title) ? props.proposal.title : title}
+                            onChange={ev => setTitle(ev.target.value)}
+
                         />
-                    </Col>
-                </Form.Group>
+                    </Form.Group>
 
-                <Row>
-                    <Col>
-                        <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
-                            <Form.Label column>Select internal Cosupervisors</Form.Label>
-                            <Col sm={7}>
-                                <Select
-                                    defaultValue={[]}
-                                    isMulti
-                                    name="colors"
-                                    options={cosupervisorsInternal}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    onChange={selectedOptions => setCosupervisorsInt(selectedOptions)}
-
-                                />
-                            </Col>
-
-                        </Form.Group>
-                    </Col>
-                    <Col>
-                        <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
-                            <Form.Label column>Select external Cosupervisors</Form.Label>
-                            <Col sm={7}>
-                                <Select
-                                    defaultValue={[]}
-                                    isMulti
-                                    name="cosupervisors"
-                                    options={cosupervisorsExternal}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    onChange={selectedOptions => setCosupervisorsExt(selectedOptions)}
-
-                                />
-                            </Col>
-
-                        </Form.Group>
-                    </Col>
-                </Row>
-
-                <Row>
-                    <Col>
-                        <Form.Group as={Row} className="mb-3 mt-3" controlId="keywords">
-                            <Form.Label column>Keywords:</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    type="text"
-                                    name="keywords"
-                                    value={(props.proposal && props.proposal.keywords) ? props.proposal.keywords : keywords}
-                                    onChange={ev => setKeywords(ev.target.value)}
-                                />
-                            </Col>
-                        </Form.Group>
-                    </Col>
-
-                    <Col>
-                        <Form.Group as={Row} className="mb-3 mt-3" controlId="type">
-                            <Form.Label column>Type:</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    type="text"
-                                    name="type"
-                                    value={(props.proposal && props.proposal.type) ? props.proposal.type : type}
-                                    onChange={ev => setType(ev.target.value)}
-                                />
-                            </Col>
-                        </Form.Group>
-                    </Col>
-                </Row>
-
-
-                <Form.Group controlId="description">
-                    <Form.Label>Description:</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        name="description"
-                        value={(props.proposal && props.proposal.description) ? props.proposal.description : description}
-                        onChange={ev => setDescription(ev.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="requirements">
-                    <Form.Label>Requirements:</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        name="requirements"
-                        value={(props.proposal && props.proposal.requirements) ? props.proposal.requirements : requirements}
-                        onChange={ev => setRequirements(ev.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="notes">
-                    <Form.Label>Notes:</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        name="notes"
-                        value={(props.proposal && props.proposal.notes) ? props.proposal.notes : notes}
-                        onChange={ev => setNotes(ev.target.value)}
-                    />
-                </Form.Group>
-
-                <Row>
-                    <Col>
-                        <Form.Group as={Row} className="mb-3 mt-3" controlId="level">
-                            <Form.Label column>Level:</Form.Label>
-                            <Col sm={8}>
-                                <Form.Select value={level} onChange={handleLevelChange}>
-                                    <option>select the level</option>
-                                    <option value="bachelor">bachelor</option>
-                                    <option value="master">master</option>
-                                </Form.Select>
-                            </Col>
-                        </Form.Group>
-                    </Col>
-                    <Col>
-                        <Form.Group as={Row} className="mb-3 mt-3" controlId="cds">
-                            <Form.Label column>Select cds:</Form.Label>
-                            <Col sm={10}>
-                                <Select
-                                    value={cds}
-                                    defaultValue={[]}
-                                    isMulti
-                                    name="cds"
-                                    options={filteredCDS}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    onChange={selectedOptions => setCds(selectedOptions)}
-                                    isDisabled={cdsIsDisabled}
-                                />
-                            </Col>
-                        </Form.Group>
-                    </Col>
-                </Row>
-
-                <Form.Group controlId="expiration">
-                    <Form.Label>Expiration:</Form.Label>
-                    <Row>
-                        <Col>
-                            <DatePicker
-                                value={(props.proposal && props.proposal.expiration) ? props.proposal.expiration : expiration}
-                                onChange={(date) => {
-                                    const yyyy = date.getFullYear();
-                                    let mm = date.getMonth() + 1; // Months start at 0!
-                                    let dd = date.getDate();
-                                    const formattedDate = dd + '-' + mm + '-' + yyyy;
-                                    setExpiration(formattedDate);
-                                }}
-
-                                dateFormat="dd/MM/yyyy"  // Puoi personalizzare il formato della data
+                    <Form.Group as={Row} className="mb-3 mt-3" controlId="supervisor">
+                        <Form.Label column >Supervisor:</Form.Label>
+                        <Col sm={10}>
+                            <Form.Control
+                                type="text"
+                                name="supervisor"
+                                value={(props.proposal && props.proposal.supervisor) ? props.proposal.supervisor : supervisor}
+                                onChange={ev => setSupervisor(ev.target.value)}
                             />
                         </Col>
+                    </Form.Group>
+
+                    <Row>
+                        <Col>
+                            <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
+                                <Form.Label column>Select internal Cosupervisors</Form.Label>
+                                <Col sm={7}>
+                                    <Select
+                                        defaultValue={[]}
+                                        isMulti
+                                        name="colors"
+                                        options={cosupervisorsInternal}
+                                        className="basic-multi-select"
+                                        classNamePrefix="select"
+                                        onChange={selectedOptions => setCosupervisorsInt(selectedOptions)}
+
+                                    />
+                                </Col>
+
+                            </Form.Group>
+                        </Col>
+                        <Col>
+                            <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
+                                <Form.Label column>Select external Cosupervisors</Form.Label>
+                                <Col sm={7}>
+                                    <Select
+                                        defaultValue={[]}
+                                        isMulti
+                                        name="cosupervisors"
+                                        options={cosupervisorsExternal}
+                                        className="basic-multi-select"
+                                        classNamePrefix="select"
+                                        onChange={selectedOptions => setCosupervisorsExt(selectedOptions)}
+
+                                    />
+                                </Col>
+
+                            </Form.Group>
+                        </Col>
                     </Row>
-                </Form.Group>
+
+                    <Row>
+                        <Col>
+                            <Form.Group as={Row} className="mb-3 mt-3" controlId="keywords">
+                                <Form.Label column>Keywords:</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        type="text"
+                                        name="keywords"
+                                        value={(props.proposal && props.proposal.keywords) ? props.proposal.keywords : keywords}
+                                        onChange={ev => setKeywords(ev.target.value)}
+                                    />
+                                </Col>
+                            </Form.Group>
+                        </Col>
+
+                        <Col>
+                            <Form.Group as={Row} className="mb-3 mt-3" controlId="type">
+                                <Form.Label column>Type:</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        type="text"
+                                        name="type"
+                                        value={(props.proposal && props.proposal.type) ? props.proposal.type : type}
+                                        onChange={ev => setType(ev.target.value)}
+                                    />
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
 
-                <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
-                    Submit
-                </Button>
+                    <Form.Group controlId="description">
+                        <Form.Label>Description:</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            name="description"
+                            value={(props.proposal && props.proposal.description) ? props.proposal.description : description}
+                            onChange={ev => setDescription(ev.target.value)}
+                        />
+                    </Form.Group>
 
-            </Form>
+                    <Form.Group controlId="requirements">
+                        <Form.Label>Requirements:</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            name="requirements"
+                            value={(props.proposal && props.proposal.requirements) ? props.proposal.requirements : requirements}
+                            onChange={ev => setRequirements(ev.target.value)}
+                        />
+                    </Form.Group>
+
+                    <Form.Group controlId="notes">
+                        <Form.Label>Notes:</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            name="notes"
+                            value={(props.proposal && props.proposal.notes) ? props.proposal.notes : notes}
+                            onChange={ev => setNotes(ev.target.value)}
+                        />
+                    </Form.Group>
+
+                    <Row>
+                        <Col>
+                            <Form.Group as={Row} className="mb-3 mt-3" controlId="level">
+                                <Form.Label column>Level:</Form.Label>
+                                <Col sm={8}>
+                                    <Form.Select value={level} onChange={handleLevelChange}>
+                                        <option>select the level</option>
+                                        <option value="bachelor">bachelor</option>
+                                        <option value="master">master</option>
+                                    </Form.Select>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col>
+                            <Form.Group as={Row} className="mb-3 mt-3" controlId="cds">
+                                <Form.Label column>Select cds:</Form.Label>
+                                <Col sm={10}>
+                                    <Select
+                                        value={cds}
+                                        defaultValue={[]}
+                                        isMulti
+                                        name="cds"
+                                        options={filteredCDS}
+                                        className="basic-multi-select"
+                                        classNamePrefix="select"
+                                        onChange={selectedOptions => setCds(selectedOptions)}
+                                        isDisabled={cdsIsDisabled}
+                                    />
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    <Form.Group controlId="expiration">
+                        <Form.Label>Expiration:</Form.Label>
+                        <Row>
+                            <Col>
+                                <DatePicker
+                                    value={(props.proposal && props.proposal.expiration) ? props.proposal.expiration : expiration}
+                                    onChange={(date) => {
+                                        const yyyy = date.getFullYear();
+                                        let mm = date.getMonth() + 1; // Months start at 0!
+                                        let dd = date.getDate();
+                                        const formattedDate = dd + '-' + mm + '-' + yyyy;
+                                        setExpiration(formattedDate);
+                                    }}
+
+                                    dateFormat="dd/MM/yyyy"  // Puoi personalizzare il formato della data
+                                />
+                            </Col>
+                        </Row>
+                    </Form.Group>
+
+
+                    <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
+                        Submit
+                    </Button>
+
+                </Form>
+            }
         </Container>
 
     );
