@@ -90,6 +90,11 @@
   background: #FF6400;
 } 
 
+.navbar-brand {
+  display: flex;
+  flex-direction: column;
+}
+
 .top5 { margin-top:5px; }
 .top7 { margin-top:7px; }
 .top10 { margin-top:10px; }
