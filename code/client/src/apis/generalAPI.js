@@ -54,9 +54,10 @@ const rearrangeProposals = async (newDate) => {
     credentials: 'include',
     body: JSON.stringify(data)
   });
-
+  
+  const rearrangedProposals = await response.json();
+  
   if(response.ok) {
-    const rearrangedProposals = await response.json();
     return rearrangedProposals;
   }else {
     throw rearrangedProposals;
