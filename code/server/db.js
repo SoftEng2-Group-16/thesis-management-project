@@ -8,7 +8,7 @@ const db = new sqlite.Database(dbType, async (err) => {
         throw err; 
     }
     if(process.env.NODE_ENV === 'test'){
-        console.log('Connected to the in-memory SQlite database.')
+        //console.log('Connected to the in-memory SQlite database.')
         const dbData = fs.readFileSync('./db_TM.sql', 'utf8');
         await new Promise((resolve, reject) => {
           db.exec(dbData, (err) => {
