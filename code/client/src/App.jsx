@@ -69,10 +69,13 @@ function App() {
   const handleDateChange = async (newDate) => {
     // Placeholder for calling the API with the new date
     try {
-
-      console.log(`API call to update system date with ${newDate}`);
+      const changed = await API.rearrangeProposals(newDate);
+      if(changed===0 || changed >=0){
+        setMessage({ msg: `Time updated, overall ${changed} proposals changed status`, type: 'success' });
+      }
     } catch (error) {
-      console.error('Error updating system date:', error);
+      setMessage({ msg: error, type: 'danger' });
+
     }
   };
 

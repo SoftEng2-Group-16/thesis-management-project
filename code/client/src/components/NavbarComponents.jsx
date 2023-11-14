@@ -11,7 +11,7 @@ function NavHeader(props) {
 
   const handleDateChange = (newDate) => {
     // Handler? should pass it to app.jsx
-    console.log('New date:', newDate);
+    props.onDateChange(newDate);
   };
 
   return (

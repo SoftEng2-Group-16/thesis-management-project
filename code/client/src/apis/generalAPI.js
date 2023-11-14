@@ -44,6 +44,7 @@ const logOut = async () => {
 }
 
 const rearrangeProposals = async (newDate) => {
+  console.log(newDate);
   const data = {
     selectedTimestamp: newDate
   }
