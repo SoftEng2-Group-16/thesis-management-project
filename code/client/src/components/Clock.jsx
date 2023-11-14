@@ -5,7 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Modal, Button } from 'react-bootstrap';
 
 function Clock(props) {
-  const [currentDate, setCurrentDate] = useState(new Date()); 
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
 
   const isSameDay = (date1, date2) => {
@@ -18,11 +18,13 @@ function Clock(props) {
 
   const handleDateChange = (date) => {
     setCurrentDate(date);
+    setShowModal(true);
+
   };
 
-  const handleConfirm = () => {
-    setShowModal(true);
-  };
+  /*   const handleConfirm = () => {
+      setShowModal(true);
+    }; */
 
   const handleClose = () => {
     setShowModal(false);
@@ -45,11 +47,11 @@ function Clock(props) {
         dateFormat="dd-MM-yyyy"
         customInput={<input style={{ cursor: 'pointer' }} />}
       />
-      <Button variant="secondary"
+      {/* <Button variant="secondary"
       disabled={isSameDay(currentDate, new Date())}
       onClick={handleConfirm}>
       Change System Time
-      </Button>
+      </Button> */}
 
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>

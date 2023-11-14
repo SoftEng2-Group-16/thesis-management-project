@@ -44,13 +44,14 @@ const logOut = async () => {
 }
 
 const rearrangeProposals = async (newDate) => {
-  console.log(newDate);
   const data = {
     selectedTimestamp: newDate
   }
-
   const response = await fetch(SERVER_URL + '/api/clockchanged', {
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    }, 
     credentials: 'include',
     body: JSON.stringify(data)
   });
