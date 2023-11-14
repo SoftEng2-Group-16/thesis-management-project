@@ -49,7 +49,7 @@ function ThesisPage(props) {
                 </Col>
                 <Col md={6}>
                   <Card.Text className="mb-2"><strong>Level:</strong> {thesisDetails.level}</Card.Text>
-                  <Card.Text className="mb-2"><strong>Group:</strong> {thesisDetails.groups}</Card.Text>
+                  <Card.Text className="mb-2"><strong>Group:</strong> {thesisDetails.groups.join(', ')}</Card.Text>
                 </Col>
               </Row>
               <Row className="mb-4">

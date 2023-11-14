@@ -18,11 +18,17 @@ function removeDuplicates(array) {
 
 function ThesisProposals(props) {
   const { handleErrors } = useContext(MessageContext);
+  //the list with all the thesis from the db
   const [Allthesis, setAllThesis] = useState([]);
+  //the thesis list that we show
   const [thesis, setThesis] = useState([]);
+  //the current filter type that we have
   const [filter, setFilter] = useState();
+  //the suggestions that appera on the Select component
   const [options, setOptions] = useState([]);
+  //what we have selected from the Select component is saved here
   const [selections, setSelections] = useState([]);
+  //the associative array list of all suggestions for the Select component
   const [title, setTitle] = useState([]);
   const [supervisor, setSupervisor] = useState([]);
   const [keywords, setKeywords] = useState([]);
@@ -43,7 +49,7 @@ function ThesisProposals(props) {
 
         const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
         setTitle(uniqueByTitle);
-
+        //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
         setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
         setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
         setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
@@ -63,11 +69,16 @@ function ThesisProposals(props) {
     }
   }, [props.loggedIn]);
 
+// this function is used to give back all the thesis list
   function handleReset() {
     setSelections([]);
     setThesis([...Allthesis]);
   }
 
+  /* this function is called when we have a ne filter type
+     we reset the selection done for the Selection component
+     then we set the Options based on what filter the use chose
+  */
   function changeParameter(parameter) {
     setVersion(version +1)
     setFilter(parameter)
@@ -82,6 +93,7 @@ function ThesisProposals(props) {
 
   }
 
+  //This function filters the thesis based on what we have selected on the Select component
   function filtering() {
     let filteredThesis = [...Allthesis];
 
@@ -105,6 +117,7 @@ function ThesisProposals(props) {
     setThesis(filteredThesis);
   }
 
+  // function called every time we add or remove a selection from Select component
   function changeSelection(selection) {
       let array = []
       selection.forEach(item => {
@@ -154,7 +167,7 @@ function ThesisProposals(props) {
                           {singleThesis.title}
                         </Link>
                       </td>
-                      <td>{singleThesis.groups}</td>
+                      <td>{singleThesis.groups.join(', ')}</td>
                       <td>{singleThesis.supervisor}</td>
                       <td>{singleThesis.expiration}</td>
                     </tr>
