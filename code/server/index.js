@@ -4,6 +4,7 @@
 
 const express = require('express');
 const dayjs = require('dayjs');
+const http = require('http');
 //import router
 const router =require('./routes/router.js');
 
@@ -13,7 +14,7 @@ const port = 3001;
 
 const morgan = require('morgan');
 const cors = require('cors');
-const dao = require('./dao');
+const dao = require('./daoUsers.js');
 
 const { check, validationResult, } = require('express-validator'); // validation middleware
 
@@ -35,21 +36,40 @@ app.use(cors(corsOptions));
 // Passport: set up local strategy
 // Later the strategy will be changed to SAML2
 
-passport.use(new LocalStrategy({  usernameField: 'email', //redefining passport internal fields
-passwordField: 'password' //same thing here
-},async function verify(username, password, cb) {
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password'
+}, async function verify(username, password, cb) {
   try {
     const userDAO = await dao.getUser(username, password);
-    const user = { id: userDAO.id, email: userDAO.email, role: userDAO.role }
-    console.log(user)
-    if (!user)
+    
+    if (!userDAO || !userDAO.id) {
       return cb(null, false, 'Incorrect username or password.');
+    }
+    
+    let fetch;
+    let user;
+    
+    if (userDAO.role === "teacher") {
+      fetch = await dao.getProfessorById(userDAO.id);
+      user = {id:fetch.id, surname: fetch.surname, name: fetch.name,role: userDAO.role, email: fetch.email, group_code: fetch.group_code, department_code: fetch.department_code}
 
+    } else if (userDAO.role === "student") {
+      fetch = await dao.getStudentById(userDAO.id);
+      user = {id:fetch.id, surname: fetch.surname, name: fetch.name,role: userDAO.role, email: fetch.email, gender: fetch.gender, nationality: fetch.nationality, degree_code: fetch.degree_code, enrollment_year: fetch.enrollment_year }
+
+    }
+    
+    if (!user) {
+      return cb(null, false, 'Error, authentication succeeded but data fetch failed.');
+    }
+    
     return cb(null, user);
-  } catch {
-    return cb(null, false, 'Incorrect username or password.');
+  } catch (error) {
+    return cb(error, false, 'An error occurred during authentication.');
   }
 }));
+
 
 passport.serializeUser(function (user, cb) {
   cb(null, user);
@@ -81,9 +101,15 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
 /* ROUTERS */
 app.use('/api', router);
 
+const server = http.createServer(app);
 
-// activate the server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
+// activate the server
+// app.listen(port, () => {
+//   console.log(`Server listening at http://localhost:${port}`);
+// });
+
+module.exports = { app, server };
