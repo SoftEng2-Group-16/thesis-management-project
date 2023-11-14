@@ -4,6 +4,7 @@
 
 const express = require('express');
 const dayjs = require('dayjs');
+const http = require('http');
 //import router
 const router =require('./routes/router.js');
 
@@ -100,9 +101,15 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
 /* ROUTERS */
 app.use('/api', router);
 
+const server = http.createServer(app);
 
-// activate the server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
+// activate the server
+// app.listen(port, () => {
+//   console.log(`Server listening at http://localhost:${port}`);
+// });
+
+module.exports = { app, server };
