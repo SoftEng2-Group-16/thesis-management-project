@@ -5,9 +5,11 @@ import Nav from 'react-bootstrap/Nav';
 import { LogoutButton } from './AuthComponents';
 import User from '../assets/user.png';
 import Clock from './Clock';
+import { useState } from 'react';
 
 
 function NavHeader(props) {
+  const [showClock, setShowClock] = useState(false);
 
   const handleDateChange = (newDate) => {
     // Handler? should pass it to app.jsx
@@ -18,14 +20,20 @@ function NavHeader(props) {
     <Navbar className="d-flex justify-content-around" bg="primary" variant="dark">
       <Container>
         <div className='navbar-brand'>
-          <Navbar.Brand  >
-            Shitty Thesis Management
+          <Navbar.Brand
+            className='app-title'
+            onClick={() => {
+              if (props.loggedIn)
+                setShowClock(!showClock)
+            }
+          }>
+            Thesis Management
           </Navbar.Brand>
-          {props.loggedIn ? <Clock onDateChange={props.onDateChange} /> : null}
+          {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} /> : null) : null}
         </div>
 
         <Nav className="me-auto">
-          <Nav.Link href='#'>Thesis</Nav.Link>
+          <Nav.Link className='link' href='#'>Thesis</Nav.Link>
         </Nav>
         {props.loggedIn ? <>
           <Navbar.Text>

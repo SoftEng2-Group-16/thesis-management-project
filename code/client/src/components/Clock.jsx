@@ -6,6 +6,7 @@ import { Modal, Button } from 'react-bootstrap';
 
 function Clock(props) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [newDate, setNewDate] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const isSameDay = (date1, date2) => {
@@ -17,7 +18,7 @@ function Clock(props) {
   };
 
   const handleDateChange = (date) => {
-    setCurrentDate(date);
+    setNewDate(date);
     setShowModal(true);
 
   };
@@ -33,32 +34,30 @@ function Clock(props) {
   const handleConfirmModal = () => {
     setShowModal(false);
     let today = new Date();
-    if (currentDate != today) {
+    if (newDate != today) {
       console.log("clocks sends")
-      props.onDateChange(dayjs(currentDate).format('DD-MM-YYYY'));
+      props.onDateChange(dayjs(newDate).format('DD-MM-YYYY'));
+      setCurrentDate(newDate);
+      setNewDate("");
     }
   };
 
   return (
     <div>
       <DatePicker
+        className='mydatepicker'
         selected={currentDate}
         onChange={handleDateChange}
         dateFormat="dd-MM-yyyy"
-        customInput={<input style={{ cursor: 'pointer' }} />}
+        customInput={<input className='datepicker-input' type='text'/>}
       />
-      {/* <Button variant="secondary"
-      disabled={isSameDay(currentDate, new Date())}
-      onClick={handleConfirm}>
-      Change System Time
-      </Button> */}
 
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {`Do you want to change the system time to ${dayjs(currentDate).format('DD-MM-YYYY')}?`}
+          {`Do you want to change the system time to ${dayjs(newDate).format('DD-MM-YYYY')}?`}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

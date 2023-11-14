@@ -1,9 +1,11 @@
 
 const db = require('./db');
 const dayjs = require('dayjs');
-const customParseFormat = require("dayjs/plugin/customParseFormat")
+const customParseFormat = require("dayjs/plugin/customParseFormat");
+var isSameOrAfter = require('dayjs/plugin/isSameOrAfter')
 
 dayjs.extend(customParseFormat);
+dayjs.extend(isSameOrAfter);
 
 // PROFESSOR SECTION
 exports.getProfessors = () => {
@@ -193,7 +195,7 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
           const proposals = rows
             .filter( r => {
               const pts = dayjs(r.expiration, "DD-MM-YYYY");
-              if(pts.isAfter(ts))
+              if(pts.isSameOrAfter(ts))
                 return r;
             })
             .map( (row) => (

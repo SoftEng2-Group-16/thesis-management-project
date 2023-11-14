@@ -11,9 +11,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -22,6 +24,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -67,7 +70,7 @@
 
 .form-element {
   width: 100%;
-  padding: 13px 12px;  
+  padding: 13px 12px;
   border: none;
   font-size: 14px;
   border-radius: 4px;
@@ -88,17 +91,51 @@
 
 .form-button:hover {
   background: #FF6400;
-} 
+}
 
 .navbar-brand {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.top5 { margin-top:5px; }
-.top7 { margin-top:7px; }
-.top10 { margin-top:10px; }
-.top15 { margin-top:15px; }
-.top17 { margin-top:17px; }
-.top30 { margin-top:30px; }
+.datepicker-input {
+  width: 60%;
+  border: 1px solid white;
+  border-radius: 5px;
+  background-color: rgba(0,0,0,0);
+  color: white;
+  text-align: center;
+  font-size: 15px;
+  cursor: pointer;
+}
 
+.app-title {
+  cursor: pointer;
+}
+
+.top5 {
+  margin-top: 5px;
+}
+
+.top7 {
+  margin-top: 7px;
+}
+
+.top10 {
+  margin-top: 10px;
+}
+
+.top15 {
+  margin-top: 15px;
+}
+
+.top17 {
+  margin-top: 17px;
+}
+
+.top30 {
+  margin-top: 30px;
+}
