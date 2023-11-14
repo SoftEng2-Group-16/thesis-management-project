@@ -24,6 +24,8 @@ content-type: application/json
 {
     "studentId": "200001",
     "proposalId": "3"
+}
+
 ###
 #test the API for getting proposals
 GET http://localhost:3001/api/proposals/LM-1
