@@ -13,9 +13,13 @@ exports.getThesisProposals = (degCode) => {
         if (err) {
           reject(err);
         } else if (rows.length === 0) {
-          resolve({ error: `No thesis proposals found for study course ${degCode || 'all courses'}` });
+          resolve(
+            degCode === "" ? 
+            { error: "No thesis proposals found for all courses" } : 
+            { error: `No thesis proposals found for study course ${degCode}`}
+          );
         } else {
-          if (degCode === false) {
+          if (degCode === "") {
             // No filtering needed, return all thesis proposals
             const proposals = rows.map((row) => ({
               id: row.id,

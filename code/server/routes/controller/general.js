@@ -1,13 +1,13 @@
 const dao = require('../../dao');
 
-const getThesisProposals = async (req,res) => {
-    let studentCourse = false;
-    if(req.user.role === "student"){
-    studentCourse = req.params.degreeCode;
+const getThesisProposals = async (req, res) => {
+    let studentCourse = "";
+    if (req.user.role === "student") {
+        studentCourse = req.user.degree_code;
     }
     try {
         const proposals = await dao.getThesisProposals(studentCourse);
-        if(proposals.error){
+        if (proposals.error) {
             return res.status(404).json(proposals);
         } else {
             return res.status(200).json(proposals);
@@ -16,6 +16,6 @@ const getThesisProposals = async (req,res) => {
         return res.status(500).json(e.message);
     }
 }
- module.exports = {
+module.exports = {
     getThesisProposals
- };
+};
