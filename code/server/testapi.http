@@ -17,6 +17,19 @@ DELETE http://localhost:3001/api/sessions/current HTTP/1.1
 content-type: application/json
 
 ###
+#test insertion of a new application
+POST http://localhost:3001/api/newapplication HTTP/1.1
+content-type: application/json
+
+{
+    "studentId": "200001",
+    "proposalId": "3"
+}
+
+###
+#test the API for getting proposals
+GET http://localhost:3001/api/thesis/
+
 #test API for getting cosupervisors list
 GET http://localhost:3001/api/cosupervisors HTTP/1.1
 
@@ -51,4 +64,8 @@ content-type: application/json
 
 {
     "selectedTimestamp": "01-01-2024"
+}
+    "expiration": "22-10-2028",
+    "level": "Bachelor",
+    "cds": ["LM-1", "LM-2"]
 }

@@ -1,5 +1,8 @@
 const SERVER_URL = 'http://localhost:3001';
 
+
+// session apis
+
 const logIn = async (credentials) => {
   const response = await fetch(SERVER_URL + '/api/sessions', {
     method: 'POST',
@@ -64,6 +67,20 @@ const rearrangeProposals = async (newDate) => {
     throw rearrangedProposals;
   }
 
- }
-const API = { getUserInfo, logIn, logOut, rearrangeProposals };
+  
+  // general purpose apis 
+  const getThesisProposals = async () => {
+    const response = await fetch(SERVER_URL + '/api/thesis', {
+      credentials: 'include',
+    });
+    const proposals = await response.json();
+    if (response.ok) {
+      return proposals
+    } else {
+      throw proposals;  // an object with the error coming from the server
+    }
+  };
+
+
+const API= {getUserInfo,logIn,logOut,getThesisProposals, rearrangeProposals};
 export default API;

@@ -38,7 +38,6 @@ exports.getUser = (email, password) =>
           const pass = password;
           const salt = row.salt;
           const hashedPassword = crypto.scryptSync(pass, salt, 64).toString('hex');
-          console.log(row.password);
           if (hashedPassword === row.password) {
             console.log(row);
             resolve(row);

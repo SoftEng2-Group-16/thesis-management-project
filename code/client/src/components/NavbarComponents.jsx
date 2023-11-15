@@ -16,6 +16,7 @@ function NavHeader(props) {
     props.onDateChange(newDate);
   };
 
+
   return (
     <Navbar className="d-flex justify-content-around" bg="primary" variant="dark">
       <Container>
