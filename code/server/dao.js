@@ -71,7 +71,12 @@ exports.getThesisProposals = (degCode) => {
                 expiration: row.expiration,
                 level: row.level,
                 cds: row.cds.split(','),
-              }));
+              }
+            ));
+          
+          if(proposals.length == 0) {
+            resolve({error: `No thesis proposals found for study course ${degCode}`});
+          } else {
             resolve(proposals);
           }
         }
