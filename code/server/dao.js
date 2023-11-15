@@ -1,5 +1,6 @@
 const db = require('./db');
 
+// STUDENT SECTION
 exports.addApplicationForThesis = (thesisId, studentId, timestamp, status) => {
   return new Promise((resolve, reject) => {
     const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status) VALUES (?,?,?,?)';
@@ -19,41 +20,66 @@ exports.addApplicationForThesis = (thesisId, studentId, timestamp, status) => {
 
 exports.getThesisProposals = (degCode) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * from thesis_proposals'
+    const sql = 'SELECT * from thesis_proposals';
+    
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err) {
-          reject(err)
-        } else if(rows.length == 0) {
-          resolve({error: `No thesis proposals found for study course ${degCode}`});
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length === 0) {
+          resolve(
+            degCode === "" ? 
+            { error: "No thesis proposals found for all courses" } : 
+            { error: `No thesis proposals found for study course ${degCode}`}
+          );
         } else {
-          const proposals = rows
-            .filter( r => r.cds.match(degCode) != null)
-            .map( (row) => (
-              {
+          if (degCode === "") {
+            // No filtering needed, return all thesis proposals
+            const proposals = rows.map((row) => ({
+              id: row.id,
+              title: row.title,
+              supervisor: row.supervisor,
+              cosupervisors: row.cosupervisors.split('-'),
+              keywords: row.keywords.split(','),
+              type: row.type,
+              groups: row.groups.split(','),
+              description: row.description,
+              requirements: row.requirements,
+              notes: row.notes,
+              expiration: row.expiration,
+              level: row.level,
+              cds: row.cds.split(','),
+            }));
+            resolve(proposals);
+          } else {
+            // Filter proposals based on the study course code
+            const proposals = rows
+              .filter(r => r.cds.match(degCode) !== null)
+              .map((row) => ({
                 id: row.id,
                 title: row.title,
                 supervisor: row.supervisor,
                 cosupervisors: row.cosupervisors.split('-'),
-                keywords: row.keywords,
+                keywords: row.keywords.split(','),
                 type: row.type,
-                groups: row.groups.split('-'),
+                groups: row.groups.split(','),
                 description: row.description,
                 requirements: row.requirements,
                 notes: row.notes,
                 expiration: row.expiration,
                 level: row.level,
                 cds: row.cds.split(','),
-              }
-            ));
-          resolve(proposals);
+              }));
+            resolve(proposals);
+          }
         }
       }
-    )
+    );
   });
-}
+};
+
 
 // PROFESSOR SECTION
 exports.getProfessors = () => {
@@ -62,11 +88,11 @@ exports.getProfessors = () => {
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err) {
+      (err, rows) => {
+        if (err) {
           reject(err);
-        } else if(rows.length == 0) {
-          resolve({error: 'Problems while retrieving possible internal cosupervisors'});
+        } else if (rows.length == 0) {
+          resolve({ error: 'Problems while retrieving possible internal cosupervisors' });
         } else {
           const internals = rows.map(row => ({
             id: row.id,
@@ -87,11 +113,11 @@ exports.getExternals = () => {
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err) {
+      (err, rows) => {
+        if (err) {
           reject(err);
-        } else if(rows.length == 0) {
-          resolve({error: 'Problems while retrieving possible external cosupervisors'});
+        } else if (rows.length == 0) {
+          resolve({ error: 'Problems while retrieving possible external cosupervisors' });
         } else {
           const externals = rows.map(row => ({
             name: row.name,
@@ -111,11 +137,11 @@ exports.getDegrees = () => {
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err) {
+      (err, rows) => {
+        if (err) {
           reject(err);
-        } else if(rows.length == 0) {
-          resolve({error: 'Problems while retrieving degrees info'});
+        } else if (rows.length == 0) {
+          resolve({ error: 'Problems while retrieving degrees info' });
         } else {
           const degrees = rows.map((row) => (`${row.degree_code}  ${row.degree_title}`));
           resolve(degrees);
@@ -132,10 +158,10 @@ exports.getGroupForTeacherById = (id) => {
       sql,
       [id],
       (err, row) => {
-        if(err){
+        if (err) {
           reject(err);
         } else if (row == null) {
-          resolve({error: `Prolem while retrieving group info for teacher ${id}`});
+          resolve({ error: `Prolem while retrieving group info for teacher ${id}` });
         } else {
           resolve(row.group_code);
         }
@@ -147,18 +173,18 @@ exports.getGroupForTeacherById = (id) => {
 exports.saveNewProposal = (proposal) => {
   return new Promise((resolve, reject) => {
     const sql = "INSERT INTO thesis_proposals (title, supervisor, cosupervisors, keywords, " +
-              "type, groups, description, requirements, notes, expiration, level, cds) " +
-              "values (?,?,?,?,?,?,?,?,?,?,?,?)"
-  db.run(
-    sql, 
-    [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
-    function(err) {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(this.lastID);
+      "type, groups, description, requirements, notes, expiration, level, cds) " +
+      "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+    db.run(
+      sql,
+      [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
       }
-    }
-  );
+    );
   });
 }

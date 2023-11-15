@@ -28,7 +28,7 @@ content-type: application/json
 
 ###
 #test the API for getting proposals
-GET http://localhost:3001/api/proposals/LM-1
+GET http://localhost:3001/api/thesis/
 
 #test API for getting cosupervisors list
 GET http://localhost:3001/api/cosupervisors HTTP/1.1

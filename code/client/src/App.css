@@ -98,3 +98,27 @@
 .top17 { margin-top:17px; }
 .top30 { margin-top:30px; }
 
+.selector {
+  max-width: 160px;
+}
+.parameters {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+}
+
+
+/* ThesisPage.css */
+.thesis-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.border-top {
+  border-top: 1px solid #dee2e6;
+}
