@@ -32,7 +32,7 @@ exports.getUser = (email, password) =>
         reject(err);
       } else {
         if (!row) {
-          reject('Invalid email or password');
+          resolve(false)
         } else {
           
           const pass = password;
@@ -42,7 +42,7 @@ exports.getUser = (email, password) =>
             console.log(row);
             resolve(row);
           } else {
-            reject('Invalid email or password');
+            resolve(false);
           }
         }
       }

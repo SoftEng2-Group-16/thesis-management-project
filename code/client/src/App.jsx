@@ -71,6 +71,21 @@ function App() {
     setMessage('');
   };
 
+  const handleDateChange = async (newDate) => {
+    // Placeholder for calling the API with the new date
+    try {
+      const changed = await API.rearrangeProposals(newDate);
+      if(changed===0 || changed >=0){
+        setMessage({ msg: `Time updated, overall ${changed} proposals changed status`, type: 'success' });
+      }
+    } catch (error) {
+      setMessage({ msg: error, type: 'danger' });
+
+    }
+  };
+
+
+
   //the react container uses the outlet feature
 
   return (
@@ -80,7 +95,7 @@ function App() {
         <Route
           element={
             <>
-              <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} />
+              <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} />
               <Container fluid className="mt-3 text-center">
                 {message && (
                   <Row>

@@ -24,4 +24,6 @@ router.post('/newproposal',auth.isLoggedIn, professor.insertNewProposal);
 /*student routes*/
 
 
+router.put('/clockchanged', utils.rearrangeProposals)
+
 module.exports = router;
