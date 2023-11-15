@@ -127,6 +127,13 @@ THESIS_PROPOSALS
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
+- POST `/api/newapplication`
+  - Description: inserts a new application for a thesis proposal (student)
+  - Request body: object containing the id of the student applying and the id of the thesis proposal
+    - object{`studentId`, `proposalId`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
+  - Response body: number, indicating the number of applications inserted (should always be 1)
+
 - GET `/api/proposals/:degreeCode`
   - Description: retrieves all the thesis proposals a student can view (based on student's degree code)
   - Request param: `degreeCode`, the degree of the study course of the student
@@ -158,7 +165,6 @@ THESIS_PROPOSALS
   - Response body: the id of the newly created proposal
 
 
-
 ## Utility functions
 ### `getJson(httpResponsePromise)`
 - **Description**: A utility function for parsing HTTP responses.
@@ -177,3 +183,24 @@ THESIS_PROPOSALS
 
 This utility function is helpful when working with API requests, ensuring that you can handle HTTP responses in a consistent manner, whether they represent success or errors.
 
+## Testing
+
+Jest setted up for unit and integration testing.
+
+### Implemetation for Integration
+
+- setup process.env.NODE_ENV as 'test' in the integration test file
+- import the server, which will start listening on port 3001
+- the db file will create/open an in-memory db and populate it with the exported db in `thesis-management-project/code/server/db_TM.sql`
+- connection to the in-memory sqlite database before every test case (in the file) start execution
+- after all test cases the db is closed, the server is closed.
+
+>*IMPORTANT*: keep the `db_TM.sql` updated as the `cleanDB/db_TM.db` is updated
+
+### Commands
+
+This commands are executed only on test files under `thesis-management-project/code/server/tests` directory
+
+- `npm test`: runs all test 
+- `npm test:unit`: runs only unit tests with coverage
+- `npm run test:integration`: runs only integration tests with coverage

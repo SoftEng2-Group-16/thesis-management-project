@@ -17,6 +17,16 @@ DELETE http://localhost:3001/api/sessions/current HTTP/1.1
 content-type: application/json
 
 ###
+#test insertion of a new application
+POST http://localhost:3001/api/newapplication HTTP/1.1
+content-type: application/json
+
+{
+    "studentId": "200001",
+    "proposalId": "3"
+}
+
+###
 #test the API for getting proposals
 GET http://localhost:3001/api/thesis/
 
