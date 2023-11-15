@@ -2,7 +2,11 @@
 const sqlite = require('sqlite3');
 const fs = require('fs');
 
+//Choose the correct line (depending on which db you intend to use)
 const dbType = process.env.NODE_ENV === 'test' ? ':memory:' : './cleanDB/db_TM.db';
+//const dbType = process.env.NODE_ENV === 'test' ? ':memory:' : './db_TM_dirty.db';
+
+console.log(dbType);
 const db = new sqlite.Database(dbType, async (err) => {
     if (err){ 
         throw err; 
