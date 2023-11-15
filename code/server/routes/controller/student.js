@@ -18,7 +18,7 @@ const insertNewApplication = async (req, res) => {
     }
 }
 
-const getThesisProposals = async (req,res) => {
+/*const getThesisProposals = async (req,res) => {
     const studentCourse = req.params.degreeCode
     try {
         const proposals = await dao.getThesisProposals(studentCourse);
@@ -30,9 +30,9 @@ const getThesisProposals = async (req,res) => {
     } catch (e) {
         return res.status(500).json(e.message);
     }
-}
+}*/
  module.exports = {
      insertNewApplication,
-     getThesisProposals
+     //getThesisProposals
    
  };
