@@ -81,7 +81,7 @@ exports.getThesisProposals = (degCode) => {
           }
         }
       }
-    );
+    });
   });
 };
 
