@@ -26,8 +26,6 @@ exports.getThesisProposals = (degCode) => {
       (err,rows) => {
         if(err) {
           reject(err)
-        } else if(rows.length == 0) {
-          resolve({error: `No thesis proposals found for study course ${degCode}`});
         } else {
           const proposals = rows
             .filter( r => r.cds.match(degCode) != null)
@@ -48,7 +46,12 @@ exports.getThesisProposals = (degCode) => {
                 cds: row.cds.split(','),
               }
             ));
-          resolve(proposals);
+          
+          if(proposals.length == 0) {
+            resolve({error: `No thesis proposals found for study course ${degCode}`});
+          } else {
+            resolve(proposals);
+          }
         }
       }
     )
