@@ -5,8 +5,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Modal, Button } from 'react-bootstrap';
 
 function Clock(props) {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [newDate, setNewDate] = useState("");
+  //const [currentDate, setCurrentDate] = useState(new Date());
+  //const [newDate, setNewDate] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const isSameDay = (date1, date2) => {
@@ -18,7 +18,7 @@ function Clock(props) {
   };
 
   const handleDateChange = (date) => {
-    setNewDate(date);
+    props.setNewDate(date);
     setShowModal(true);
 
   };
@@ -34,11 +34,11 @@ function Clock(props) {
   const handleConfirmModal = () => {
     setShowModal(false);
     let today = new Date();
-    if (newDate != today) {
-      console.log("clocks sends")
-      props.onDateChange(dayjs(newDate).format('DD-MM-YYYY'));
-      setCurrentDate(newDate);
-      setNewDate("");
+    if (props.newDate != today) {
+      props.onDateChange(dayjs(props.newDate).format('DD-MM-YYYY'));
+      props.setCurrentDate(props.newDate);
+      props.setNewDate("");
+      props.setShowClock(false);
     }
   };
 
@@ -46,7 +46,7 @@ function Clock(props) {
     <div>
       <DatePicker
         className='mydatepicker'
-        selected={currentDate}
+        selected={props.currentDate}
         onChange={handleDateChange}
         dateFormat="dd-MM-yyyy"
         customInput={<input className='datepicker-input' type='text'/>}
@@ -57,7 +57,7 @@ function Clock(props) {
           <Modal.Title>Confirm</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {`Do you want to change the system time to ${dayjs(newDate).format('DD-MM-YYYY')}?`}
+          {`Do you want to change the system time to ${dayjs(props.newDate).format('DD-MM-YYYY')}?`}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

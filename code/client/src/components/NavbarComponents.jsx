@@ -31,7 +31,7 @@ function NavHeader(props) {
           }>
             Thesis Management
           </Navbar.Brand>
-          {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} /> : null) : null}
+          {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} setShowClock={setShowClock} currentDate={props.currentDate} newDate={props.newDate} setNewDate={props.setNewDate} setCurrentDate = {props.setCurrentDate}/> : null) : null}
         </div>
 
         {props.loggedIn ? <Nav className="me-auto">

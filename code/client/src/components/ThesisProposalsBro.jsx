@@ -64,10 +64,11 @@ function ThesisProposals(props) {
       }
     };
 
-    if (props.loggedIn) {
+    if (props.loggedIn || props.update == true) {
       fetchThesis();
+      props.setUpdate(false);
     }
-  }, [props.loggedIn]);
+  }, [props.loggedIn, props.update]);
 
 // this function is used to give back all the thesis list
   function handleReset() {
