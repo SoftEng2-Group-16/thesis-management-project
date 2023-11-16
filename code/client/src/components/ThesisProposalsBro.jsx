@@ -80,6 +80,7 @@ function ThesisProposals(props) {
      then we set the Options based on what filter the use chose
   */
   function changeParameter(parameter) {
+    
     setVersion(version +1)
     setFilter(parameter)
     setSelections([]);
@@ -136,7 +137,7 @@ function ThesisProposals(props) {
               <option value="title">Title</option>
               <option value="supervisor">Supervisor</option>
               <option value="keywords">Keywords</option>
-              <option value="Type">Type</option>
+              <option value="type">Type</option>
               <option value="groups">Groups</option>
               <option value="level">Level</option>
               <option value="cds">Course of study</option>
