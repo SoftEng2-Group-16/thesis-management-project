@@ -36,9 +36,18 @@ afterAll(async () => {
 
 describe('professor Integration Tests', () => {
     test('should insert new proposal', async () => {
+
+    const user = {
+      email: 'luigi.bianchi@polito.it',
+      password: "268554"
+    };
+
+    const loginResponse = await request(app).post('/api/sessions/').send(user);
+
+    if(loginResponse.status == 201) { //user logged in
         const response = await request(app)
             .post('/api/newproposal')
-            //.set("Cookie", `accessToken=${adminAccessTokenValid}; refreshToken=${adminAccessTokenValid}`)
+            // .set("Cookie", `accessToken=${adminAccessTokenValid}; refreshToken=${adminAccessTokenValid}`)
             .send({
                 title: "Sample Title",
                 supervisor: "123, John Doe",
@@ -56,7 +65,9 @@ describe('professor Integration Tests', () => {
         console.log(response);
         expect(response.status).toBe(200);
         expect(response.body).toEqual(8);
-
+    } else {
+        console.log("Logged in failed");
+    }
     });
 
     test('should insert new proposal', async () => {
