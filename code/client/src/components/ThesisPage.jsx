@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
+import studentAPI from '../apis/studentAPI';
 
 function ThesisPage(props) {
   const navigate = useNavigate();
   const { state } = useLocation();
   const [thesisDetails, setThesisDetails] = useState(null);
+  const studentId = props.user.id;
 
   useEffect(() => {
     console.log(state)
@@ -14,18 +16,26 @@ function ThesisPage(props) {
       console.error('Thesis details not available.');
       return;
     }
-
-
     setThesisDetails(state.thesisDetails);
   }, [state]);
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
-    console.log('Apply button clicked!');
+    console.log(thesisDetails);
+    studentAPI.insertApplication(studentId, thesisDetails.id)
+      .then(() => {
+        props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
+        navigate('/thesis');
+      })
+      .catch( e => {
+        console.log(e);
+        props.setMessage({ msg: e, type: 'danger' });
+      });
   };
 
   const handleGoBackClick = () => {
     // Navigate back to /thesis
+    props.setMessage('');
     navigate('/thesis');
   };
 

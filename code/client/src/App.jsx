@@ -21,8 +21,6 @@ function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [newDate, setNewDate] = useState("");
 
-  //const [newDate, setNewDate] = useState("");
-
   //the error message
   const [message, setMessage] = useState('');
 
@@ -54,10 +52,10 @@ function App() {
     };
 
     checkAuth();
-    if (loggedIn) {
+    /* if (loggedIn) {
       setCurrentDate(Date());
       handleDateChange(currentDate);
-    }
+    } */
     setMessage('');
   }, []);
 
@@ -68,6 +66,7 @@ function App() {
       setLoggedIn(true);
       setMessage({ msg: `Welcome, ${u.role}!`, type: 'success' });
       handleDateChange(currentDate);
+      console.log(currentDate);
     } catch (err) {
       console.log(err);
       setMessage({ msg: err, type: 'danger' });
@@ -87,10 +86,8 @@ function App() {
     try {
       const changed = await API.rearrangeProposals(newDate);
       if (changed === 0 || changed >= 0) {
-        setMessage({ msg: `Time updated, reloading... (overall ${changed} proposals changed)`, type: 'success' });
-        setTimeout(() => {
-          setUpdate(true);
-        }, 1000);
+        setMessage({ msg: `Time updated, overall ${changed} proposals changed`, type: 'success' });
+        setUpdate(true);
       }
     } catch (error) {
       setMessage({ msg: error, type: 'danger' });
@@ -127,7 +124,7 @@ function App() {
             <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} /> : <ThesisProposals user={user} />} ></Route>
             <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <ProposalForm user={user} />}></Route>
 
-            <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} /> : <ThesisPage />} />
+            <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
 
             <Route path="*" element={<NotFoundLayout />} />
             <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />} />
