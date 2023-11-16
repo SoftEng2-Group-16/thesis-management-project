@@ -3,6 +3,7 @@ const auth = require('./auth/auth.js');
 const student = require('./controller/student.js');
 const professor = require('./controller/professor.js')
 const general = require('./controller/general.js')
+const utils = require('./utils/utils.js');
 
 const router = express.Router();
 

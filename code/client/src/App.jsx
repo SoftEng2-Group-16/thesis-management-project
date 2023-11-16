@@ -11,6 +11,7 @@ import { LoginForm } from './components/AuthComponents';
 import ProposalForm from './components/ProposalForm.jsx';
 import ThesisProposals from './components/ThesisProposalsBro.jsx';
 import ThesisPage from './components/ThesisPage.jsx';
+import dayjs from 'dayjs';
 
 function App() {
 
@@ -19,9 +20,9 @@ function App() {
   const [user, setUser] = useState([])
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
   
-
   //the error message
   const [message, setMessage] = useState('');
+
   // If an error occurs, the error message will be shown in a toast.
   const handleErrors = (err) => {
     let msg = '';
@@ -50,6 +51,9 @@ function App() {
     };
   
     checkAuth();
+    if(loggedIn)
+      handleDateChange(dayjs().format("DD-MM-YYYY"));
+    setMessage('');
   }, []);
 
   const handleLogin = async (credentials) => {
@@ -76,7 +80,10 @@ function App() {
     try {
       const changed = await API.rearrangeProposals(newDate);
       if(changed===0 || changed >=0){
-        setMessage({ msg: `Time updated, overall ${changed} proposals changed status`, type: 'success' });
+        setMessage({ msg: `Time updated, reloading... (overall ${changed} proposals changed)`, type: 'success' });
+        setTimeout( () => {
+          window.location.reload(true);  
+        }, 1000); 
       }
     } catch (error) {
       setMessage({ msg: error, type: 'danger' });
