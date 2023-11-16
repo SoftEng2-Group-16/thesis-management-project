@@ -12,8 +12,8 @@ const insertNewApplication = async (req, res) => {
         return res.status(201).json(changes);
     } catch(e) {
         if(e.message.includes("SQLITE_CONSTRAINT")) {
-            e.message = "Application already submitted, wait for professor response"
-;        }
+            e.message = "Application already submitted, wait for professor response";       
+        }
         return res.status(500).json(e.message);
     }
 }
