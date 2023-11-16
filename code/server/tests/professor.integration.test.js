@@ -35,40 +35,39 @@ afterAll(async () => {
 });
 
 describe('professor Integration Tests', () => {
-    test('should insert new proposal', async () => {
+    // test('should insert new proposal', async () => {
 
-    const user = {
-      email: 'luigi.bianchi@polito.it',
-      password: "268554"
-    };
+    // const user = {
+    //   email: 'luigi.bianchi@polito.it',
+    //   password: "268554"
+    // };
 
-    const loginResponse = await request(app).post('/api/sessions/').send(user);
+    // const loginResponse = await request(app).post('/api/sessions/').send(user);
 
-    if(loginResponse.status == 201) { //user logged in
-        const response = await request(app)
-            .post('/api/newproposal')
-            // .set("Cookie", `accessToken=${adminAccessTokenValid}; refreshToken=${adminAccessTokenValid}`)
-            .send({
-                title: "Sample Title",
-                supervisor: "123, John Doe",
-                cosupervisors: ["Maria Rossi, 268553, DAD"],
-                keywords: "Sample, Keywords",
-                type: "Sample Type",
-                groups: [""],
-                description: "Sample Description",
-                requirements: "Sample Requirements",
-                notes: "Sample Notes",
-                expiration: "01-01-2024", // Assuming date format is dd-mm-yyyy
-                level: "master",
-                cds: ["LM adha"],
-            });
-        console.log(response);
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual(8);
-    } else {
-        console.log("Logged in failed");
-    }
-    });
+    // if(loginResponse.status == 201) { //user logged in
+    //     const response = await request(app)
+    //         .post('/api/newproposal')
+    //         .send({
+    //             title: "test title2",
+    //             supervisor: "268556",
+    //             cosupervisors: ["Maria Rossi, 268553, DAD", "Marco Rossi, REPLY", "Stefano Mariani, 268565, DAT"],
+    //             keywords: "test1, test2",
+    //             type: "Abroad Thesis",
+    //             groups: [],
+    //             description: "test description",
+    //             requirements: "test requirements",
+    //             notes: "test notes",
+    //             expiration: "31/12/2023",
+    //             level: "Bachelor",
+    //             cds: ["LM-1", "LM-2"]
+    //         });
+    //     console.log(response);
+    //     expect(response.status).toBe(200);
+    //     expect(response.body).toEqual(8);
+    // } else {
+    //     console.log("Logged in failed");
+    // }
+    // });
 
     test('should insert new proposal', async () => {
         const response = await request(app)
