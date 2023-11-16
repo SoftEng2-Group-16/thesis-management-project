@@ -23,7 +23,7 @@ const { check } = require('express-validator');
 
 exports.getUser = (email, password) => 
 {
-  console.log(email,password) 
+  //console.log(email,password) 
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM auth WHERE email = ?';
 
@@ -32,17 +32,17 @@ exports.getUser = (email, password) =>
         reject(err);
       } else {
         if (!row) {
-          reject('Invalid email or password');
+          resolve(false)
         } else {
           
           const pass = password;
           const salt = row.salt;
           const hashedPassword = crypto.scryptSync(pass, salt, 64).toString('hex');
           if (hashedPassword === row.password) {
-            console.log(row);
+            //console.log(row);
             resolve(row);
           } else {
-            reject('Invalid email or password');
+            resolve(false);
           }
         }
       }

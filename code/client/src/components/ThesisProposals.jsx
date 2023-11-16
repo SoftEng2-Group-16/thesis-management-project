@@ -9,8 +9,11 @@ import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
-import Select from 'react-select'
+import Select from 'react-select';
 import { Col, Row } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
+import makeAnimated from 'react-select/animated';
 
 /*
 here we can implement the home, the home shows the thesis;
@@ -22,219 +25,247 @@ if role:
 
 function ThesisProposals(props) {
 
-  const [loggedIn, setLoggedIn] = useState(false);
   const { handleErrors } = useContext(MessageContext);
+  //array where we save all the thesis that we fetch
   const [Allthesis, setAllThesis] = useState([]);
+  //this are the thesis that we need to show
   const [thesis, setThesis] = useState([]);
-  const [modalShow, setModalShow] = useState(false);
+  //this is the filter type that we selected
   const [filter, setFilter] = useState();
-  const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-  ]
+  //this are all the possible result for a specific filter type
+  const [options, setOptions] = useState([]);
+  //this are all the selected results for a specific filter type 
+  const [selections, setSelections] = useState([]);
+  //here we save all the data for the specific types
+  const [title, setTitle] = useState([])
+  const [supervisor, setSupervisor] = useState([])
+  const [keywords, setKeywords] = useState([])
+  const [type, setType] = useState([])
+  const [level, setLevel] = useState([])
+  const [cds, setCds] = useState([])
+  const [groups, setGroups] = useState([])
+
+  //this is used to reset the filter
+  const [version, setVersion] = useState(0);
+
+  //function to reset the selector
+  function handleReset() {
+    setVersion(version + 1);
+  }
+
+
+  //constant to animate the filter selector
+  const animatedComponents = makeAnimated();
+
+  function removeDuplicates(arrayAssociativo) {
+    var uniqueElements = {};
+    Object.keys(arrayAssociativo).forEach(key => {
+        var value = arrayAssociativo[key];
+        uniqueElements[value] = key; // Memorizza solo l'ultima chiave associata al valore
+    });
+
+    var uniqueArrayAssociativo = {};
+    Object.keys(uniqueElements).forEach(value => {
+        var key = uniqueElements[value];
+        uniqueArrayAssociativo[key] = value;
+    });
+
+    return uniqueArrayAssociativo;
+}
 
 
   useEffect(() => {
-    //This will be deleted when the BE part will be finished
-    setAllThesis([{ 
-      id: "1",
-      title: "Thesis 1", 
-      supervisors:"1001", 
-      cosupervisors:"1001, 10101", 
-      keywords: "AI", 
-      type: "Company Thesis", 
-      group: "AI Research Group, Medical Research Group", 
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.", 
-      requirements: "Machine Learning, Medical Science, Data Analysis", 
-      notes: "This project focuses on leveraging AI for healthcare advancements.", 
-      expiration: "20-11-24", 
-      level: "bachelor", 
-      cds: "LT-2" 
-    },{ 
-      id: "2",
-      title: "Thesis 2",
-      supervisors:"1001",  
-      cosupervisors:"1001, 10101", 
-      keywords: "AI", 
-      type: "Company Thesis", 
-      group: "AI Research Group, Medical Research Group", 
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.", 
-      requirements: "Machine Learning, Medical Science, Data Analysis", 
-      notes: "This project focuses on leveraging AI for healthcare advancements.", 
-      expiration: "20-11-24", 
-      level: "bachelor", 
-      cds: "LT-2" 
-    },{ 
-      id: "3",
-      title: "Thesis 3", 
-      supervisors:"1001", 
-      cosupervisors:"1001, 10101", 
-      keywords: "Data Science", 
-      type: "Company Thesis", 
-      group: "AI Research Group, Medical Research Group", 
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.", 
-      requirements: "Machine Learning, Medical Science, Data Analysis", 
-      notes: "This project focuses on leveraging AI for healthcare advancements.", 
-      expiration: "20-11-24", 
-      level: "bachelor", 
-      cds: "LT-2" 
-    }]);
 
-    setThesis([{ 
-      id: "1",
-      title: "Thesis 1", 
-      supervisors:"1001", 
-      cosupervisors:"1001, 10101", 
-      keywords: "AI", 
-      type: "Company Thesis", 
-      group: "AI Research Group, Medical Research Group", 
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.", 
-      requirements: "Machine Learning, Medical Science, Data Analysis", 
-      notes: "This project focuses on leveraging AI for healthcare advancements.", 
-      expiration: "20-11-24", 
-      level: "bachelor", 
-      cds: "LT-2" 
-    },{ 
-      id: "2",
-      title: "Thesis 2",
-      supervisors:"1001",  
-      cosupervisors:"1001, 10101", 
-      keywords: "AI", 
-      type: "Company Thesis", 
-      group: "AI Research Group, Medical Research Group", 
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.", 
-      requirements: "Machine Learning, Medical Science, Data Analysis", 
-      notes: "This project focuses on leveraging AI for healthcare advancements.", 
-      expiration: "20-11-24", 
-      level: "bachelor", 
-      cds: "LT-2" 
-    },{ 
-      id: "3",
-      title: "Thesis 3", 
-      supervisors:"1001", 
-      cosupervisors:"1001, 10101", 
-      keywords: "Data Science", 
-      type: "Company Thesis", 
-      group: "AI Research Group, Medical Research Group", 
-      description: "Develop AI-powered healthcare solutions for diagnosing diseases.", 
-      requirements: "Machine Learning, Medical Science, Data Analysis", 
-      notes: "This project focuses on leveraging AI for healthcare advancements.", 
-      expiration: "20-11-24", 
-      level: "bachelor", 
-      cds: "LT-2" 
-    }])
-    
-    /*this part will be used later and changed in order to set up the thesis array depending on the user type
+    //api fetch
 
-    const checkAuth = async () => {
-      if (loggedIn) {
-        try {
-          const user = await API.getUserInfo(); // we have the user info here 
-          if (user) {
-            setUser({ //TODO this needs to be changed to set the new info
-              id: user.id,
-              role: user.role, //for now role?
-            })
-
-            setLoggedIn(true);
+    const fetchThesis = async () => {
+      try {
+        const proposals = await API.getThesisProposals();
+        setAllThesis(proposals)
+        setThesis(proposals)
+        var titleApp = []
+        var supervisorApp = []
+        var groupsApp = []
+        var keywordsApp = []
+        var typeApp = []
+        var levelApp = []
+        var cdsApp = []
+        for (let i = 0; i < proposals.length; i++) {
+          if(!titleApp.includes({value: proposals[i].title , label: proposals[i].title})) 
+            titleApp.push({value: proposals[i].title , label: proposals[i].title})
+          supervisorApp.push({value: proposals[i].supervisor , label: proposals[i].supervisor})
+          typeApp.push({value: proposals[i].type , label: proposals[i].type})
+          if(!levelApp.includes({value: proposals[i].level , label: proposals[i].level}))
+            levelApp.push({value: proposals[i].level , label: proposals[i].level})
+          cdsApp.push({value: proposals[i].cds , label: proposals[i].cds})
+          //inserting double values
+          for(let x = 0; x < proposals[i].keywords.length; x++){
+            if(!keywordsApp.includes({value: proposals[i].keywords[x] , label: proposals[i].keywords[x]}))
+              keywordsApp.push({value: proposals[i].keywords[x] , label: proposals[i].keywords[x]})
           }
-        } catch { (err) => { return null; } }
+          for(let x = 0; x < proposals[x].groups.length; x++){
+            if(!groupsApp.includes({value: proposals[i].groups[x] , label: proposals[i].groups[x]}) )
+              groupsApp.push({value: proposals[i].groups[x] , label: proposals[i].groups[x]})
+          }
+         
+        }
+        titleApp = removeDuplicates(titleApp) 
+        supervisorApp = removeDuplicates(supervisorApp) 
+        keywordsApp = removeDuplicates(keywordsApp) 
+        groupsApp = removeDuplicates(groupsApp) 
+        typeApp = removeDuplicates(typeApp) 
+        levelApp = removeDuplicates(levelApp) 
+        cdsApp = removeDuplicates(cdsApp)
+         
+        setTitle(titleApp)
+        setSupervisor(supervisorApp)
+        setKeywords(keywordsApp)
+        setGroups(groupsApp)
+        setType(typeApp)
+        setLevel(levelApp)
+        setCds(cdsApp)
+        setOptions(titleApp)
 
+      } catch (error) {
+        console.error(error);
+        // Handle error
       }
-    }
-    checkAuth();*/
-  }, []);
- 
+    };
+    if(props.loggedIn){fetchThesis()}
+    
+    
 
-  function filtering(){
-    var listThesis = [...Allthesis]
-    if(filter == "") {setThesis(listThesis)
-    }else{
-    listThesis = listThesis.filter((item) => {
-      if(filter == item.keywords) return item
-    });
-    console.log(listThesis)
-    setThesis(listThesis)}
+  }, []);
+
+
+  function changeParameter(parameter) {
+    setFilter(parameter)
+    setSelections([])
+    if(parameter == "title") setOptions(title)
+    if(parameter == "supervisor") setOptions(supervisor)
+    if(parameter == "keywords") setOptions(keywords)
+    if(parameter == "type") setOptions(type)
+    if(parameter == "level") setOptions(level)
+    if(parameter == "cds") setOptions(cds)
+    if(parameter == "groups") setOptions(groups)
+    handleReset()
+    /*
+    if(parameter = )
+    let array = []
+    selection.forEach(item => {
+        array.push(item.value)
+    })
+    setSelections(array)*/
   }
+
+  function filtering() {
+    var listThesis = [...Allthesis]
+    if (filter.lenght == 0) {
+      setThesis(listThesis)
+    } else {
+
+      listThesis = listThesis.filter((item) => {
+
+        if (filter == "title") {if(selections.includes(item.title)) return item}
+        
+        if (filter == "supervisor"){if(selections.includes(item.supervisor)) return item} 
+        if (filter == "type") {if(selections.includes(item.type)) return item} 
+        if (filter == "cds") {if(selections.includes(item.cds)) return item} 
+        if (filter == "level") {if(selections.includes(item.level)) return item} 
+        if (filter == "keywords") {
+          var check = false
+          //iterate two arrays to see if there are elements in common
+          for (let i = 0; i < item.keywords.length; i++) { 
+  
+            for (let j = 0; j < selections.length; j++) { 
+      
+                if (item.keywords[i] == selections[j]) { 
+                    check = true; 
+                } 
+            }
+          }
+          if(check) return item
+        
+      }
+      setThesis(listThesis)
+    })
+  }
+}
+
+  function changeSelection(selection) {
+    if (selection.lenght == 0) {
+      setOptions([])
+    } else {
+      let array = []
+      selection.forEach(item => {
+        array.push(item.value)
+      })
+      setSelections(array)
+    }
+  }
+
 
 
   return (
     <>
-    {props.loggedIn && props.user.role === "student" ? (
-      <div style={{ marginTop: '10px' }}> 
-                <Form className="d-flex" onChange={(event) => {setFilter(event.target.value)}}>
-                <Form.Select aria-label="Default select example" style={{ lenght: '10px' }}>
-                  <option value="title">Title</option>
-                  <option value="group">Group</option>
-                  <option value="keyword">Keyword</option>
-                </Form.Select>
-                <Select options={options} />
-            <Button variant="outline-success" onClick={()=>filtering()}>Search</Button>
+      {props.loggedIn ? (
+        <div style={{ marginTop: '10px' }}>
+          <Form className="d-flex" >
+            <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
+              <option value="title">Title</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="keywords">Keywords</option>
+              <option value="Type">Type</option>
+              <option value="groups">Groups</option>
+              <option value="level">Level</option>
+              <option value="cds">Course of study</option>
+            </Form.Select>
+            <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
+            <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
           </Form>
 
-      {thesis.map((singleThesis) => (
+          <Row style={{ marginTop: '20px' }}>
+            <Col xs={12}>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {thesis.map((singleThesis) => (
+                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                      <td>{singleThesis.type}</td>
+                      <td>
+                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                          {singleThesis.title}
+                        </Link>
+                      </td>
+                      <td>{singleThesis.groups}</td>
+                      <td>{singleThesis.supervisor}</td>
+                      <td>{singleThesis.expiration}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
 
-    <Card border="primary" style={{ marginTop: '20px' }}>
-    <Card.Header as="h3">{singleThesis.title}</Card.Header>
-    <Card.Body>
-      <Card.Title as="h4">{singleThesis.group}</Card.Title>
-      <Card.Text >
-        {singleThesis.description}
-      </Card.Text>
-      <Button variant="primary" onClick={() => setModalShow(singleThesis)}>Show me more</Button>
-    </Card.Body>
-  </Card>
-      
-      ))}
-            <MyVerticallyCenteredModal
-            thesis = {modalShow}
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-      />
-      
-      </div>
-      ) : props.loggedIn && props.user.role === "teacher" ?(
-        <div>Logged in as a professor!</div> //TODO: Insert here code to the professor page
+
+
+        </div>
       ):(
-        <div>You need to LOGIN!</div> 
-
+        <div>You need to LOGIN!</div>
       )
-    }
+      }
 
     </>
   );
 }
 
-function MyVerticallyCenteredModal(props) {
-  return (
-    <Modal
-     {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-            {props.thesis.title}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <h4>{props.thesis.group}</h4>
-        <h5>Professor: {props.thesis.supervisors}    Cosupervisors: {props.thesis.cosupervisors}</h5> 
-        <h6>
-          {props.thesis.description}
-        </h6>
-        <h9>{props.thesis.notes}</h9>
-
-        <h10>Final day to apply: {props.thesis.expiration}</h10>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="success" >Submit</Button>
-        <Button variant="danger" onClick={props.onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-}
 
 export default ThesisProposals;
