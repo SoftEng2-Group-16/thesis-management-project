@@ -19,23 +19,36 @@ const login = async (req, res, next) => {
     req.login(user, (err) => {
       if (err)
         return next(err);
-
       // req.user contains the authenticated user, we send all the user info back
-      return res.status(201).json(req.user);
+      const userInfo = {
+        id: req.user.id,
+        role: req.user.role,
+        name: req.user.name,
+        surname: req.user.surname,
+        degree_code: req.user.role ==='student' ? req.user.degree_code : ""
+      }
+      return res.status(201).json(userInfo);
     });
   })(req, res, next);
 };
 
 const getCurrentSession = (req, res) => {
   if (req.isAuthenticated()) {
-    res.status(200).json(req.user);
+    const userInfo = {
+      id: req.user.id,
+      role: req.user.role,
+      name: req.user.name,
+      surname: req.user.surname,
+      degree_code: req.user.role ==='student' ? req.user.degree_code : ""
+    }
+    res.status(200).json(userInfo);
   } else {
     res.status(401).json({ error: 'Not authenticated' });
   }
 };
 
 const logout = (req, res) => {
-  console.log(req.user)
+  //console.log(req.user)
   req.logout(() => {
     res.sendStatus(204);
   });

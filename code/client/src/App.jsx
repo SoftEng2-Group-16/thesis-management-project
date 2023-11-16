@@ -4,7 +4,7 @@ import './App.css'
 import NavHeader from './components/NavbarComponents';
 import { NotFoundLayout } from './components/PageLayout';
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import MessageContext from './messageCtx.jsx';
 import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
@@ -14,10 +14,9 @@ import ThesisPage from './components/ThesisPage.jsx';
 import dayjs from 'dayjs';
 
 function App() {
-
   const [loggedIn, setLoggedIn] = useState(null);
 
-  const [user, setUser] = useState([])
+  const [user, setUser] = useState({})
   const [update, setUpdate] = useState(false); // unused, can be used to trigger an update
   
   //the error message
@@ -36,12 +35,12 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const user = await API.getUserInfo();
+        const u = await API.getUserInfo();
         setUser({
-          id: user.id,
-          role: user.role,
-          name: user.name,
-          surname: user.surname,
+          id: u.id,
+          role: u.role,
+          name: u.name,
+          surname: u.surname,
         });
         setLoggedIn(true);
       } catch (err) {
@@ -58,9 +57,10 @@ function App() {
 
   const handleLogin = async (credentials) => {
     try {
-      const user = await API.logIn(credentials);
+      const u = await API.logIn(credentials);
+      setUser(u);
       setLoggedIn(true);
-      setMessage({ msg: `Welcome, ${user.role}!`, type: 'success' });
+      setMessage({ msg: `Welcome, ${u.role}!`, type: 'success' });
     } catch (err) {
       console.log(err);
       setMessage({ msg: err, type: 'danger' });
@@ -71,8 +71,8 @@ function App() {
     await API.logOut();
     setLoggedIn(false);
     // clean up everything
-
     setMessage('');
+    setUser(null);
   };
 
   const handleDateChange = async (newDate) => {
@@ -119,7 +119,7 @@ function App() {
         > 
           <Route  path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm login={handleLogin} />)}/>
           <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user}/> : <ThesisProposals user={user}/>} ></Route>
-          <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user}/> : <ProposalForm user={user}/>}></Route>
+          <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <ProposalForm user={user}/>}></Route>
           
           <Route path="/thesis/:id" element={loggedIn? <ThesisPage user={user}/>: <ThesisPage/>}/>
          

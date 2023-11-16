@@ -28,6 +28,7 @@ const getUserInfo = async () => {
   });
   const user = await response.json();
   if (response.ok) {
+    //console.log(user);
     return user;
   } else {
     throw user;  // an object with the error coming from the server

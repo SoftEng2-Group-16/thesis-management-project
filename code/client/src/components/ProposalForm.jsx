@@ -27,7 +27,7 @@ const ProposalForm = (props) => {
     const navigate = useNavigate();
 
     const [title, setTitle] = useState('');
-    const [supervisor, setSupervisor] = useState(props.user.name + " " + props.user.surname);
+    //const [supervisor, setSupervisor] = useState(props.user.name + " " + props.user.surname);
     const [cosupervisorsInt, setCosupervisorsInt] = useState([]); //to save the choice
     const [cosupervisorsExt, setCosupervisorsExt] = useState([]); //to save the choice
     const [keywords, setKeywords] = useState('');
@@ -54,15 +54,22 @@ const ProposalForm = (props) => {
     const [filteredCDS, setFilteredCDS] = useState([]);
     const [cdsIsDisabled, setCdsDisabled] = useState(true);
 
-
+    const supervisor = `${props.user.id}, ${props.user.name} ${props.user.surname}`
 
 
     useEffect(() => {
-
+        //console.log(props.user);
         professorAPI.getPossibleCosupervisors()
             .then((cosupervisors) => {
+                setCosupervisorsInternal(cosupervisors.internals.filter(str => {
+                    const id1 = (str.split(' ')[2]).replace(',', '');
+                    const idSupervisor = (supervisor.split(' ')[0]).replace(',','');
+                    console.log(idSupervisor);
+                    console.log(id1)
 
-                setCosupervisorsInternal(cosupervisors.internals.map(str => ({ value: str, label: str })));
+                    if(id1 !== idSupervisor)
+                        return str;
+                }).map(str => ({ value: str, label: str })));
                 setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
             })
             .catch((err) => { handleErrors(err); });
@@ -156,7 +163,7 @@ const ProposalForm = (props) => {
             // Send data
             const proposal = {
                 title: title,
-                supervisor: `${props.user.id}, ${props.user.name} ${props.user.surname}`,
+                supervisor: supervisor,
                 cosupervisors: cosupervisors.map(obj => obj.value),
                 keywords: keywords,
                 type: type,
@@ -200,10 +207,9 @@ const ProposalForm = (props) => {
 
     }
 
-
     return (
-
-        <Container>
+        <>
+        { props.loggedIn ? <Container>
             {errorMsg ? <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible>{errorMsg}</Alert> : false}
 
             {successMessage ? (
@@ -229,7 +235,7 @@ const ProposalForm = (props) => {
                             <Form.Control
                                 type="text"
                                 name="supervisor"
-                                value={(props.proposal && props.proposal.supervisor) ? props.proposal.supervisor : supervisor}
+                                value={supervisor}
                                 onChange={ev => setSupervisor(ev.target.value)}
                             />
                         </Col>
@@ -396,6 +402,10 @@ const ProposalForm = (props) => {
                 </Form>
             }
         </Container>
+        : 
+        <div>You need to LOGIN!</div>
+        }
+    </>
 
     );
 }

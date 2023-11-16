@@ -6,7 +6,7 @@ const fs = require('fs');
 //const dbType = process.env.NODE_ENV === 'test' ? ':memory:' : './cleanDB/db_TM.db';
 const dbType = process.env.NODE_ENV === 'test' ? ':memory:' : './db_TM_dirty.db';
 
-console.log(dbType);
+//console.log(dbType);
 const db = new sqlite.Database(dbType, async (err) => {
     if (err){ 
         throw err; 
