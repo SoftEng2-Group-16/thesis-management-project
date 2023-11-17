@@ -40,6 +40,7 @@ function ThesisProposals(props) {
   const animatedComponents = makeAnimated();
 
   useEffect(() => {
+    
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
@@ -81,7 +82,7 @@ function ThesisProposals(props) {
      then we set the Options based on what filter the use chose
   */
   function changeParameter(parameter) {
-    
+    console.log(groups);
     setVersion(version +1)
     setFilter(parameter)
     setSelections([]);
@@ -132,7 +133,7 @@ function ThesisProposals(props) {
   return (
     <>
       {props.loggedIn ? (
-        <div style={{ marginTop: '10px' }}>
+        <div style={{ marginTop: '10px' }} >
           <Form className="d-flex">
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
               <option value="title">Title</option>

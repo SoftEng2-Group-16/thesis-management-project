@@ -36,6 +36,7 @@ const getDegreesInfo = async (req,res) => {
 
 const insertNewProposal = async (req, res) => {
     const cosupervisors = req.body.cosupervisors;
+    const supervisor=req.body.supervisor;
     let groups = [];
 
     for (c of cosupervisors) {
@@ -50,7 +51,10 @@ const insertNewProposal = async (req, res) => {
             }
         } 
     }
-    
+    const group=await dao.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
+    if(!groups.includes(group)){
+        groups.push(group);
+    }
     let proposal = new models.ThesisProposal(
         -1, //can be whatever, DB handles autoincrement id
         req.body.title,

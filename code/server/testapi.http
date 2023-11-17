@@ -8,8 +8,8 @@ POST http://localhost:3001/api/sessions/ HTTP/1.1
 content-type: application/json
 
 {
-    "email": "mario.rossi@studenti.polito.it",
-    "password": "200001"
+    "email": "maria.rossi@polito.it",
+    "password": "268553"
 }
 
 ###
@@ -45,7 +45,7 @@ content-type: application/json
 {
     "title": "test title2",
     "supervisor": "268556",
-    "cosupervisors": ["Maria Rossi, 268553, DAD", "Marco Rossi, REPLY", "Stefano Mariani, 268565, DAT"],
+    "cosupervisors": [],
     "keywords": "test1, test2",
     "type": "Abroad Thesis",
     "groups": [],
