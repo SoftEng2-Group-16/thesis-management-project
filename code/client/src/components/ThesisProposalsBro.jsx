@@ -40,7 +40,6 @@ function ThesisProposals(props) {
   const animatedComponents = makeAnimated();
 
   useEffect(() => {
-    
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
@@ -48,17 +47,23 @@ function ThesisProposals(props) {
         setAllThesis(proposals);
         setThesis(proposals)
 
-        const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
-        setTitle(uniqueByTitle);
-        //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
-        setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
-        setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
-        setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
-        setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
-        setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
-        setCds(removeDuplicates(proposals.map(item => ({ value: item.cds, label: item.cds }))));
-        setFilter("title")
-        setOptions(uniqueByTitle);
+        if(props.user.role == 'teacher') {
+          console.log("quando é que estou a entrar aqui");
+          filterByTeacher(proposals);
+        } else {
+          const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
+          setTitle(uniqueByTitle);
+          //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
+          setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
+          setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
+          setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
+          setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
+          setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
+          setCds(removeDuplicates(proposals.map(item => ({ value: item.cds, label: item.cds }))));
+          setFilter("title")
+          setOptions(uniqueByTitle);
+        }
+
       } catch (error) {
         console.error(error);
         // Handle error
@@ -130,9 +135,22 @@ function ThesisProposals(props) {
     
   }
 
+  function filterByTeacher(proposals) {
+    let teacherThesis = [];
+    proposals.forEach(thesis => {
+      let spv = thesis.supervisor.split(', ');
+      if (spv[0] == props.user.id && spv[1].includes(props.user.name) && spv[1].includes(props.user.surname)) {
+        teacherThesis.push(thesis);
+      }
+
+    })
+    console.log("filtered teacher thesis", teacherThesis)
+    setThesis(teacherThesis);
+  }
+
   return (
     <>
-      {props.loggedIn ? (
+      {props.loggedIn && props.user.role == 'student'?
         <div style={{ marginTop: '10px' }} >
           <Form className="d-flex">
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
@@ -180,9 +198,40 @@ function ThesisProposals(props) {
             </Col>
           </Row>
         </div>
-      ) : (
-        <div>You need to LOGIN!</div>
-      )}
+       : props.user.role == 'teacher'? 
+          <Row style={{ marginTop: '20px' }}>
+            <Col xs={12}>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  { thesis.map((singleThesis) => (
+                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                      <td>{singleThesis.type}</td>
+                      <td>
+                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                          {singleThesis.title}
+                        </Link>
+                      </td>
+                      <td>{singleThesis.groups.join(', ')}</td>
+                      <td>{singleThesis.supervisor}</td>
+                      <td>{singleThesis.expiration}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+       :
+       <div>You need to LOGIN!</div>
+      }
     </>
   );
 }

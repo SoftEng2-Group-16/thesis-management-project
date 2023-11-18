@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Navbar, Container, Button } from 'react-bootstrap';
+import { Navbar, Container, Button, NavbarText } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
 import { LogoutButton } from './AuthComponents';
@@ -41,10 +41,18 @@ function NavHeader(props) {
           {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} setShowClock={setShowClock} currentDate={props.currentDate} newDate={props.newDate} setNewDate={props.setNewDate} setCurrentDate={props.setCurrentDate} /> : null) : null}
           {props.loggedIn ?
             <Nav className="me-auto">
-              <Nav.Link className='link' onClick={() => navigate('/thesis')}>Thesis</Nav.Link>
-              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/proposal')}>Proposal</Nav.Link> : null}
+              {
+                props.user.role == 'student' ?
+                <Nav.Link className='link' onClick={() => navigate('/thesis')}> All Thesis</Nav.Link>
+              : null}
+              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link> : null}
             </Nav> : null}
           <Nav>
+            {props.loggedIn ?
+            <NavbarText>
+              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/')}>My Proposals</Nav.Link> : null}
+            </NavbarText>
+            : null}
             {props.loggedIn ?
               <Navbar.Text>
                 <img src={User} style={{ width: '45px', height: 'auto', fill: 'white' }} alt="User:" />
