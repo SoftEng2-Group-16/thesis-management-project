@@ -62,7 +62,7 @@ const insertNewProposal = async (req, res) => {
         cosupervisors.join('-'),
         req.body.keywords,
         req.body.type,
-        groups.join('-'),
+        groups.join(','),
         req.body.description,
         req.body.requirements,
         req.body.notes,
