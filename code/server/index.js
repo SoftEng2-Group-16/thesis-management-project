@@ -20,7 +20,8 @@ const { check, validationResult, } = require('express-validator'); // validation
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local'); // well, not anymore my friend
-const SamlStrategy = require('passport-saml').Strategy;
+
+const Auth0Strategy = require('passport-auth0'); //auth0 has his dedicated strategy, very convenient
 
 const session = require('express-session');
 
