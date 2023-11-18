@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 const express = require('express');
 const dayjs = require('dayjs');
 const http = require('http');
@@ -18,10 +16,16 @@ const dao = require('./daoUsers.js');
 
 const { check, validationResult, } = require('express-validator'); // validation middleware
 
-// Passport-related imports
+// TODO Passport-related imports + new idp import module
+
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const LocalStrategy = require('passport-local'); // well, not anymore my friend
+const SamlStrategy = require('passport-saml').Strategy;
+
 const session = require('express-session');
+
+const { auth } = require('express-openid-connect');
+
 
 // set up middlewares
 app.use(express.json());
@@ -33,8 +37,17 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
-// Passport: set up local strategy
-// Later the strategy will be changed to SAML2
+//!Later the strategy will be changed to SAML2
+const config = {  // figure out where this goes
+  authRequired: false,
+  auth0Logout: true,
+  secret: 'a long, randomly-generated string stored in env',
+  baseURL: 'http://localhost:3000',
+  clientID: '7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
+  issuerBaseURL: 'https://group16-thesis-management-system.eu.auth0.com'
+};
+
+// todo here the new strategy, after the auth tho we can keep our dao to fetch data :) i hope
 
 passport.use(new LocalStrategy({
   usernameField: 'email',
