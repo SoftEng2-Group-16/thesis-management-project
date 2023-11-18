@@ -70,6 +70,16 @@ content-type: application/json
     "cds": ["LM-1", "LM-2"]
 }
 
+
+### 
+
+POST http://localhost:3001/api/sessions/ HTTP/1.1
+content-type: application/json
+
+{
+    "email": "maria.rossi@polito.it",
+    "password": "268553"
+}
 ###
 #test the API for getting applications for a proposal
 GET http://localhost:3001/api/applications/

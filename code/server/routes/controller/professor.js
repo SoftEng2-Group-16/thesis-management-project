@@ -87,8 +87,20 @@ const getAllApplicationsByProf = async (req, res) => {
             return res.status(404).json(applications);
         }
         else {
+            const enhancedApplications = [];
+
+            for (const appl of applications) {
+                const studentInfo = await dao.getStudentById(appl.studentId);
+                const thesisInfo = await dao.getThesisProposalById(appl.thesisId);
+
+                enhancedApplications.push({
+                    ...appl,
+                    studentInfo,
+                    thesisInfo,
+                });
+            }
             return res.status(200).json({
-                applications
+                enhancedApplications
             });
         }
     } catch (err) {

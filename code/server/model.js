@@ -18,11 +18,21 @@ function ThesisProposal(id, title, supervisor, cosupervisors, keywords, type, gr
 
 function Application(id, thesisId,studentId,timestamp,status,teacherId){
     this.id = id;
-    this.stduentId = studentId;
+    this.studentId = studentId;
     this.thesisId=thesisId;
     this.timestamp = timestamp;
     this.status=status;
     this.teacherId=teacherId;
 
 }
-module.exports = {ThesisProposal,Application};
+function Student(id, surname, name, gender, nationality, email, degreeCode, enrollmentYear) {
+    this.id = id;
+    this.surname = surname;
+    this.name = name;
+    this.gender = gender;
+    this.nationality = nationality;
+    this.email = email;
+    this.degreeCode = degreeCode;
+    this.enrollmentYear = enrollmentYear;
+  }
+module.exports = {ThesisProposal,Application,Student};
