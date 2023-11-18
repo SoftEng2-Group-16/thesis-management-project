@@ -61,6 +61,7 @@ const ProposalForm = (props) => {
 
         professorAPI.getPossibleCosupervisors()
             .then((cosupervisors) => {
+                console.log(cosupervisors);
                 setCosupervisorsInternal(cosupervisors.internals.filter(str => {//removes supervisor from internsals
                     const id1 = (str.split(' ')[2]).replace(',', '');
                     const idSupervisor = (supervisor.split(' ')[0]).replace(',', '');
@@ -68,11 +69,14 @@ const ProposalForm = (props) => {
                     if (id1 !== idSupervisor)
                         return str;
                 }).map(str => ({ value: str, label: str })));
+
+                setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
             })
             .catch((err) => { handleErrors(err); });
-
+        
         professorAPI.getDegreesInfo()
             .then((degreesInfo) => {
+                
                 setCdsList(degreesInfo.map(str => ({ value: str, label: str })));
             })
             .catch((err) => { handleErrors(err); });
@@ -95,7 +99,7 @@ const ProposalForm = (props) => {
             errors.supervisor = 'Supervisor is required';
         }
 
-       
+
         /*  if (cosupervisors.length === 0 || cosupervisorsInt.length===0) {
               errors.cosupervisors = 'Cosupervisors are required';
           }
@@ -245,7 +249,7 @@ const ProposalForm = (props) => {
                         <Row>
                             <Col>
                                 <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
-                                    <Form.Label column>Select internal Cosupervisors</Form.Label>
+                                    <Form.Label column>Select internal Cosupervisors (optional)</Form.Label>
                                     <Col sm={7}>
                                         <Select
                                             defaultValue={[]}
@@ -263,7 +267,7 @@ const ProposalForm = (props) => {
                             </Col>
                             <Col>
                                 <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
-                                    <Form.Label column>Select external Cosupervisors</Form.Label>
+                                    <Form.Label column>Select external Cosupervisors (optional)</Form.Label>
                                     <Col sm={7}>
                                         <Select
                                             defaultValue={[]}
@@ -323,7 +327,7 @@ const ProposalForm = (props) => {
                         </Form.Group>
 
                         <Form.Group controlId="requirements">
-                            <Form.Label>Requirements:</Form.Label>
+                            <Form.Label>Requirements: (optional)</Form.Label>
                             <Form.Control
                                 as="textarea"
                                 name="requirements"
@@ -333,7 +337,7 @@ const ProposalForm = (props) => {
                         </Form.Group>
 
                         <Form.Group controlId="notes">
-                            <Form.Label>Notes:</Form.Label>
+                            <Form.Label>Notes: (optional)</Form.Label>
                             <Form.Control
                                 as="textarea"
                                 name="notes"
@@ -380,6 +384,7 @@ const ProposalForm = (props) => {
                             <Row>
                                 <Col>
                                     <DatePicker
+                                        className='mydatepicker'
                                         value={(props.proposal && props.proposal.expiration) ? props.proposal.expiration : expiration}
                                         onChange={(date) => {
                                             const yyyy = date.getFullYear();
@@ -388,7 +393,7 @@ const ProposalForm = (props) => {
                                             const formattedDate = dd + '-' + mm + '-' + yyyy;
                                             setExpiration(formattedDate);
                                         }}
-
+                                        
                                         dateFormat="dd/MM/yyyy"  // Puoi personalizzare il formato della data
                                     />
                                 </Col>
