@@ -38,9 +38,6 @@ const getUserInfo = async () => {
 const logOut = async () => {
   const response = await fetch(SERVER_URL + '/api/sessions/current', {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json'
-    },
     credentials: 'include',
   });
   if (response.ok)

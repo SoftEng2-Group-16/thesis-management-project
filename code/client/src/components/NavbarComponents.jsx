@@ -16,11 +16,11 @@ function NavHeader(props) {
     // Handler? should pass it to app.jsx
     props.onDateChange(newDate);
   };
-  const onLogout = () => {
-    props.handleLogout();
+  const onLogout = async() => {
+    await props.handleLogout();
     // Go back to main screen
     console.log(props.user);
-    navigate("/");
+    navigate("/login");
 }
 
   return (
