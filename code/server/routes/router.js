@@ -21,7 +21,7 @@ router.post('/newapplication', student.insertNewApplication);
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.post('/newproposal',auth.isLoggedIn, professor.insertNewProposal);
-
+router.get('/applications', auth.isLoggedIn,professor.getAllApplicationsByProf);
 /*student routes*/
 
 

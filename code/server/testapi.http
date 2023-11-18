@@ -69,3 +69,7 @@ content-type: application/json
     "level": "Bachelor",
     "cds": ["LM-1", "LM-2"]
 }
+
+###
+#test the API for getting applications for a proposal
+GET http://localhost:3001/api/applications/

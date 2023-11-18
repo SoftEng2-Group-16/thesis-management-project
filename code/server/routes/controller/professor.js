@@ -4,39 +4,39 @@ const models = require('../../model');
 const getPossibleCosupervisors = async (req, res) => {
     try {
         const internals = await dao.getProfessors();
-        if(internals.error) {
+        if (internals.error) {
             return res.status(404).json(internals);
         }
         const externals = await dao.getExternals();
-        if(externals.error) {
+        if (externals.error) {
             return res.status(404).json(externals);
         } else {
             return res.status(200).json({
-                internals: internals.map( i => `${i.name} ${i.surname}, ${i.id}, ${i.department_code}` ),
-                externals: externals.map( e => `${e.name} ${e.surname}, ${(e.company).toUpperCase()}`)
+                internals: internals.map(i => `${i.name} ${i.surname}, ${i.id}, ${i.department_code}`),
+                externals: externals.map(e => `${e.name} ${e.surname}, ${(e.company).toUpperCase()}`)
             });
         }
-    } catch(err) {
-        return res.status(500).json(err.message); 
+    } catch (err) {
+        return res.status(500).json(err.message);
     }
 }
 
-const getDegreesInfo = async (req,res) => {
+const getDegreesInfo = async (req, res) => {
     try {
         const degrees = await dao.getDegrees();
-        if(degrees.error) {
+        if (degrees.error) {
             return res.status(404).json(degrees);
         } else {
             return res.status(200).json(degrees);
         }
-    } catch(e) {
+    } catch (e) {
         return res.status(500).json(e.message);
     }
 }
 
 const insertNewProposal = async (req, res) => {
     const cosupervisors = req.body.cosupervisors;
-    const supervisor=req.body.supervisor;
+    const supervisor = req.body.supervisor;
     let groups = [];
 
     for (c of cosupervisors) {
@@ -46,13 +46,13 @@ const insertNewProposal = async (req, res) => {
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await dao.getGroupForTeacherById(id);
-            if(!groups.includes(group)){
+            if (!groups.includes(group)) {
                 groups.push(group);
             }
-        } 
+        }
     }
-    const group=await dao.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
-    if(!groups.includes(group)){
+    const group = await dao.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
+    if (!groups.includes(group)) {
         groups.push(group);
     }
     let proposal = new models.ThesisProposal(
@@ -74,16 +74,31 @@ const insertNewProposal = async (req, res) => {
     try {
         const lastId = await dao.saveNewProposal(proposal);
         return res.status(201).json(lastId);
-    } catch(e) {
+    } catch (e) {
         return res.status(500).json(e.message);
 
     }
 }
 
-
+const getAllApplicationsByProf = async (req, res) => {
+    try {
+        const applications = await dao.getAllApplicationsByProf(req.user.id);
+        if (applications.error) {
+            return res.status(404).json(applications);
+        }
+        else {
+            return res.status(200).json({
+                applications
+            });
+        }
+    } catch (err) {
+        return res.status(500).json(err.message);
+    }
+}
 
 module.exports = {
     getPossibleCosupervisors,
     insertNewProposal,
-    getDegreesInfo
+    getDegreesInfo,
+    getAllApplicationsByProf
 }
