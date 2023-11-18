@@ -17,7 +17,7 @@ function NavHeader(props) {
     props.onDateChange(newDate);
   };
   const onLogout = async() => {
-    await props.handleLogout();
+   await props.handleLogout();
     // Go back to main screen
     console.log(props.user);
     navigate("/login");
