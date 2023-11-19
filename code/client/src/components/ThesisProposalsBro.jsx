@@ -48,7 +48,6 @@ function ThesisProposals(props) {
         setThesis(proposals)
 
         if(props.user.role == 'teacher') {
-          console.log("quando é que estou a entrar aqui");
           filterByTeacher(proposals);
         } else {
           const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
@@ -144,7 +143,6 @@ function ThesisProposals(props) {
       }
 
     })
-    console.log("filtered teacher thesis", teacherThesis)
     setThesis(teacherThesis);
   }
 
