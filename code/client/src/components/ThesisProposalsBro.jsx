@@ -31,6 +31,7 @@ function ThesisProposals(props) {
   //the associative array list of all suggestions for the Select component
   const [title, setTitle] = useState([]);
   const [supervisor, setSupervisor] = useState([]);
+  const [cosupervisorsThesis, setCosupervisorsThesis] = useState([]);
   const [keywords, setKeywords] = useState([]);
   const [type, setType] = useState([]);
   const [level, setLevel] = useState([]);
@@ -49,6 +50,7 @@ function ThesisProposals(props) {
 
         if(props.user.role == 'teacher') {
           filterByTeacher(proposals);
+          filterByCosupervisor(proposals);
         } else {
           const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
           setTitle(uniqueByTitle);
@@ -146,6 +148,22 @@ function ThesisProposals(props) {
     setThesis(teacherThesis);
   }
 
+    function filterByCosupervisor(proposals) {
+      let cosupervisorThesis = [];
+      proposals.forEach(thesis => {
+        thesis.cosupervisors.forEach(cosupervisor => {
+        console.log("cosupervisor", cosupervisor);
+        let spv = cosupervisor.split(', ');
+        console.log("spv", spv);
+        if (spv[1] == props.user.id && spv[0].includes(props.user.name) && spv[0].includes(props.user.surname)) {
+          cosupervisorThesis.push(thesis);
+        }
+      });
+    });
+    console.log("cosupervisorThesis", cosupervisorThesis);
+    setCosupervisorsThesis(cosupervisorThesis);
+  }
+
   return (
     <>
       {props.loggedIn && props.user.role == 'student'?
@@ -197,7 +215,11 @@ function ThesisProposals(props) {
           </Row>
         </div>
        : props.user.role == 'teacher'? 
+       <>
           <Row style={{ marginTop: '20px' }}>
+            <Row className="text-start">
+              <h3>As a Supervisor</h3>
+            </Row>
             <Col xs={12}>
               <Table striped bordered hover>
                 <thead>
@@ -227,6 +249,40 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
+          <Row style={{ marginTop: '20px' }}>
+            <Row className="text-start">
+                <h3>As a Cosupervisor</h3>
+            </Row>
+            <Col xs={12}>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  { cosupervisorsThesis.map((singleThesis) => (
+                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                      <td>{singleThesis.type}</td>
+                      <td>
+                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                          {singleThesis.title}
+                        </Link>
+                      </td>
+                      <td>{singleThesis.groups.join(', ')}</td>
+                      <td>{singleThesis.supervisor}</td>
+                      <td>{singleThesis.expiration}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+          </>
        :
        <div>You need to LOGIN!</div>
       }
