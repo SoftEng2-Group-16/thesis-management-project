@@ -7,6 +7,9 @@ const insertNewApplication = async (req, res) => {
     const timestamp = dayjs().format("DD/MM/YYYY HH:mm:ss");
     const status = 'pending';
 
+    if(req.user.id !== studentId){
+        return res.status(422).json({error:"the student who is sending the application is not the logged in one"});
+    }
     try {
         const changes = await dao.addApplicationForThesis(proposalId, studentId, timestamp, status);
         return res.status(201).json(changes);
