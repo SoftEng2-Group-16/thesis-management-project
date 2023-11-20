@@ -8,10 +8,64 @@ POST http://localhost:3001/api/sessions/ HTTP/1.1
 content-type: application/json
 
 {
-    "username": "MRossi",
-    "password": "password3"
+    "email": "maria.rossi@polito.it",
+    "password": "268553"
 }
 
 ###
 DELETE http://localhost:3001/api/sessions/current HTTP/1.1
 content-type: application/json
+
+###
+#test insertion of a new application
+POST http://localhost:3001/api/newapplication HTTP/1.1
+content-type: application/json
+
+{
+    "studentId": "200001",
+    "proposalId": "3"
+}
+
+###
+#test the API for getting proposals
+GET http://localhost:3001/api/thesis/
+
+#test API for getting cosupervisors list
+GET http://localhost:3001/api/cosupervisors HTTP/1.1
+
+###
+# test api for getting degrees info
+GET http://localhost:3001/api/degrees HTTP/1.1
+
+###
+#test api for inserting a new proposal
+POST http://localhost:3001/api/newproposal HTTP/1.1
+content-type: application/json
+
+{
+    "title": "test title2",
+    "supervisor": "268556",
+    "cosupervisors": [],
+    "keywords": "test1, test2",
+    "type": "Abroad Thesis",
+    "groups": [],
+    "description": "test description",
+    "requirements": "test requirements",
+    "notes": "test notes",
+    "expiration": "31/12/2023",
+    "level": "Bachelor",
+    "cds": ["LM-1", "LM-2"]
+}
+
+###
+#test api for handling virtual clock changes
+PUT http://localhost:3001/api/clockchanged HTTP/1.1
+content-type: application/json
+
+{
+    "selectedTimestamp": "01-01-2024"
+}
+    "expiration": "22-10-2028",
+    "level": "Bachelor",
+    "cds": ["LM-1", "LM-2"]
+}

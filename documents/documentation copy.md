@@ -99,6 +99,8 @@ THESIS_PROPOSALS
 ## Main Component
 - `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
 - `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
+- `ThesisProposalBro`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
+- `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there is only a go back button (for now, later we will add the fact that we can modify it only if he is the owner). If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis.
 
 
 ## API Server
@@ -126,13 +128,6 @@ THESIS_PROPOSALS
     - Response body: object user
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
-
-- POST `/api/newapplication`
-  - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal
-    - object{`studentId`, `proposalId`}
-  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
-  - Response body: number, indicating the number of applications inserted (should always be 1)
 
 - GET `/api/proposals/:degreeCode`
   - Description: retrieves all the thesis proposals a student can view (based on student's degree code)
@@ -165,6 +160,7 @@ THESIS_PROPOSALS
   - Response body: the id of the newly created proposal
 
 
+
 ## Utility functions
 ### `getJson(httpResponsePromise)`
 - **Description**: A utility function for parsing HTTP responses.
@@ -183,24 +179,18 @@ THESIS_PROPOSALS
 
 This utility function is helpful when working with API requests, ensuring that you can handle HTTP responses in a consistent manner, whether they represent success or errors.
 
-## Testing
+## FE testing
+### `ThesisProposalsBro`
+  **Description**: Test1: checking if the filter for title functions.
+- **Before**: The user needs to be logged in
+- **Actions**:
+  - I go to `/thesis` Route
+  - I write "sustainable" and then click on the only suggestion (`Sustainable Energy Sources Research`).
+  - I click on `Smart Cities Urban Planning` to add it as a parameter.
+  - I click on the Searcch button.
+  - The only thesis that appear are `Sustainable Energy Sources Research` and `Smart Cities Urban Planning`.
+  - I remove `Smart Cities Urban Planning` as a parameter bi clicking on the X next to it.
+  - The only thesis that appear is `Sustainable Energy Sources Research`.
+- **Result**: The filter worked properly
 
-Jest setted up for unit and integration testing.
-
-### Implemetation for Integration
-
-- setup process.env.NODE_ENV as 'test' in the integration test file
-- import the server, which will start listening on port 3001
-- the db file will create/open an in-memory db and populate it with the exported db in `thesis-management-project/code/server/db_TM.sql`
-- connection to the in-memory sqlite database before every test case (in the file) start execution
-- after all test cases the db is closed, the server is closed.
-
->*IMPORTANT*: keep the `db_TM.sql` updated as the `cleanDB/db_TM.db` is updated
-
-### Commands
-
-This commands are executed only on test files under `thesis-management-project/code/server/tests` directory
-
-- `npm test`: runs all test 
-- `npm test:unit`: runs only unit tests with coverage
-- `npm run test:integration`: runs only integration tests with coverage
+  
