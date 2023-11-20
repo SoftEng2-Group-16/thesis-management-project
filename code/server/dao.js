@@ -13,8 +13,8 @@ exports.addApplicationForThesis = (thesisId, studentId, timestamp, status) => {
     db.run(
       sql,
       [thesisId, studentId, timestamp, status],
-      function(err) {
-        if(err){
+      function (err) {
+        if (err) {
           reject(err);
         } else {
           resolve(this.changes);
@@ -27,7 +27,7 @@ exports.addApplicationForThesis = (thesisId, studentId, timestamp, status) => {
 exports.getThesisProposals = (degCode) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * from thesis_proposals';
-    
+
     db.all(
       sql,
       [],
@@ -36,9 +36,9 @@ exports.getThesisProposals = (degCode) => {
           reject(err);
         } else if (rows.length === 0) {
           resolve(
-            degCode === "" ? 
-            { error: "No thesis proposals found for all courses" } : 
-            { error: `No thesis proposals found for study course ${degCode}`}
+            degCode === "" ?
+              { error: "No thesis proposals found for all courses" } :
+              { error: `No thesis proposals found for study course ${degCode}` }
           );
         } else {
           if (degCode === "") {
@@ -78,16 +78,16 @@ exports.getThesisProposals = (degCode) => {
                 level: row.level,
                 cds: row.cds.split(','),
               }
-            ));
-          
-          if(proposals.length == 0) {
-            resolve({error: `No thesis proposals found for study course ${degCode}`});
-          } else {
-            resolve(proposals);
+              ));
+
+            if (proposals.length == 0) {
+              resolve({ error: `No thesis proposals found for study course ${degCode}` });
+            } else {
+              resolve(proposals);
+            }
           }
         }
-      }
-    });
+      });
   });
 };
 
@@ -202,12 +202,12 @@ exports.saveNewProposal = (proposal) => {
 
 exports.deleteProposal = (proposalId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'DELETE FROM thesis_proposals WHERE id=?'
-    db.run (
+    const sql = 'DELETE FROM thesis_proposals WHERE id=? '
+    db.run(
       sql,
       [proposalId],
-      function(err) {
-        if(err) {
+      function (err) {
+        if (err) {
           reject(err);
         } else {
           resolve(this.changes);
@@ -216,6 +216,56 @@ exports.deleteProposal = (proposalId) => {
     )
   });
 }
+
+exports.acceptApplication = (applicationId, teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "accepted" WHERE id = ? AND teacherId = ?';
+
+    db.run(
+      sql,
+      [applicationId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'))
+        } else {
+          // return application updated
+          const updatedApplication = {
+            id: applicationId,
+            status: 'accepted',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
+
+exports.rejectApplication = (applicationId, teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "rejected" WHERE id = ? AND teacherId = ?';
+
+    db.run(
+      sql,
+      [applicationId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'));
+        } else {
+          const updatedApplication = {
+            id: applicationId,
+            status: 'rejected',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
+
 
 
 
@@ -227,19 +277,19 @@ exports.getExpiredProposals = (selectedTimestamp) => {
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err) {
+      (err, rows) => {
+        if (err) {
           reject(err)
-        } else if(rows.length == 0) {
-          resolve({error: `No thesis proposals found while changing time`});
+        } else if (rows.length == 0) {
+          resolve({ error: `No thesis proposals found while changing time` });
         } else {
           const proposals = rows
-            .filter( r => {
+            .filter(r => {
               const pts = dayjs(r.expiration, "DD-MM-YYYY");
-              if(pts.isBefore(ts))
+              if (pts.isBefore(ts))
                 return r;
             })
-            .map( (row) => (
+            .map((row) => (
               {
                 id: row.id,
                 title: row.title,
@@ -270,19 +320,19 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err) {
+      (err, rows) => {
+        if (err) {
           reject(err)
-        } else if(rows.length == 0) {
-          resolve({error: `No archived thesis proposals found while changing time`});
+        } else if (rows.length == 0) {
+          resolve({ error: `No archived thesis proposals found while changing time` });
         } else {
           const proposals = rows
-            .filter( r => {
+            .filter(r => {
               const pts = dayjs(r.expiration, "DD-MM-YYYY");
-              if(pts.isSameOrAfter(ts))
+              if (pts.isSameOrAfter(ts))
                 return r;
             })
-            .map( (row) => (
+            .map((row) => (
               {
                 id: row.id,
                 title: row.title,
@@ -309,30 +359,30 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
 exports.archiveProposal = (proposal) => {
   return new Promise((resolve, reject) => {
     const sql = "INSERT INTO archived_thesis_proposals (title, supervisor, cosupervisors, keywords, " +
-              "type, groups, description, requirements, notes, expiration, level, cds) " +
-              "values (?,?,?,?,?,?,?,?,?,?,?,?)"
-  db.run(
-    sql, 
-    [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
-    function(err) {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(this.lastID);
+      "type, groups, description, requirements, notes, expiration, level, cds) " +
+      "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+    db.run(
+      sql,
+      [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
       }
-    }
-  );
+    );
   });
 }
 
 exports.deleteProposalFromArchived = (proposalId) => {
   return new Promise((resolve, reject) => {
     const sql = 'DELETE FROM archived_thesis_proposals WHERE id=?'
-    db.run (
+    db.run(
       sql,
       [proposalId],
-      function(err) {
-        if(err) {
+      function (err) {
+        if (err) {
           reject(err);
         } else {
           resolve(this.changes);

@@ -16,14 +16,16 @@ router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 router.get('/thesis', general.getThesisProposals); 
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
-router.post('/newapplication', student.insertNewApplication);
 //router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.post('/newproposal',auth.isLoggedIn, professor.insertNewProposal);
+router.put('/applications/:id',auth.isLoggedIn, professor.decideApplication);
+
 
 /*student routes*/
 
+router.post('/newapplication', student.insertNewApplication);
 
 router.put('/clockchanged', utils.rearrangeProposals)
 
