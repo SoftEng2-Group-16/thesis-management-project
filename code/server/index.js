@@ -19,13 +19,30 @@ const { check, validationResult, } = require('express-validator'); // validation
 // TODO Passport-related imports + new idp import module
 
 const passport = require('passport');
+
+// passport strategies
+
 const LocalStrategy = require('passport-local'); // well, not anymore my friend
 
-const Auth0Strategy = require('passport-auth0'); //auth0 has his dedicated strategy, very convenient
+const auth0Strategy = require('passport-auth0'); //auth0 has his dedicated strategy
 
 const session = require('express-session');
 
-const { auth } = require('express-openid-connect');
+//const { auth } = require('express-openid-connect'); //used by auth0 strategy?
+
+passport.use(new auth0Strategy({
+  domain: 'group16-thesis-management-system.eu.auth0.com',
+  clientID: '7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
+  clientSecret: 'thisshouldbeafuckingsecretbutguesswhatwhocares',
+  callbackURL: 'http://localhost:3001/login/callback',
+  scope: 'openid profile',
+  credentials: true
+},
+  function (accessToken, refreshToken, extraParams, profile, done) {
+      return done(null, profile);
+  }
+));
+
 
 
 // set up middlewares
@@ -39,18 +56,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 //!Later the strategy will be changed to SAML2
-const config = {  // figure out where this goes
-  authRequired: false,
-  auth0Logout: true,
-  secret: 'a long, randomly-generated string stored in env',
-  baseURL: 'http://localhost:3000',
-  clientID: '7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
-  issuerBaseURL: 'https://group16-thesis-management-system.eu.auth0.com'
-};
 
 // todo here the new strategy, after the auth tho we can keep our dao to fetch data :) i hope
 
-passport.use(new LocalStrategy({
+/* passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password'
 }, async function verify(username, password, cb) {
@@ -83,6 +92,7 @@ passport.use(new LocalStrategy({
     return cb(error, false, 'An error occurred during authentication.');
   }
 }));
+ */
 
 
 passport.serializeUser(function (user, cb) {
@@ -92,6 +102,8 @@ passport.serializeUser(function (user, cb) {
 passport.deserializeUser(function (user, cb) { // this user all the data found in the select user in the db, needs to be cleaned up
   console.log(user)
   return cb(null, user);
+  //! i do not now what happens now, how do i store session data? we should not call here a dao function, maybe in serialize?
+  //! this function it's called every fucking time the api receives a call dealing with passport middleware
   // if needed, we can do extra check here (e.g., double check that the user is still in the database, etc.)
 });
 
@@ -99,6 +111,10 @@ app.use(session({
   secret: "shhhhh... it's a secret!",
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    maxAge: 60000,
+    _expires: 60000
+}
 }));
 
 app.use(passport.authenticate('session'));
@@ -111,6 +127,54 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
   return `${location}[${param}]: ${msg}`;
 };
 
+// auth routes, temp?
+app.get('/login', (req, res, next) => {
+  !req.isAuthenticated() ?
+      passport.authenticate('auth0', function (err, user, info) {
+          if (err) return next(err);
+          if (!user) return res.redirect('/login');
+          req.logIn(user, function (err) {
+              if (err) { return next(err); }
+              return res.redirect('/');
+          });
+      }
+      )(req, res, next)
+      : res.status(401).json({ message: 'Forbidden' });
+});
+
+app.get('/login/callback', (req, res, next) => {
+  !req.isAuthenticated() ?
+      passport.authenticate('auth0', function (err, user, info) {
+          if (err) return next(err);
+          if (!user) return res.redirect('/login');
+          req.logIn(user, async function (err) {
+              if (err) { return next(err); }
+
+              const userData = await UserDAO.getUserById(user.nickname.substring(1, user.length));
+
+              if (userData === undefined)
+                  return next(err);
+
+              const redirectURL = "http://localhost:5173";
+              return res.redirect(redirectURL);
+          });
+      }
+      )(req, res, next) :
+      res.status(401).json({ message: 'Forbidden' });
+}
+);
+
+app.get('/logout', (req, res) => {
+  req.isAuthenticated() ?
+      req.logOut(res, function (err) {
+          if (err) { return next(err); }
+
+          const redirectURL = "http://localhost:5173/";
+          return res.redirect(redirectURL);
+      })
+      : res.status(401).json({ message: 'Unauthorized' });
+    }
+);
 
 /* ROUTERS */
 app.use('/api', router);
