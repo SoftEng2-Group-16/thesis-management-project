@@ -130,40 +130,89 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
 // auth routes, temp?
 app.get('/login', (req, res, next) => {
   !req.isAuthenticated() ?
-      passport.authenticate('auth0', function (err, user, info) {
-          if (err) return next(err);
-          if (!user) return res.redirect('/login');
-          req.logIn(user, function (err) {
-              if (err) { return next(err); }
-              return res.redirect('/');
-          });
-      }
-      )(req, res, next)
-      : res.status(401).json({ message: 'Forbidden' });
+    passport.authenticate('auth0', function (err, user, info) {
+      if (err) return next(err);
+      if (!user) return res.redirect('/login');
+
+      // No need for req.logIn here
+
+      return res.redirect('/');
+    })(req, res, next)
+    : res.status(401).json({ message: 'Forbidden' });
 });
+
 
 app.get('/login/callback', (req, res, next) => {
   !req.isAuthenticated() ?
-      passport.authenticate('auth0', function (err, user, info) {
-          if (err) return next(err);
-          if (!user) return res.redirect('/login');
-          req.logIn(user, async function (err) {
-              if (err) { return next(err); }
+    passport.authenticate('auth0', async function (err, user, info) {
+      if (err) return next(err);
+      if (!user) return res.redirect('/login');
 
-              const userData = user;
-              console.log(user)
+      // Get the email
+      const userEmail = user.displayName;
 
-              if (userData === undefined)
-                  return next(err);
+      // Check if email contains "studenti.polito"
+      const isStudent = userEmail.includes("studenti.polito");
 
-              const redirectURL = "http://localhost:5173";
-              return res.redirect(redirectURL);
-          });
+      try {
+        let userData;
+
+        // If email is for a student, fetch data from the student table
+        if (isStudent) {
+          const studentData = await dao.getStudentByEmail(userEmail);
+
+          if (!studentData || !studentData.id) {
+            return res.status(401).json({ message: 'Error fetching student data from the database.' });
+          }
+
+          userData = {
+            id: studentData.id,
+            surname: studentData.surname,
+            name: studentData.name,
+            role: 'student', // need to set it here since we do not pass trough auth table
+            email: studentData.email,
+            gender: studentData.gender,
+            nationality: studentData.nationality,
+            degree_code: studentData.degree_code,
+            enrollment_year: studentData.enrollment_year
+          };
+        } else {
+          // If email is not for a student, fetch data from the teacher table
+          const teacherData = await dao.getProfessorByEmail(userEmail);
+
+          if (!teacherData || !teacherData.id) {
+            return res.status(401).json({ message: 'Error fetching teacher data from the database.' });
+          }
+
+          userData = {
+            id: teacherData.id,
+            surname: teacherData.surname,
+            name: teacherData.name,
+            role: 'teacher', 
+            email: teacherData.email,
+            group_code: teacherData.group_code,
+            department_code: teacherData.department_code
+          };
+        }
+
+        if (!userData) {
+          return res.status(401).json({ message: 'Error, authentication succeeded but data fetch failed.' });
+        }
+
+        // Log in the user and store the additional user data in the session
+        req.logIn(userData, async function (err) {
+          if (err) { return next(err); }
+
+          const redirectURL = "http://localhost:5173";
+          return res.redirect(redirectURL);
+        });
+      } catch (error) {
+        return next(error);
       }
-      )(req, res, next) :
-      res.status(401).json({ message: 'Forbidden' });
-}
-);
+    })(req, res, next) :
+    res.status(401).json({ message: 'Unauthorized' });
+});
+
 
 app.get('/logout', (req, res) => {
   req.isAuthenticated() ?
