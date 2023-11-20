@@ -167,7 +167,7 @@ THESIS_PROPOSALS
 - GET `/api/applications`
 - Description: retrieves all the applications sent for proposals of the logged if professor
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
-  - Response body: an array containing all the applications
+  - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
   - "enhancedApplications": 
     - [
       {
@@ -176,8 +176,8 @@ THESIS_PROPOSALS
         - "timestamp": "08/11/2023 16:42:50",
         - "status": "pending",
         - "teacherId": 268553,
-        - "studentInfo": { info taken from teacher table },
-        - "thesisInfo": { info taken from thesis table }
+        - **"studentInfo"**: { info taken from teacher table },
+        - **"thesisInfo"**: { info taken from thesis table }
      },
       // ... more entries ...
     ]
