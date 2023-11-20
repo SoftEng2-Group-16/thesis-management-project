@@ -33,7 +33,7 @@ const session = require('express-session');
 passport.use(new auth0Strategy({
   domain: 'group16-thesis-management-system.eu.auth0.com',
   clientID: '7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
-  clientSecret: 'thisshouldbeafuckingsecretbutguesswhatwhocares',
+  clientSecret: 'H_2SVIDuHNHOpDpblKvUthc9sDSx3wr5FonBnNU_m7QtB6WaAPx-ac_QbrZAQmaT',
   callbackURL: 'http://localhost:3001/login/callback',
   scope: 'openid profile',
   credentials: true
@@ -150,7 +150,8 @@ app.get('/login/callback', (req, res, next) => {
           req.logIn(user, async function (err) {
               if (err) { return next(err); }
 
-              const userData = await UserDAO.getUserById(user.nickname.substring(1, user.length));
+              const userData = user;
+              console.log(user)
 
               if (userData === undefined)
                   return next(err);
