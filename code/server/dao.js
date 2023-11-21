@@ -217,13 +217,14 @@ exports.deleteProposal = (proposalId) => {
   });
 }
 
-exports.acceptApplication = (applicationId, teacherId) => {
+exports.acceptApplication = (thesisId, teacherId,studentId) => {
+  console.log(thesisId,teacherId,studentId);
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "accepted" WHERE id = ? AND teacherId = ?';
+    const sql = 'UPDATE applications SET status = "accepted" WHERE thesisid = ?  AND teacherId = ? AND studentid=?';
 
     db.run(
       sql,
-      [applicationId, teacherId],
+      [thesisId, teacherId,studentId],
       function (err) {
         if (err) {
           reject(err);
@@ -232,7 +233,7 @@ exports.acceptApplication = (applicationId, teacherId) => {
         } else {
           // return application updated
           const updatedApplication = {
-            id: applicationId,
+            id: thesisId,
             status: 'accepted',
           };
           resolve(updatedApplication);
@@ -242,13 +243,13 @@ exports.acceptApplication = (applicationId, teacherId) => {
   });
 };
 
-exports.rejectApplication = (applicationId, teacherId) => {
+exports.rejectApplication = (thesisId, teacherId,studentId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "rejected" WHERE id = ? AND teacherId = ?';
+    const sql = 'UPDATE applications SET status = "rejected" WHERE thesisid = ?  AND teacherId = ? AND studentid=?';
 
     db.run(
       sql,
-      [applicationId, teacherId],
+      [thesisId, teacherId,studentId],
       function (err) {
         if (err) {
           reject(err);
@@ -256,7 +257,7 @@ exports.rejectApplication = (applicationId, teacherId) => {
           reject(new Error('No matching application found or unauthorized.'));
         } else {
           const updatedApplication = {
-            id: applicationId,
+            id: thesisId,
             status: 'rejected',
           };
           resolve(updatedApplication);
