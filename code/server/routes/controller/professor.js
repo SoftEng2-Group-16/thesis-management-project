@@ -88,7 +88,7 @@ const getAllApplicationsByProf = async (req, res) => {
         }
         else {
             const enhancedApplications = [];
-
+            //add the 2 fields with details to the object
             for (const appl of applications) {
                 const studentInfo = await dao.getStudentById(appl.studentId);
                 const thesisInfo = await dao.getThesisProposalById(appl.thesisId);
