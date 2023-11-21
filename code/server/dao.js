@@ -8,12 +8,12 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 
 // STUDENT SECTION
-exports.addApplicationForThesis = (thesisId, studentId, timestamp, status) => {
+exports.addApplicationForThesis = (thesisId, studentId, timestamp, status,teacherId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status) VALUES (?,?,?,?)';
+    const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid) VALUES (?,?,?,?,?)';
     db.run(
       sql,
-      [thesisId, studentId, timestamp, status],
+      [thesisId, studentId, timestamp, status,teacherId],
       function (err) {
         if (err) {
           reject(err);
