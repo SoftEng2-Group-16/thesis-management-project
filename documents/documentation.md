@@ -165,6 +165,12 @@ THESIS_PROPOSALS
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
+- PUT `/api/applications/:id`
+  - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter
+  - Request body: object containing the decision "accepted" or "rejected"
+  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
+  - Response body: the updated application
+
 
 ## Utility functions
 ### `getJson(httpResponsePromise)`

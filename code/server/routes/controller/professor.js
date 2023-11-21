@@ -84,7 +84,7 @@ const insertNewProposal = async (req, res) => {
 const decideApplication = async (req, res) => {
     const id = req.params.id;
     const decision = req.body.decision;
-    const teacherId=req.user.id;
+    const teacherId=req.user.id; //sent to the query to double check the logged in professor is the one referred in the application
 
     if(!teacherId){
         return res.status(503).json({ error: "problem with the authentication" });
@@ -99,7 +99,7 @@ const decideApplication = async (req, res) => {
 
     if (decision === "accepted") {
         try {
-            const application = await dao.acceptApplication(id,teacherId);
+            const application = await dao.acceptApplication(id,teacherId); 
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
