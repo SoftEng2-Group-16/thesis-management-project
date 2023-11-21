@@ -103,9 +103,7 @@ app.use(passport.authenticate('session'));
 
 
 app.get('/login', (req, res, next) => {
-  !req.isAuthenticated() ?
-    passport.authenticate('saml', { failureRedirect: '/login', failureFlash: true })(req, res, next) :
-    res.redirect('/');
+    passport.authenticate('saml', { failureRedirect: '/login', failureFlash: true })(req, res, next) 
 });
 
 app.post('/login/callback',
@@ -177,7 +175,7 @@ app.post('/login/callback',
       req.logIn(userData, async function (err) {
         if (err) { return next(err); }
 
-        const redirectURL = "http://localhost:5173";
+        const redirectURL = "http://localhost:5173/thesis";
         return res.redirect(redirectURL);
       });
     } catch (error) {
