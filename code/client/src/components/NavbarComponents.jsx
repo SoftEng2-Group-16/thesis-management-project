@@ -43,6 +43,7 @@ function NavHeader(props) {
             <Nav className="me-auto">
               <Nav.Link className='link' onClick={() => navigate('/thesis')}>Thesis</Nav.Link>
               {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/proposal')}>Proposal</Nav.Link> : null}
+              <Nav.Link className='link' onClick={() => navigate('/applications')}>Applications</Nav.Link>
             </Nav> : null}
           <Nav>
             {props.loggedIn ?
