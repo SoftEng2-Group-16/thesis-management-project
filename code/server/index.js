@@ -50,7 +50,7 @@ passport.use(new SamlStrategy({
 }, function (profile, done) {
 
 
-  return done(null, //take from the token the parameters so that will be available in req.user ffs
+  return done(null, //take from the Saml token the parameters so that will be available in req.user ffs
     {
       id: profile['nameID'],
       email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
@@ -113,9 +113,11 @@ app.post('/login/callback',
   async function (req, res, next) {
 
     //! the req does not contain req.user and it's full of crap that does not fit the console.... i need a txtlog
-   /* const logStream = fs.createWriteStream('request_log.txt', { flags: 'a' });
+   
+    /* const logStream = fs.createWriteStream('request_log.txt', { flags: 'a' });
       logStream.write('Request Object:\n' + JSON.stringify(req, null, 2) + '\n\n');
       logStream.end(); */
+
     //! solved in the setup strategy
 
     // I need a new way to find the user in db, regexp?
@@ -189,7 +191,7 @@ app.get('/logout', (req, res) => {
     req.logOut(function (err) {
       if (err) { return next(err); }
 
-      const redirectURL = "http://localhost:5173/";
+      const redirectURL = "http://localhost:5173/thesis";
       return res.redirect(redirectURL);
     }) :
     res.status(401).json({ message: 'Unauthorized' });
