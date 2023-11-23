@@ -79,7 +79,6 @@ const insertNewProposal = async (req, res) => {
 
     }
 }
-
 const getAllApplicationsByProf = async (req, res) => {
     try {
         const applications = await dao.getAllApplicationsByProf(req.user.id);
