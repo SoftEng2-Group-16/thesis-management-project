@@ -22,7 +22,8 @@ function ThesisPage(props) {
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
     console.log(thesisDetails);
-    studentAPI.insertApplication(studentId, thesisDetails.id)
+    const teacherId=thesisDetails.supervisor.split(",")[0];
+    studentAPI.insertApplication(studentId, thesisDetails.id,teacherId)
       .then(() => {
         props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
         navigate('/thesis');

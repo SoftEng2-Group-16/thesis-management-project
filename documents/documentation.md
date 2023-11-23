@@ -95,10 +95,11 @@ THESIS_PROPOSALS
 - Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
 - Route `/login`: to perform login
 - Route `*`: for non existing pages
-
 ## Main Component
 - `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
 - `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
+- `ThesisProposalBro`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
+- `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there is only a go back button (for now, later we will add the fact that we can modify it only if he is the owner). If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis.
 
 
 ## API Server
@@ -129,8 +130,8 @@ THESIS_PROPOSALS
 
 - POST `/api/newapplication`
   - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal
-    - object{`studentId`, `proposalId`}
+  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
+    - object{`studentId`, `proposalId`,`teacherId`}
   - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
   - Response body: number, indicating the number of applications inserted (should always be 1)
 
@@ -164,24 +165,26 @@ THESIS_PROPOSALS
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
+- GET `/api/applications`
+- Description: retrieves all the applications sent for proposals of the logged if professor
+  - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
+  - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
+  - "enhancedApplications": 
+    - [
+      {
+        - "studentId": 200001,
+        - "thesisId": 3,
+        - "timestamp": "08/11/2023 16:42:50",
+        - "status": "pending",
+        - "teacherId": 268553,
+        - **"studentInfo"**: { info taken from teacher table },
+        - **"thesisInfo"**: { info taken from thesis table }
+     },
+      // ... more entries ...
+    ]
 
-## Utility functions
-### `getJson(httpResponsePromise)`
-- **Description**: A utility function for parsing HTTP responses.
-- **Parameters**:
-  - `httpResponsePromise` (Promise) - A promise representing the HTTP response.
 
-- **Returns**:
-  - A Promise that resolves with the parsed JSON response or rejects with an error message.
-
-- **Behavior**:
-  - If the HTTP response is successful parse the JSON response and resolve the promise with the parsed JSON.
-  - If the response is not successful attempt to parse the response body to extract an error message and reject the promise with the error message.
-  - If there's an error in making the HTTP request (e.g., a network issue), reject the promise with a "Cannot communicate" error message.
-  
-  
-
-This utility function is helpful when working with API requests, ensuring that you can handle HTTP responses in a consistent manner, whether they represent success or errors.
+    
 
 ## Testing
 
