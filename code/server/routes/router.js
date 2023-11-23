@@ -17,7 +17,11 @@ router.get('/thesis', general.getThesisProposals);
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication',auth.isLoggedIn, student.insertNewApplication);
-router.get('/student/applications/:studentId', student.getApplicationsForStudent);
+
+// remove the :studentId param when api is protected, it will be taken from req.user
+// REMEMBER to update documentation
+router.get('/student/applications/:studentId', /*auth.isLoggedIn,*/ student.getApplicationsForStudent);
+
 //router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
