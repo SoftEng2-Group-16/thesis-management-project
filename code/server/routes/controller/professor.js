@@ -101,6 +101,11 @@ const getAllApplicationsByProf = async (req, res) => {
             return res.status(200).json({
                 enhancedApplications
             });
+                 }
+    } catch (err) {
+        return res.status(500).json(err.message);
+    }
+}
 
 const decideApplication = async (req, res) => {
     
