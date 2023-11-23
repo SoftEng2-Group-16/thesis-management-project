@@ -67,7 +67,7 @@ function NavHeader(props) {
                 Logout
               </Button>
               :
-              <Link to='/login' className='btn btn-outline-light'>Login</Link>
+              <Link to='http://localhost:3001/login' className='btn btn-outline-light'>Login</Link>
             }
           </Nav>
         </Navbar.Collapse>
