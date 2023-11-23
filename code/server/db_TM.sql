@@ -4,8 +4,10 @@ CREATE TABLE IF NOT EXISTS "applications" (
 	"studentid"	INTEGER NOT NULL,
 	"timestamp"	TEXT NOT NULL,
 	"status"	TEXT NOT NULL,
+	"teacherid"	INTEGER,
 	FOREIGN KEY("thesisid") REFERENCES "thesis_proposals"("id"),
 	FOREIGN KEY("studentid") REFERENCES "students"("id"),
+	FOREIGN KEY("teacherid") REFERENCES "teachers"("id"),
 	PRIMARY KEY("thesisid","studentid")
 );
 CREATE TABLE IF NOT EXISTS "archived_thesis_proposals" (
@@ -96,7 +98,8 @@ CREATE TABLE IF NOT EXISTS "thesis_proposals" (
 	FOREIGN KEY("supervisor") REFERENCES "teachers"("id"),
 	FOREIGN KEY("cds") REFERENCES "degrees"("degree_code")
 );
-INSERT INTO "applications" ("thesisid","studentid","timestamp","status") VALUES (3,200001,'08/11/2023 16:42:50','pending');
+INSERT INTO "applications" ("thesisid","studentid","timestamp","status") VALUES (3,200001,'08/11/2023 16:42:50','pending','268553');
+INSERT INTO "applications" ("thesisid","studentid","timestamp","status") VALUES (1,200001,'18/11/2023 10:42:50','pending','268553');
 INSERT INTO "auth" ("id","email","role","password","salt") VALUES (200001,'mario.rossi@studenti.polito.it','student','78a9b43f33c457b3f12446c7cc4ab6150498ad85c832ec81321ade572350aedfe5903e2cd6252db2b154a747d3a6c2e60a1db3f4578c1f53ccdc96fafcbd9df5','e8a1ea50eeaaa38f');
 INSERT INTO "auth" ("id","email","role","password","salt") VALUES (200002,'maria.bianchi@studenti.polito.it','student','2fc9bef697d33a03b59eae40f55f07b56cb86c9707de9bc84903b13166ba1d31dcac9dea6afc3ac466b9b444e7b721f191720535e0ce8ddbe129f25fd6868803','4cf6a245a3ba5a7e');
 INSERT INTO "auth" ("id","email","role","password","salt") VALUES (200003,'luigi.ferrari@studenti.polito.it','student','a8d5ff4330dbb180375c94912de0b2bf0b1f27a123e7356f4cb245ddc07b65b0539a0178a836d01cc528baaf34554f5bb719b179803d969f3a6d68f0e6074a23','8eb1844efeb3221f');
