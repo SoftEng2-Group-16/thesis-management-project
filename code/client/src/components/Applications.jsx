@@ -6,41 +6,27 @@ if role:
 
 import { Col, Row, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import API from '../apis/professorAPI.js';
+
+import { useContext, useState, useEffect } from 'react';
 
 
 function ThesisApplications (props) {
-
-    let applications = [
-        {
-            StudentID: 1,
-            Student: 'John Doe',
-            Thesis: 'Advanced Physics',
-            Type: 'Scientific Research',
-            ExpirationDate: '2023-12-31'
-        },
-        {
-            StudentID: 2,
-            Student: 'Jane Smith',
-            Thesis: 'Modern Art Interpretations',
-            Type: 'Art History',
-            ExpirationDate: '2023-11-30'
-        },
-        {
-            StudentID: 3,
-            Student: 'Alex Johnson',
-            Thesis: 'Cultural Anthropology',
-            Type: 'Social Sciences',
-            ExpirationDate: '2024-02-28'
-        },
-        {
-            StudentID: 4,
-            Student: 'Emma Brown',
-            Thesis: 'Environmental Studies',
-            Type: 'Ecology',
-            ExpirationDate: '2024-01-15'
-        }
-    ];
+    const navigate = useNavigate();
+    const [applications, setApplications] = useState([]);
     
+    useEffect(() => {
+        API.getApplications().then((listApplications) => {
+            setApplications(listApplications.enhancedApplications);
+        })
+        .catch((err) => {
+            console.log(err);
+            props.handleErrors(err);
+            navigate('/thesis')
+        });
+    }, [props.user.id]);
+
     return (
         <>
             {props.loggedIn & props.user.role === 'teacher' ? (
@@ -56,23 +42,23 @@ function ThesisApplications (props) {
                                         <th>Student</th>
                                         <th>Thesis</th>
                                         <th>Type</th>
-                                        <th>Expiration Date</th>
+                                        <th>Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {applications.map((appl) => (
+                                    {applications.map((appl, index) => (
                                         // choose a better key...student may apply to more than just 1 thesis
                                         //maybe applicationID 
-                                        <tr key={appl.StudentID} style={{ fontWeight: 'bold' }}> 
-                                            <td>{appl.StudentID}</td>
-                                            <td>{appl.Student}</td>
+                                        <tr key={index} style={{ fontWeight: 'bold' }}> 
+                                            <td>{appl.studentId}</td>
+                                            <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br/><small>{appl.studentInfo.email}</small> </td>
                                             <td>
-                                                <Link to={`/application/${0}`} state={{ thesisDetails: appl }}>
-                                                    {appl.Thesis}
+                                                <Link to={`/application/${index}`} state={{ applicationDetails: appl }}>
+                                                    {appl.thesisInfo.title}
                                                 </Link>
                                             </td>
-                                            <td>{appl.Type}</td>
-                                            <td>{appl.ExpirationDate}</td>
+                                            <td>{appl.thesisInfo.type}</td>
+                                            <td>{appl.timestamp.split(' ')[0]}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -89,3 +75,55 @@ function ThesisApplications (props) {
 }
 
 export default ThesisApplications;
+
+// {
+//     "enhancedApplications": [
+//       {
+//         "studentId": 200001,
+//         "thesisId": 3,
+//         "timestamp": "08/11/2023 16:42:50",
+//         "status": "pending",
+//         "teacherId": 268553,
+//         "studentInfo": {
+//           "id": 200001,
+//           "surname": "Rossi",
+//           "name": "Mario",
+//           "gender": "M",
+//           "nationality": "Italian",
+//           "email": "mario.rossi@studenti.polito.it",
+//           "degreeCode": "LM-1",
+//           "enrollmentYear": "2010"
+//         },
+//         "thesisInfo": {
+//           "id": 3,
+//           "title": "Blockchain Technology and Cryptocurrencies",
+//           "supervisor": "268555, Ferrari Giovanna",
+//           "cosupervisors": [
+//             "Maria Rossi, 268553, DAD",
+//             "Luigi Bianchi, 268554, DAUIN"
+//           ],
+//           "keywords": [
+//             "Blockchain",
+//             " Cryptocurrency",
+//             " Security"
+//           ],
+//           "type": "Company Thesis",
+//           "groups": [
+//             "AI",
+//             "SO",
+//             "SE"
+//           ],
+//           "description": "Explore the potential of blockchain technology and cryptocurrencies.",
+//           "requirements": "Blockchain Development, Security, Financial Technology",
+//           "notes": "This project focuses on the security and applications of blockchain and cryptocurrencies.",
+//           "expiration": "31/12/2023",
+//           "level": "master",
+//           "cds": [
+//             "LM-1",
+//             "LM-2",
+//             "LM-3"
+//           ]
+//         }
+//       },
+//     ]
+//   }
