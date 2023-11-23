@@ -74,8 +74,11 @@ function App() {
   };
 
   const handleLogout = async () => {
+    console.log("false")
     await API.logOut();
+    console.log("here")
     setLoggedIn(false);
+    
     // clean up everything
     setMessage('');
     setUser(null);
