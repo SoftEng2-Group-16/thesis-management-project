@@ -88,6 +88,8 @@ THESIS_PROPOSALS
 
 
 ## Useful ideas and future development needs
+### Update get thesis proposals
+Students need to get thesis proposals filtered by their course, and professors need to get only their own thesis proposals (so the ones containing the corresponding teacher id), so it might be a good idea to split the two apis into one since the filtering needs to be done on a different field. Tests need to be update accordingly.
 
 ## React Client Application Routes
 
