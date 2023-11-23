@@ -79,7 +79,28 @@ const insertNewProposal = async (req, res) => {
 
     }
 }
+const getAllApplicationsByProf = async (req, res) => {
+    try {
+        const applications = await dao.getAllApplicationsByProf(req.user.id);
+        if (applications.error) {
+            return res.status(404).json(applications);
+        }
+        else {
+            const enhancedApplications = [];
+            //add the 2 fields with details to the object
+            for (const appl of applications) {
+                const studentInfo = await dao.getStudentById(appl.studentId);
+                const thesisInfo = await dao.getThesisProposalById(appl.thesisId);
 
+                enhancedApplications.push({
+                    ...appl,
+                    studentInfo,
+                    thesisInfo,
+                });
+            }
+            return res.status(200).json({
+                enhancedApplications
+            });
 
 const decideApplication = async (req, res) => {
     
