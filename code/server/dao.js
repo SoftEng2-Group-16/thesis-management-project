@@ -277,9 +277,10 @@ exports.acceptApplication = (thesisId, teacherId,studentId) => {
   });
 };
 
+
 exports.rejectApplication = (thesisId, teacherId,studentId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "rejected" WHERE thesisid = ?  AND teacherId = ? AND studentid=?';
+    const sql = 'UPDATE applications SET status = "rejected" WHERE thesisid = ?  AND teacherId = ? AND studentid=? ';
 
     db.run(
       sql,
@@ -301,7 +302,55 @@ exports.rejectApplication = (thesisId, teacherId,studentId) => {
   });
 };
 
+exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ?';
 
+    db.run(
+      sql,
+      [thesisId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'))
+        } else {
+          // return application updated
+          const updatedApplication = {
+            id: thesisId,
+            status: 'canceled',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
+
+exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ?  AND teacherId = ?';
+
+    db.run(
+      sql,
+      [studentId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'))
+        } else {
+          // return application updated
+          const updatedApplication = {
+            id: studentId,
+            status: 'canceled',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
 exports.getAllApplicationsByProf = (idProfessor) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM applications where teacherid=?'

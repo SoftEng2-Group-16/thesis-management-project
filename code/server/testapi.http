@@ -22,8 +22,8 @@ POST http://localhost:3001/api/newapplication HTTP/1.1
 content-type: application/json
 
 {
-    "studentId": "200001",
-    "proposalId": "3"
+    "studentId": "200003",
+    "proposalId": "4"
 }
 
 ###
@@ -83,3 +83,12 @@ content-type: application/json
 ###
 #test the API for getting applications for a proposal
 GET http://localhost:3001/api/applications/
+
+###
+PUT http://localhost:3001/api/applications/1 
+content-type: application/json
+
+{
+    "decision":"rejected",
+    "studentId":200001
+}
