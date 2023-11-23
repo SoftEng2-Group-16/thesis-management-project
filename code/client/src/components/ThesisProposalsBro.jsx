@@ -66,6 +66,7 @@ function ThesisProposals(props) {
     };
 
     if (props.loggedIn || props.update == true) {
+      console.log(props.loggedIn);
       fetchThesis();
       props.setUpdate(false);
     }

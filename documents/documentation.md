@@ -130,8 +130,8 @@ THESIS_PROPOSALS
 
 - POST `/api/newapplication`
   - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal
-    - object{`studentId`, `proposalId`}
+  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
+    - object{`studentId`, `proposalId`,`teacherId`}
   - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
   - Response body: number, indicating the number of applications inserted (should always be 1)
 
@@ -165,24 +165,26 @@ THESIS_PROPOSALS
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
+- GET `/api/applications`
+- Description: retrieves all the applications sent for proposals of the logged if professor
+  - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
+  - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
+  - "enhancedApplications": 
+    - [
+      {
+        - "studentId": 200001,
+        - "thesisId": 3,
+        - "timestamp": "08/11/2023 16:42:50",
+        - "status": "pending",
+        - "teacherId": 268553,
+        - **"studentInfo"**: { info taken from teacher table },
+        - **"thesisInfo"**: { info taken from thesis table }
+     },
+      // ... more entries ...
+    ]
 
-## Utility functions
-### `getJson(httpResponsePromise)`
-- **Description**: A utility function for parsing HTTP responses.
-- **Parameters**:
-  - `httpResponsePromise` (Promise) - A promise representing the HTTP response.
 
-- **Returns**:
-  - A Promise that resolves with the parsed JSON response or rejects with an error message.
-
-- **Behavior**:
-  - If the HTTP response is successful parse the JSON response and resolve the promise with the parsed JSON.
-  - If the response is not successful attempt to parse the response body to extract an error message and reject the promise with the error message.
-  - If there's an error in making the HTTP request (e.g., a network issue), reject the promise with a "Cannot communicate" error message.
-  
-  
-
-This utility function is helpful when working with API requests, ensuring that you can handle HTTP responses in a consistent manner, whether they represent success or errors.
+    
 
 ## Testing
 
