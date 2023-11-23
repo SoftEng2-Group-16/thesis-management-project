@@ -150,12 +150,12 @@ THESIS_PROPOSALS
     - { `internals`: [...], `externals`: [...] } 
 
 - GET `/api/degrees`
-- Description: retrieves all possible degrees a professore can insert a new thesis proposal for
+  - Description: retrieves all possible degrees a professore can insert a new thesis proposal for
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the possible degrees
 
 - POST `/api/newproposal`
-- Description: inserts a new thesis proposal
+  - Description: inserts a new thesis proposal
   - Request body: an object describing the proposal to insert
     - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
 `cds` } 
@@ -165,8 +165,18 @@ THESIS_PROPOSALS
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
+- GET `/api/applications/:studentId`
+  - Description: retrieves all the applications the student has sent (including status)
+  - Request param: the id of the student currently logged in (should be retrieved from the session cookie)
+  - Response: `200 OK` (success), `404 Not Found` (no applications found for the specific studentId), `500 Internal Server Error` (generic server error)
+  - Response body: an array of objects, each describing an application
+    - {`studentId`, `thesisId`, `timestamp`, `status`, `teacherId`}
+    
+    (Note: it will be an array even if the student only inserted one application)
+
+
 - GET `/api/applications`
-- Description: retrieves all the applications sent for proposals of the logged if professor
+- Description: retrieves all the applications sent for proposals of the logged in professor
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
   - "enhancedApplications": 
@@ -184,11 +194,26 @@ THESIS_PROPOSALS
     ]
 
 
-    
 
 ## Testing
 
-Jest setted up for unit and integration testing.
+### FE testing
+### `ThesisProposalsBro`
+  **Description**: Test1: checking if the filter for title functions.
+- **Before**: The user needs to be logged in
+- **Actions**:
+  - I go to `/thesis` Route
+  - I write "sustainable" and then click on the only suggestion (`Sustainable Energy Sources Research`).
+  - I click on `Smart Cities Urban Planning` to add it as a parameter.
+  - I click on the Searcch button.
+  - The only thesis that appear are `Sustainable Energy Sources Research` and `Smart Cities Urban Planning`.
+  - I remove `Smart Cities Urban Planning` as a parameter bi clicking on the X next to it.
+  - The only thesis that appear is `Sustainable Energy Sources Research`.
+- **Result**: The filter worked properly
+
+
+### BE testing
+Jest is set up for unit and integration testing.
 
 ### Implemetation for Integration
 
