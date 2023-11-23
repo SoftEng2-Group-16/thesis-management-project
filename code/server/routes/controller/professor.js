@@ -131,5 +131,6 @@ module.exports = {
     getPossibleCosupervisors,
     insertNewProposal,
     getDegreesInfo,
+    getAllApplicationsByProf,
     decideApplication
 }

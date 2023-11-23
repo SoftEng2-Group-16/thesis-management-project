@@ -1,9 +1,10 @@
 const SERVER_URL = 'http://localhost:3001';
 
-const insertApplication = async (studentId, proposalId) => {
+const insertApplication = async (studentId, proposalId,teacherid) => {
     const data = {
         studentId: studentId,
-        proposalId: proposalId
+        proposalId: proposalId,
+        teacherId:teacherid
     }
     const response = await fetch(SERVER_URL + '/api/newapplication', {
         method: 'POST',

@@ -1,0 +1,21 @@
+version: '3'
+services:
+  client:
+    image: atorre98/tms_client:latest
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+    depends_on: 
+      - server
+
+  
+  server:
+    image: atorre98/tms_server:latest
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    

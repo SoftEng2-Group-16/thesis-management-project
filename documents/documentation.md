@@ -130,8 +130,8 @@ THESIS_PROPOSALS
 
 - POST `/api/newapplication`
   - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal
-    - object{`studentId`, `proposalId`}
+  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
+    - object{`studentId`, `proposalId`,`teacherId`}
   - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
   - Response body: number, indicating the number of applications inserted (should always be 1)
 
@@ -165,6 +165,26 @@ THESIS_PROPOSALS
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
+- GET `/api/applications`
+- Description: retrieves all the applications sent for proposals of the logged if professor
+  - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
+  - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
+  - "enhancedApplications": 
+    - [
+      {
+        - "studentId": 200001,
+        - "thesisId": 3,
+        - "timestamp": "08/11/2023 16:42:50",
+        - "status": "pending",
+        - "teacherId": 268553,
+        - **"studentInfo"**: { info taken from teacher table },
+        - **"thesisInfo"**: { info taken from thesis table }
+     },
+      // ... more entries ...
+    ]
+
+
+    
 - PUT `/api/applications/:id`
   - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter
   - Request body: object containing the decision "accepted" or "rejected" and the id of the student sending the application
