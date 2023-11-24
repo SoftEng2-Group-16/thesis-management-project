@@ -8,12 +8,12 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 
 // STUDENT SECTION
-exports.addApplicationForThesis = (thesisId, studentId, timestamp, status,teacherId) => {
+exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teacherId) => {
   return new Promise((resolve, reject) => {
     const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid) VALUES (?,?,?,?,?)';
     db.run(
       sql,
-      [thesisId, studentId, timestamp, status,teacherId],
+      [thesisId, studentId, timestamp, status, teacherId],
       function (err) {
         if (err) {
           reject(err);
@@ -92,11 +92,9 @@ exports.getThesisProposals = (degCode) => {
   });
 };
 
-
 exports.getStudentById = (studentId) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * from students where id=? ';
-
     db.all(
       sql,
       [studentId],
@@ -124,6 +122,32 @@ exports.getStudentById = (studentId) => {
   });
 };
 
+exports.getApplicationsForStudent = (studentId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM applications WHERE studentid=?';
+    db.all(
+      sql,
+      [studentId],
+      (err,rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          if (rows.length == 0 || rows == null || rows == undefined) {
+            resolve({ error: `No applications found for student ${studentId}` });
+          } else {
+            const applications = rows.map(row => ({
+              studentId: row.studentid,
+              thesisId: row.thesisid,
+              timestamp: dayjs(row.timestamp),
+              status: row.status,
+              teacherId: row.teacherid
+            }));
+            resolve(applications);
+          }
+        }
+    });
+  });
+}
 
 // PROFESSOR SECTION
 exports.getProfessors = () => {

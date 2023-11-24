@@ -65,14 +65,8 @@ content-type: application/json
 {
     "selectedTimestamp": "01-01-2024"
 }
-    "expiration": "22-10-2028",
-    "level": "Bachelor",
-    "cds": ["LM-1", "LM-2"]
-}
-
 
 ### 
-
 POST http://localhost:3001/api/sessions/ HTTP/1.1
 content-type: application/json
 
@@ -82,6 +76,14 @@ content-type: application/json
 }
 ###
 #test the API for getting applications for a proposal
+
+GET http://localhost:3001/api/teacher/applications/
+
+###
+# test api for retrieving student applications
+GET http://localhost:3001/api/student/applications/200001 HTTP/1.1 
+#seems ok
+
 GET http://localhost:3001/api/applications/
 
 ###
@@ -92,3 +94,4 @@ content-type: application/json
     "decision":"rejected",
     "studentId":200001
 }
+
