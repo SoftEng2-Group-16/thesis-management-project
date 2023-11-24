@@ -88,6 +88,8 @@ THESIS_PROPOSALS
 
 
 ## Useful ideas and future development needs
+### Update get thesis proposals
+Students need to get thesis proposals filtered by their course, and professors need to get only their own thesis proposals (so the ones containing the corresponding teacher id), so it might be a good idea to split the two apis into one since the filtering needs to be done on a different field. Tests need to be update accordingly.
 
 ## React Client Application Routes
 
@@ -165,6 +167,7 @@ THESIS_PROPOSALS
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
+
 - GET `/api/applications/:studentId`
   - Description: retrieves all the applications the student has sent (including status)
   - Request param: the id of the student currently logged in (should be retrieved from the session cookie)
@@ -175,8 +178,8 @@ THESIS_PROPOSALS
     (Note: it will be an array even if the student only inserted one application)
 
 
-- GET `/api/applications`
-- Description: retrieves all the applications sent for proposals of the logged in professor
+- GET `/api/teacher/applications`
+- Description: retrieves all the applications sent for proposals of the logged if professor
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
   - "enhancedApplications": 
@@ -192,6 +195,14 @@ THESIS_PROPOSALS
      },
       // ... more entries ...
     ]
+
+
+    
+- PUT `/api/teacher/applications/:id`
+  - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter. Also when an application is accepetd all the other applications of the same student and for the same thesis are canceled.
+  - Request body: object containing the decision "accepted" or "rejected" and the id of the student sending the application
+  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
+  - Response body: the updated application {id, status}
 
 
 
