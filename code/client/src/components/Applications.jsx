@@ -91,7 +91,7 @@ function StudentApplications({ applications }) {
                             {applications.map((appl, index) => (
                                 // choose a better key...
                                 <tr key={index} style={{ fontWeight: 'bold' }}>
-                                    <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br /><small>{appl.studentInfo.email}</small> </td>
+                                    <td>{appl.teacherInfo.surname + ' ' + appl.teacherInfo.name}<br /><small>{appl.teacherInfo.email}</small> </td>
                                     <td>
                                         <Link to={`/application/${index}`} state={{ applicationDetails: appl }}>
                                             {appl.thesisInfo.title}

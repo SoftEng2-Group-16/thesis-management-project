@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -431,7 +431,33 @@ exports.getThesisProposalById = (thesisId) => {
   });
 };
 
-
+exports.getTeacherById = (teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * from teachers where id=? ';
+    db.all(
+      sql,
+      [teacherId],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length === 0) {
+          resolve(
+            { error: `No teacher found for id ${teacherId}` }
+          );
+        } else {
+          const teacher = new Teacher(
+            rows[0].id,
+            rows[0].surname,
+            rows[0].name,
+            rows[0].email,
+            rows[0].group_code,
+            rows[0].department_code
+          );
+          resolve(teacher);
+        }
+      });
+  });
+};
 
 //VIRTUAL CLOCK ONLY 
 exports.getExpiredProposals = (selectedTimestamp) => {

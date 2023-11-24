@@ -37,13 +37,15 @@ const getApplicationsForStudent = async (req,res) => {
             const enhancedApplications = [];
             //add the 2 fields with details to the object
             for (const appl of applications) {
-                const studentInfo = await dao.getStudentById(appl.studentId);
+                const teacherInfo = await dao.getTeacherById(appl.teacherId);
                 const thesisInfo = await dao.getThesisProposalById(appl.thesisId);
+                const studentInfo=await dao.getStudentById(appl.studentId);
 
                 enhancedApplications.push({
                     ...appl,
-                    studentInfo,
+                    teacherInfo,
                     thesisInfo,
+                    studentInfo,
                 });
             }
             return res.status(200).json({
