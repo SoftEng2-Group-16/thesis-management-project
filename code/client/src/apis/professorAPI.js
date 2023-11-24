@@ -47,7 +47,7 @@ const getApplications = async () => {
   const response = await fetch(SERVER_URL + '/api/applications', {
       credentials: 'include',
   });
-  const res = response.json();
+  const res = await response.json();
   if (response.ok) {
     return res; // list of applications related to the logged user
   }

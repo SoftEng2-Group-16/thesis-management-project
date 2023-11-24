@@ -4,12 +4,12 @@ if role:
  student -> show all the applications sent and their relative status
 */
 
-import { Col, Row, Table } from 'react-bootstrap';
+import { Col, Row, Table, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import API from '../apis/professorAPI.js';
-
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import '../App.css';
 
 
 function ThesisApplications (props) {
@@ -20,19 +20,23 @@ function ThesisApplications (props) {
         API.getApplications().then((listApplications) => {
             setApplications(listApplications.enhancedApplications);
         })
-        .catch((err) => {
-            console.log(err);
-            props.handleErrors(err);
-            navigate('/thesis')
+        .catch(() => {
+            // set empty list of applications
+            setApplications([]);
         });
     }, [props.user.id]);
 
+    const handleGoBack = () => {
+        // Navigate back to
+        navigate('/thesis');
+    }
+    
     return (
         <>
             {props.loggedIn & props.user.role === 'teacher' ? (
                 <div style={{ marginTop: '10px' }}>
-
-                    <Row style={{ marginTop: '20px' }}>
+                    { applications.length !== 0 ? (
+                        <Row style={{ marginTop: '20px' }}>
                         <Col style={{ marginBottom: '15px'}}><h2> Thesis applications </h2></Col>
                         <Col xs={12}>
                             <Table striped bordered hover>
@@ -47,8 +51,7 @@ function ThesisApplications (props) {
                                 </thead>
                                 <tbody>
                                     {applications.map((appl, index) => (
-                                        // choose a better key...student may apply to more than just 1 thesis
-                                        //maybe applicationID 
+                                        // choose a better key...
                                         <tr key={index} style={{ fontWeight: 'bold' }}> 
                                             <td>{appl.studentId}</td>
                                             <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br/><small>{appl.studentInfo.email}</small> </td>
@@ -65,6 +68,18 @@ function ThesisApplications (props) {
                             </Table>
                         </Col>
                     </Row>
+                    ) : ( // No applications found
+                        <Card className="thesis-card">
+                            <Card.Title>
+                                No applications to show yet!
+                            </Card.Title>
+                            <Card.Body>
+                                <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBack}>
+                                Go Back
+                                </Button>
+                            </Card.Body>
+                        </Card>
+                    )}
                 </div>
             ) : (
                 props.loggedIn & props.user.role === 'student' ? <div>STUDENT VIEW!</div> : <div>You need to LOGIN!</div>
@@ -75,55 +90,3 @@ function ThesisApplications (props) {
 }
 
 export default ThesisApplications;
-
-// {
-//     "enhancedApplications": [
-//       {
-//         "studentId": 200001,
-//         "thesisId": 3,
-//         "timestamp": "08/11/2023 16:42:50",
-//         "status": "pending",
-//         "teacherId": 268553,
-//         "studentInfo": {
-//           "id": 200001,
-//           "surname": "Rossi",
-//           "name": "Mario",
-//           "gender": "M",
-//           "nationality": "Italian",
-//           "email": "mario.rossi@studenti.polito.it",
-//           "degreeCode": "LM-1",
-//           "enrollmentYear": "2010"
-//         },
-//         "thesisInfo": {
-//           "id": 3,
-//           "title": "Blockchain Technology and Cryptocurrencies",
-//           "supervisor": "268555, Ferrari Giovanna",
-//           "cosupervisors": [
-//             "Maria Rossi, 268553, DAD",
-//             "Luigi Bianchi, 268554, DAUIN"
-//           ],
-//           "keywords": [
-//             "Blockchain",
-//             " Cryptocurrency",
-//             " Security"
-//           ],
-//           "type": "Company Thesis",
-//           "groups": [
-//             "AI",
-//             "SO",
-//             "SE"
-//           ],
-//           "description": "Explore the potential of blockchain technology and cryptocurrencies.",
-//           "requirements": "Blockchain Development, Security, Financial Technology",
-//           "notes": "This project focuses on the security and applications of blockchain and cryptocurrencies.",
-//           "expiration": "31/12/2023",
-//           "level": "master",
-//           "cds": [
-//             "LM-1",
-//             "LM-2",
-//             "LM-3"
-//           ]
-//         }
-//       },
-//     ]
-//   }
