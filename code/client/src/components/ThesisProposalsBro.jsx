@@ -44,7 +44,6 @@ function ThesisProposals(props) {
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
-        console.log(proposals)
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -66,7 +65,7 @@ function ThesisProposals(props) {
     };
 
     if (props.loggedIn || props.update == true) {
-      console.log(props.loggedIn);
+
       fetchThesis();
       props.setUpdate(false);
     }

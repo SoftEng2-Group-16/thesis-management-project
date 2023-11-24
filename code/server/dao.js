@@ -133,15 +133,12 @@ exports.getApplicationsForStudent = (studentId) => {
           reject(err);
         } else {
           if (rows.length == 0 || rows == null || rows == undefined) {
-            resolve({ error: `No applications found for student ${studentId}` });
+            resolve({ status:404, error: `No applications found for student ${studentId}` });
           } else {
-            const applications = rows.map(row => ({
-              studentId: row.studentid,
-              thesisId: row.thesisid,
-              timestamp: dayjs(row.timestamp),
-              status: row.status,
-              teacherId: row.teacherid
-            }));
+            const applications = rows.map(row => (
+              new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+            ));
+            console.log(applications);
             resolve(applications);
           }
         }
@@ -385,10 +382,10 @@ exports.getAllApplicationsByProf = (idProfessor) => {
         if (err) {
           reject(err);
         } else if (rows.length == 0) {
-          resolve({ error: 'No Applications found for professor ' + idProfessor });
+          resolve({status:404, error: 'No Applications found for professor ' + idProfessor });
         } else {
           const applications = rows.map(row => (
-            new Application(row.id, row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+            new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
           ));
           resolve(applications);
         }

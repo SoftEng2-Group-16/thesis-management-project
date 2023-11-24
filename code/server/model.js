@@ -16,8 +16,7 @@ function ThesisProposal(id, title, supervisor, cosupervisors, keywords, type, gr
     this.cds = cds;   
 }
 
-function Application(id, thesisId,studentId,timestamp,status,teacherId){
-    this.id = id;
+function Application( thesisId,studentId,timestamp,status,teacherId){
     this.studentId = studentId;
     this.thesisId=thesisId;
     this.timestamp = timestamp;
