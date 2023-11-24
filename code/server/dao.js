@@ -385,7 +385,7 @@ exports.getAllApplicationsByProf = (idProfessor) => {
         if (err) {
           reject(err);
         } else if (rows.length == 0) {
-          resolve({ error: 'Problems while retrieving applications for the thesis of professor ' + idProfessor });
+          resolve({ error: 'No Applications found for professor ' + idProfessor });
         } else {
           const applications = rows.map(row => (
             new Application(row.id, row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
