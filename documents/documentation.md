@@ -167,7 +167,7 @@ Students need to get thesis proposals filtered by their course, and professors n
   - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
   - Response body: the id of the newly created proposal
 
-- GET `/api/applications`
+- GET `/api/teacher/applications`
 - Description: retrieves all the applications sent for proposals of the logged if professor
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
@@ -187,6 +187,12 @@ Students need to get thesis proposals filtered by their course, and professors n
 
 
     
+- PUT `/api/teacher/applications/:id`
+  - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter. Also when an application is accepetd all the other applications of the same student and for the same thesis are canceled.
+  - Request body: object containing the decision "accepted" or "rejected" and the id of the student sending the application
+  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
+  - Response body: the updated application {id, status}
+
 
 ## Testing
 
