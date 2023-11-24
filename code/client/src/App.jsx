@@ -14,6 +14,7 @@ import ThesisPage from './components/ThesisPage.jsx';
 import ThesisApplications from './components/Applications.jsx';
 import ApplicationDetails from './components/ApplicationDetails.jsx';
 import dayjs from 'dayjs';
+import ThesisApplicationsBro from './components/ApplicationsAllInOne.jsx';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(null);
@@ -129,7 +130,7 @@ function App() {
             <Route path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm loggedIn={loggedIn} />)} />
             <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} /> : <ThesisProposals user={user} />} ></Route>
             <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <LoginForm login={handleLogin} />}></Route>
-            <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors}/> : <LoginForm login={handleLogin} />} />
+            <Route path="/applications" element={loggedIn ? <ThesisApplicationsBro loggedIn={loggedIn} user={user} handleErrors={handleErrors}/> : <LoginForm login={handleLogin} />} />
             <Route path="/application/:id" element={loggedIn ? <ApplicationDetails /> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
 
