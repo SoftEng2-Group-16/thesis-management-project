@@ -11,6 +11,8 @@ import { LoginForm } from './components/AuthComponents';
 import ProposalForm from './components/ProposalForm.jsx';
 import ThesisProposals from './components/ThesisProposalsBro.jsx';
 import ThesisPage from './components/ThesisPage.jsx';
+import ThesisApplications from './components/Applications.jsx';
+import ApplicationDetails from './components/ApplicationDetails.jsx';
 import dayjs from 'dayjs';
 
 function App() {
@@ -127,7 +129,8 @@ function App() {
             <Route path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm loggedIn={loggedIn} />)} />
             <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} /> : <ThesisProposals user={user} />} ></Route>
             <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <LoginForm login={handleLogin} />}></Route>
-
+            <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors}/> : <LoginForm login={handleLogin} />} />
+            <Route path="/application/:id" element={loggedIn ? <ApplicationDetails /> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
 
             <Route path="*" element={<NotFoundLayout />} />
