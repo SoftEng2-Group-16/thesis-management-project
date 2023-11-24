@@ -145,7 +145,7 @@ function ThesisProposals(props) {
               <option value="type">Type</option>
               <option value="groups">Groups</option>
               <option value="level">Level</option>
-              <option value="cds">Course of study</option>
+              {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
             </Form.Select>
             <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
             <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
