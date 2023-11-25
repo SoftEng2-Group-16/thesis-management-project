@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, CardText } from 'react-bootstrap';
 import '../App.css';
 
-function ApplicationDetails() {
+function ApplicationDetails(props) {
     const { state } = useLocation();
     const navigate = useNavigate();
     const [applInfo, setApplInfo] = useState();
@@ -20,6 +20,18 @@ function ApplicationDetails() {
         // Navigate back to the list of applications
         navigate('/applications');
     }
+
+    const handleDecision = (decision) => {
+      console.log(decision);
+      if (decision === "accepted") {
+
+        props.setMessage({ msg: `Application accepted successfully!`, type: 'success' });
+      }
+      else{ //rejected
+        props.setMessage({ msg: `Application rejected!`, type: 'warning' });
+      }
+    }
+
     console.log(applInfo);
     if (!state || !state.applicationDetails || !applInfo) {
         return <div>Data Unavailable</div>;
@@ -83,10 +95,25 @@ function ApplicationDetails() {
                   <Card.Text className="mt-2"><strong>Keywords:</strong> {applInfo.thesisInfo.keywords.join(', ')}</Card.Text>
                 </Row>
 
-                {/* Go back button */}
-                <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBack}>
-                  Go Back
-                </Button>
+                <Row className="mb-4">
+                  <Col md={6} className="d-flex justify-content-start">
+                     {/* Go back button */}
+                     <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                  <Col md={6} className="d-flex justify-content-end">
+                    {/* Reject button */}
+                    <Button variant="dark" className="mt-3 ms-2" onClick={() => {handleDecision("rejected")}}>
+                      Reject
+                    </Button>
+
+                    {/* Accept button */}
+                    <Button variant="success" className="mt-3 ms-2" onClick={()=>{handleDecision("accepted")}}>
+                    Accept
+                    </Button>
+                  </Col>
+                </Row>
               </Card.Body>
             </Card>
           </Col>

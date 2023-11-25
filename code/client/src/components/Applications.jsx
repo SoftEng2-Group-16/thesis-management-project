@@ -49,7 +49,7 @@ function ThesisApplications (props) {
                                         <th>Date</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="align-middle">
                                     {applications.map((appl, index) => (
                                         // choose a better key...
                                         <tr key={index} style={{ fontWeight: 'bold' }}> 
