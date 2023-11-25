@@ -19,6 +19,7 @@ function ThesisApplications(props) {
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const { handleErrors } = useContext(MessageContext);
+    const [NoApplications, setNoApplications] = useState(false);
 
     useEffect(() => {
         if (props.user && props.user.role === 'teacher') {
@@ -37,6 +38,8 @@ function ThesisApplications(props) {
             if (err.error && err.status === 404) {
                 // Set empty list of applications for a 404 error
                 setApplications([]);
+                // set no applications to show
+                setNoApplications(true);
             } else {
                 // Handle other errors using the provided error handler
                 errorHandler(err);
@@ -52,7 +55,7 @@ function ThesisApplications(props) {
     return (
 
         <>
-            { applications.length === 0 ? (
+            { applications.length === 0 && NoApplications ? (
                 <NotFoundApllications handleGoBack={handleGoBack} />
             ) : props.loggedIn && props.user.role === 'teacher' ? (
                 <ProfessorApplications applications={applications} />
