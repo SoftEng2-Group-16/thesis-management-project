@@ -44,7 +44,7 @@ const insertProposal = async (proposal) => {
   };
 
 const getApplications = async () => {
-  const response = await fetch(SERVER_URL + '/api/teacher/applications', {
+  const response = await fetch(SERVER_URL + `/api/teacher/applications`, {
       credentials: 'include',
   });
   const res = await response.json();

@@ -20,7 +20,7 @@ router.post('/newapplication',auth.isLoggedIn, student.insertNewApplication);
 
 // remove the :studentId param when api is protected, it will be taken from req.user
 // REMEMBER to update documentation
-router.get('/student/applications/:studentId', /*auth.isLoggedIn,*/ student.getApplicationsForStudent);
+router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForStudent);
 
 //router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
