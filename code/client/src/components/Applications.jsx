@@ -8,22 +8,26 @@ import { Col, Row, Table, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import API from '../apis/professorAPI.js';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import '../App.css';
+import MessageContext from '../messageCtx.jsx';
 
 
 function ThesisApplications (props) {
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
+    const { handleErrors } = useContext(MessageContext);
     const [NoApplications, setNoApplications] = useState(false);
-    
+
     useEffect(() => {
         API.getApplications().then((listApplications) => {
+            console.log(listApplications);
             setApplications(listApplications.enhancedApplications);
         })
-        .catch(() => {
+        .catch((err) => {
             // set empty list of applications
             setApplications([]);
+            handleErrors(err);
             // set no applications to show
             setNoApplications(true);
         });
@@ -50,6 +54,7 @@ function ThesisApplications (props) {
                                         <th>Thesis</th>
                                         <th>Type</th>
                                         <th>Date</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="align-middle">
@@ -65,6 +70,7 @@ function ThesisApplications (props) {
                                             </td>
                                             <td>{appl.thesisInfo.type}</td>
                                             <td>{appl.timestamp.split(' ')[0]}</td>
+                                            <td>{appl.status}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -91,5 +97,6 @@ function ThesisApplications (props) {
         </>
     );
 }
+
 
 export default ThesisApplications;

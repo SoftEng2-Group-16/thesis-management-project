@@ -77,6 +77,31 @@ exports.getProfessorById = (id) => {
   });
 } 
 
+exports.getStudentByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM students WHERE email = ?`;
+    db.get(query, [email], (error, row) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+} 
+exports.getProfessorByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM teachers WHERE email = ?`;
+    db.get(query, [email], (error, row) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+} 
+
 
 // FOR SINGLE FETCH
 
