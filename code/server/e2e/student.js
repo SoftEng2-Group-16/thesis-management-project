@@ -16,9 +16,8 @@ const puppeteer = require('puppeteer');
   //this below is the mocked login for the student
   await page.waitForSelector('#username');
   // use # for the id
-  await page.type('#username', 'maria.rossi@polito.it');
-  await page.type('#password', '268553');
-  //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
+  await page.type('#username', 'mario.rossi@studenti.polito.it');
+  await page.type('#password', '200001');
   const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
   await page.click(buttonSelector);
 
