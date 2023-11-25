@@ -15,6 +15,7 @@ import '../App.css';
 function ThesisApplications (props) {
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
+    const [NoApplications, setNoApplications] = useState(false);
     
     useEffect(() => {
         API.getApplications().then((listApplications) => {
@@ -23,6 +24,8 @@ function ThesisApplications (props) {
         .catch(() => {
             // set empty list of applications
             setApplications([]);
+            // set no applications to show
+            setNoApplications(true);
         });
     }, [props.user.id]);
 
@@ -35,7 +38,7 @@ function ThesisApplications (props) {
         <>
             {props.loggedIn & props.user.role === 'teacher' ? (
                 <div style={{ marginTop: '10px' }}>
-                    { applications.length !== 0 ? (
+                    { applications.length !== 0 && !NoApplications ? (
                         <Row style={{ marginTop: '20px' }}>
                         <Col style={{ marginBottom: '15px'}}><h2> Thesis applications </h2></Col>
                         <Col xs={12}>
@@ -68,7 +71,7 @@ function ThesisApplications (props) {
                             </Table>
                         </Col>
                     </Row>
-                    ) : ( // No applications found
+                    ) : ( NoApplications && // No applications found
                         <Card className="thesis-card">
                             <Card.Title>
                                 No applications to show yet!
