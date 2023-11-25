@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, CardText } from 'react-bootstrap';
+import API from '../apis/professorAPI';
+import MessageContext from "../messageCtx.jsx"
 import '../App.css';
 
 function ApplicationDetails(props) {
     const { state } = useLocation();
     const navigate = useNavigate();
+    const { handleErrors } = useContext(MessageContext);
     const [applInfo, setApplInfo] = useState();
 
     useEffect(() => {
@@ -23,13 +26,15 @@ function ApplicationDetails(props) {
 
     const handleDecision = (decision) => {
       console.log(decision);
-      if (decision === "accepted") {
-
-        props.setMessage({ msg: `Application accepted successfully!`, type: 'success' });
-      }
-      else{ //rejected
-        props.setMessage({ msg: `Application rejected!`, type: 'warning' });
-      }
+      const data = {thesisid: applInfo.thesisInfo.id, body: {decision: decision, studentId: applInfo.studentInfo.id}};
+      API.setDecision(data).then(() => {
+        props.setMessage({ msg: 'Application accepted successfully!', type: (decision === "accepted" ? "success" : "warning") });
+        // Navigate back to the list of applications
+        navigate('/applications');
+      })
+      .catch ((err) => {
+        handleErrors(err);
+      });
     }
 
     console.log(applInfo);
@@ -102,7 +107,7 @@ function ApplicationDetails(props) {
                       Go Back
                     </Button>
                   </Col>
-                  <Col md={6} className="d-flex justify-content-end">
+                  {applInfo.status === 'pending' && <Col md={6} className="d-flex justify-content-end">
                     {/* Reject button */}
                     <Button variant="dark" className="mt-3 ms-2" onClick={() => {handleDecision("rejected")}}>
                       Reject
@@ -112,7 +117,7 @@ function ApplicationDetails(props) {
                     <Button variant="success" className="mt-3 ms-2" onClick={()=>{handleDecision("accepted")}}>
                     Accept
                     </Button>
-                  </Col>
+                  </Col>}
                 </Row>
               </Card.Body>
             </Card>
