@@ -1,7 +1,9 @@
 const puppeteer = require('puppeteer');
-
+//
 (async () => {
   // Launch the browser and open a new blank page
+  //with headless:false we show the chromium browser
+  //with headless:true we don't show the browser running, just the result
   const browser = await puppeteer.launch({
     headless: false
   });
@@ -13,7 +15,8 @@ const puppeteer = require('puppeteer');
   // Set screen size
   await page.setViewport({width: 1080, height: 1024});
 
-  //this below is the mocked login for the student
+  //this below is the mocked login for the professor
+  //here we wait for the page to re-render the saml login
   await page.waitForSelector('#username');
   // use # for the id
   await page.type('#username', 'maria.rossi@polito.it');
@@ -22,27 +25,43 @@ const puppeteer = require('puppeteer');
   const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
   await page.click(buttonSelector);
 
-
-  //await page.click('#submit');
-
-  //await browser.close();
-
-  /* Type into search box
+  //use this part above as a login in every test since it's needed.
+  await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+  const tableSelector = 'table.table-striped.table-bordered.table-hover';
   
+  
+  let cells = await page.$$(`${tableSelector} tr`);
+  cells = cells; 
 
-  // Wait and click on first result
-  const searchResultSelector = '.search-box__link';
-  await page.waitForSelector(searchResultSelector);
-  await page.click(searchResultSelector);
+  const rowIndex = 1;
+  const columnIndex = 2;
 
-  // Locate the full title with a unique string
-  const textSelector = await page.waitForSelector(
-    'text/Customize and automate'
-  );
-  const fullTitle = await textSelector?.evaluate(el => el.textContent);
+  // Select the cell using CSS selector
+  const cellSelector = `${tableSelector} tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`;
+  const cellHandle = await page.$(cellSelector);
 
-  // Print the full title
-  console.log('The title of this blog post is "%s".', fullTitle);
-    */
-  //await browser.close();
+  // Use evaluate to get the text content of the cell
+  const firstThesis = await page.evaluate(cell => cell.textContent, cellHandle);
+
+  console.log(`Name of the first thesis: ${firstThesis}`);
+  
+  // Now 'cells' contains an array of all <td> elements in the table
+  console.log("this is the number of rows", cells.length - 1); // Print the number of cells
+
+  await page.click(cellSelector);
+  
+  const titleSelector = 'div.border-bottom.pb-2.mb-4.card-title.h5';
+  const title = await page.$eval(titleSelector, component => component.textContent);
+
+  if(title == firstThesis){
+    
+    console.log("The thesis is the same that we wanted");
+  }else{
+    console.log("The thesis is a different one");
+  }
+
+  await page.click("button.mt-3.ms-2.btn.btn-danger")
+  console.log("We returned to the thesis page and everything went fine")
+
+  await browser.close();
 })();
