@@ -148,6 +148,35 @@ describe('professor Integration Tests', () => {
         });
     });
 
+    test('should return cosupervisors', async () => {
+        const response = await request(app).get('/api/teacher/applications');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            internals: [
+                "Maria Rossi, 268553, DAD",
+                "Luigi Bianchi, 268554, DAUIN",
+                "Giovanna Ferrari, 268555, DAT",
+                "Antonio Russo, 268556, DANERG",
+                "Sofia Romano, 268557, DISAT",
+                "Andrea Gallo, 268558, DAUIN",
+                "Lorenzo Esposito, 268559, DAT",
+                "Silvia Martini, 268560, DANERG",
+                "Claudia Fabbri, 268561, DISMA",
+                "Marco Mancini, 268562, DISAT",
+                "Giulia De Luca, 268563, DAD",
+                "Alessio Barone, 268564, DAUIN",
+                "Stefano Mariani, 268565, DAT",
+                "Carlo Vitale, 268566, DANERG",
+                "Carmela Greco, 268567, DISAT",
+                "Roberto Santoro, 268568, DAUIN",
+                "Sara Pagano, 268569, DAT",
+                "Davide Colombo, 268570, DANERG",
+                "Simone Gatti, 268571, DISMA",
+                "Anna Ferri, 268572, DISAT",
+            ]
+        });
+    });
 
 
 });

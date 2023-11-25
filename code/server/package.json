@@ -24,6 +24,7 @@
     "passport-local": "^1.0.0",
     "passport-openidconnect": "^0.1.1",
     "passport-saml": "^3.2.4",
+    "puppeteer": "^21.5.2",
     "sqlite": "^5.1.1"
   },
   "devDependencies": {

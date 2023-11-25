@@ -126,6 +126,28 @@ describe("Professor tests", () => {
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith("8");
     });
+
+    test("should insert a new proposal", async () => {
+        const req = {
+            body: {
+            }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+
+        dao.getAllApplicationsByProf = jest.fn((id) => new Promise((resolve) => resolve(["ED"])))
+        
+        await professorApi.getAllApplicationsByProf(req, res);
+
+
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.json).toHaveBeenCalledWith("8");
+    });
+
 });
 
 
