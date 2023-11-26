@@ -24,11 +24,10 @@ function NavHeader(props) {
 }
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="d-flex navbar-expand-lg justify-content-around" bg="primary" variant="dark">
+    <Navbar collapseOnSelect expand="lg" className="d-flex navbar-expand-lg justify-content-between " bg="primary" variant="dark">
       <a></a>
-      <Container>
         <Navbar.Brand
-          className='app-title'
+          className='app-title ms-4'
           onClick={() => {
             if (props.loggedIn)
               setShowClock(!showClock)
@@ -47,7 +46,7 @@ function NavHeader(props) {
               : null}
               {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link> : null}
             </Nav> : null}
-          <Nav>
+          <Nav className='me-4 d-flex align-items-center'>
             {props.loggedIn ?
             <NavbarText>
               {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/')}>My Proposals</Nav.Link> : null}
@@ -56,14 +55,12 @@ function NavHeader(props) {
             {props.loggedIn ?
               <Navbar.Text>
                 <img src={User} style={{ width: '45px', height: 'auto', fill: 'white' }} alt="User:" />
-                <span className="text-light me-3 username">{props.user.role}</span>
+                {/* <span className="text-light me-3 username">{props.user.role}</span> */}
                 <span className="text-light me-3 username">{props.user.id}, {props.user.name} {props.user.surname}</span>
               </Navbar.Text>
               : null}
-          </Nav>
-          <Nav>
             {props.loggedIn ?
-              <Button variant="outline-light" onClick={onLogout}>
+              <Button variant="outline-light h-75" onClick={onLogout}>
                 Logout
               </Button>
               :
@@ -71,7 +68,6 @@ function NavHeader(props) {
             }
           </Nav>
         </Navbar.Collapse>
-      </Container>
     </Navbar>
   );
 }

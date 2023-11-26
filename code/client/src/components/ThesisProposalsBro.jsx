@@ -167,8 +167,8 @@ function ThesisProposals(props) {
 
   return (
     <>
-      {props.loggedIn && props.user.role == 'student'?
-        <div style={{ marginTop: '10px' }} >
+      {props.loggedIn && props.user.role != undefined && props.user.role == 'student'?
+        <>
           <Form className="d-flex">
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
               <option value="title">Title</option>
@@ -184,7 +184,7 @@ function ThesisProposals(props) {
             <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
           </Form>
 
-          <Row style={{ marginTop: '20px' }}>
+          <Row>
             <Col xs={12}>
               <Table striped bordered hover>
                 <thead>
@@ -214,10 +214,10 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
-        </div>
+        </>
        : props.user.role == 'teacher'? 
        <>
-          <Row style={{ marginTop: '20px' }}>
+          <Row>
             <Row className="text-start">
               <h3>As a Supervisor</h3>
             </Row>
@@ -250,7 +250,7 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
-          <Row style={{ marginTop: '20px' }}>
+          <Row>
             <Row className="text-start">
                 <h3>As a Cosupervisor</h3>
             </Row>

@@ -110,17 +110,18 @@ function App() {
             element={
               <>
                 <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} />
-                <Container fluid className="mt-3 text-center">
-                  {message && (
-                    <Row>
-                      <Alert variant={message.type} onClose={() => setMessage('')} dismissible>
-                        {message.msg}
-                      </Alert>
-                    </Row>
-                  )}
-                  <Outlet />
-                </Container>
-
+                <div className="mt-3 ms-4 me-4 mb-3 text-center">
+                  <Container fluid className="text-center">
+                    {message && (
+                      <Row>
+                        <Alert variant={message.type} onClose={() => setMessage('')} dismissible>
+                          {message.msg}
+                        </Alert>
+                      </Row>
+                    )}
+                    <Outlet/>
+                  </Container>
+                </div>
               </>
             }
           >
