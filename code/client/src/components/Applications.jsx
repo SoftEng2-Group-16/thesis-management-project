@@ -23,13 +23,13 @@ function ThesisApplications(props) {
 
     useEffect(() => {
         if (props.user && props.user.role === 'teacher') {
-             fetchData(professorAPI.getApplications, handleErrors);
+             fetchData(professorAPI.getApplications);
         } else if (props.user && props.user.role === 'student') {
-             fetchData(studentAPI.getApplications, handleErrors);
+             fetchData(studentAPI.getApplications);
         }
     }, [props.user.id, props.user.role]);
 
-    const fetchData = async (apiFunction, errorHandler) => {
+    const fetchData = async (apiFunction) => {
         try {
             const listApplications = await apiFunction();
             console.log(listApplications);
@@ -42,7 +42,7 @@ function ThesisApplications(props) {
                 setNoApplications(true);
             } else {
                 // Handle other errors using the provided error handler
-                errorHandler(err);
+                handleErrors(err);
             }
         }
     };
@@ -61,7 +61,8 @@ function ThesisApplications(props) {
                 <ProfessorApplications applications={applications} />
             ) : props.loggedIn && props.user.role === 'student' ? (
                 <StudentApplications applications={applications}/>
-            ) : null}
+                // Nothing to see here...go Log in!
+            ) : navigate('/login')} 
         </>
 
 
@@ -90,7 +91,7 @@ function StudentApplications({ applications }) {
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="align-middle">
                             {applications.map((appl, index) => (
                                 // choose a better key...
                                 <tr key={index} style={{ fontWeight: 'bold' }}>
@@ -137,7 +138,7 @@ function ProfessorApplications({ applications }) {
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="align-middle">
                             {applications.map((appl, index) => (
                                 // choose a better key...
                                 <tr key={index} style={{ fontWeight: 'bold' }}>
