@@ -79,7 +79,6 @@ const insertNewProposal = async (req, res) => {
 
     }
 }
-
 const getAllApplicationsByProf = async (req, res) => {
     try {
         const applications = await dao.getAllApplicationsByProf(req.user.id);
@@ -102,15 +101,63 @@ const getAllApplicationsByProf = async (req, res) => {
             return res.status(200).json({
                 enhancedApplications
             });
-        }
+                 }
     } catch (err) {
         return res.status(500).json(err.message);
     }
 }
 
+const decideApplication = async (req, res) => {
+    
+    const thesisId = req.params.thesisid;
+    const decision = req.body.decision;
+    const studentId=req.body.studentId;
+    const teacherId=req.user.id; //sent to the query to double check the logged in professor is the one referred in the application
+    
+    if(!teacherId){
+        return res.status(503).json({ error: "problem with the authentication" });
+    }
+
+    if (!decision) {
+        return res.status(422).json({ error: "decision is missing in body" });
+    }
+    if (!studentId) {
+        return res.status(422).json({ error: "studentId is missing in body" });
+    }
+    if (isNaN(thesisId) || !Number.isInteger(parseInt(thesisId))) {
+        return res.status(422).json({ error: "thesisId non valido" });
+    }
+
+    if (decision === "accepted") {
+        try {
+            const application = await dao.acceptApplication(thesisId,teacherId,studentId); 
+            await dao.cancellPendingApplicationsForAThesis(thesisId,teacherId); 
+            await dao.cancellPendingApplicationsOfAStudent(studentId,teacherId);
+            return res.status(200).json(application);
+        } catch (e) {
+            return res.status(500).json(e.message);
+        }
+    }
+    else if (decision === "rejected") {
+        try {
+            const application = await dao.rejectApplication(thesisId,teacherId,studentId);
+            return res.status(200).json(application);
+        } catch (e) {
+            return res.status(500).json(e.message);
+        }
+    }
+    else {
+        return res.status(400).json({ error: "Invalid decision field" });
+    }
+
+}
+
+
+
 module.exports = {
     getPossibleCosupervisors,
     insertNewProposal,
     getDegreesInfo,
-    getAllApplicationsByProf
+    getAllApplicationsByProf,
+    decideApplication
 }

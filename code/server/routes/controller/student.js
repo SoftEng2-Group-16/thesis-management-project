@@ -22,6 +22,27 @@ const insertNewApplication = async (req, res) => {
     }
 }
 
+const getApplicationsForStudent = async (req,res) => {
+    // since I dont know how to log in in the testapi.http file using the new SAML strategy,
+    // for the moment I'm passing as param the studentId (should be found in the session cookie)
+    const studentId = req.params.studentId
+
+    // ideally, the API should be protected, and the studentId should be retrieved from the user object
+    // const studentId = req.user.id
+    try {
+        const applications = await dao.getApplicationsForStudent(studentId);
+        if(applications.error) {
+            return res.status(404).json(applications);
+        } else {
+            // as of now, just the row of the db is returned
+            //will be modified (for example inserting student or thesis info if ne)
+            return res.status(200).json(applications);
+        }
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 /*const getThesisProposals = async (req,res) => {
     const studentCourse = req.params.degreeCode
     try {
@@ -37,6 +58,6 @@ const insertNewApplication = async (req, res) => {
 }*/
  module.exports = {
      insertNewApplication,
+     getApplicationsForStudent,
      //getThesisProposals
-   
  };

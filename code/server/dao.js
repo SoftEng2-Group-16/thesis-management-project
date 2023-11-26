@@ -8,12 +8,12 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 
 // STUDENT SECTION
-exports.addApplicationForThesis = (thesisId, studentId, timestamp, status,teacherId) => {
+exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teacherId) => {
   return new Promise((resolve, reject) => {
     const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid) VALUES (?,?,?,?,?)';
     db.run(
       sql,
-      [thesisId, studentId, timestamp, status,teacherId],
+      [thesisId, studentId, timestamp, status, teacherId],
       function (err) {
         if (err) {
           reject(err);
@@ -92,11 +92,9 @@ exports.getThesisProposals = (degCode) => {
   });
 };
 
-
 exports.getStudentById = (studentId) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * from students where id=? ';
-
     db.all(
       sql,
       [studentId],
@@ -124,6 +122,32 @@ exports.getStudentById = (studentId) => {
   });
 };
 
+exports.getApplicationsForStudent = (studentId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM applications WHERE studentid=?';
+    db.all(
+      sql,
+      [studentId],
+      (err,rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          if (rows.length == 0 || rows == null || rows == undefined) {
+            resolve({ error: `No applications found for student ${studentId}` });
+          } else {
+            const applications = rows.map(row => ({
+              studentId: row.studentid,
+              thesisId: row.thesisid,
+              timestamp: dayjs(row.timestamp),
+              status: row.status,
+              teacherId: row.teacherid
+            }));
+            resolve(applications);
+          }
+        }
+    });
+  });
+}
 
 // PROFESSOR SECTION
 exports.getProfessors = () => {
@@ -251,7 +275,106 @@ exports.deleteProposal = (proposalId) => {
   });
 }
 
+exports.acceptApplication = (thesisId, teacherId,studentId) => {
+  console.log(thesisId,teacherId,studentId);
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "accepted" WHERE thesisid = ?  AND teacherId = ? AND studentid=?';
 
+    db.run(
+      sql,
+      [thesisId, teacherId,studentId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'))
+        } else {
+          // return application updated
+          const updatedApplication = {
+            id: thesisId,
+            status: 'accepted',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
+
+
+exports.rejectApplication = (thesisId, teacherId,studentId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "rejected" WHERE thesisid = ?  AND teacherId = ? AND studentid=? ';
+
+    db.run(
+      sql,
+      [thesisId, teacherId,studentId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'));
+        } else {
+          const updatedApplication = {
+            id: thesisId,
+            status: 'rejected',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
+
+exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ?';
+
+    db.run(
+      sql,
+      [thesisId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'))
+        } else {
+          // return application updated
+          const updatedApplication = {
+            id: thesisId,
+            status: 'canceled',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
+
+exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ?  AND teacherId = ?';
+
+    db.run(
+      sql,
+      [studentId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else if (this.changes === 0) {
+          reject(new Error('No matching application found or unauthorized.'))
+        } else {
+          // return application updated
+          const updatedApplication = {
+            id: studentId,
+            status: 'canceled',
+          };
+          resolve(updatedApplication);
+        }
+      }
+    );
+  });
+};
 exports.getAllApplicationsByProf = (idProfessor) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM applications where teacherid=?'
@@ -262,7 +385,7 @@ exports.getAllApplicationsByProf = (idProfessor) => {
         if (err) {
           reject(err);
         } else if (rows.length == 0) {
-          resolve({ error: 'Problems while retrieving applications for the thesis of professor ' + idProfessor });
+          resolve({ error: 'No Applications found for professor ' + idProfessor });
         } else {
           const applications = rows.map(row => (
             new Application(row.id, row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
@@ -310,6 +433,8 @@ exports.getThesisProposalById = (thesisId) => {
       });
   });
 };
+
+
 
 //VIRTUAL CLOCK ONLY 
 exports.getExpiredProposals = (selectedTimestamp) => {

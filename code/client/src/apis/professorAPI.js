@@ -43,5 +43,18 @@ const insertProposal = async (proposal) => {
     }
   };
 
-const professorAPI = {getPossibleCosupervisors,getDegreesInfo,insertProposal}
+const getApplications = async () => {
+  const response = await fetch(SERVER_URL + '/api/teacher/applications', {
+      credentials: 'include',
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res; // list of applications related to the logged user
+  }
+  else{
+    throw res;
+  }
+}
+
+const professorAPI = {getPossibleCosupervisors,getDegreesInfo,insertProposal,getApplications}
 export default professorAPI;

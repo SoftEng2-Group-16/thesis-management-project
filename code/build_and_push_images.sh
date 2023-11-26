@@ -1,5 +1,6 @@
 #!/bin/bash
 
+dockerUsername="atorre98"
 # create a multi platform context, to build multi-architecture images
 docker buildx create --use > contextName.txt
 
@@ -7,13 +8,13 @@ docker buildx create --use > contextName.txt
 cd ./client
 clear
 echo "Building client image..."
-docker buildx build --platform linux/amd64,linux/arm64 -t atorre98/tms_client:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 -t ${dockerUsername}/tms_client:latest --push .
 
 # do the same for the server image
 cd ../server
 clear
 echo "Building server image..."
-docker buildx build --platform linux/amd64,linux/arm64 -t atorre98/tms_server:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 -t ${dockerUsername}/tms_server:latest --push .
 
 #cleanup
 cd ..
