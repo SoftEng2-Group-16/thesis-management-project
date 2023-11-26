@@ -102,6 +102,7 @@ Students need to get thesis proposals filtered by their course, and professors n
 - `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
 - `ThesisProposalBro`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
 - `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there is only a go back button (for now, later we will add the fact that we can modify it only if he is the owner). If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis.
+- `Applications`: This component renders a table of thesis applications, dynamically adapting its display based on the user's role (teacher or student). It efficiently utilizes the ApplicationsTable component to provide a clean and intuitive interface for managing thesis applications within the application..
 
 
 ## API Server
@@ -168,7 +169,7 @@ Students need to get thesis proposals filtered by their course, and professors n
   - Response body: the id of the newly created proposal
 
 
-- GET `/api/applications/:studentId`
+- GET `/api/student/applications/:studentId`
   - Description: retrieves all the applications the student has sent (including status)
   - Request param: the id of the student currently logged in (should be retrieved from the session cookie)
   - Response: `200 OK` (success), `404 Not Found` (no applications found for the specific studentId), `500 Internal Server Error` (generic server error)
@@ -206,21 +207,7 @@ Students need to get thesis proposals filtered by their course, and professors n
 
 
 
-## Testing
 
-### FE testing
-### `ThesisProposalsBro`
-  **Description**: Test1: checking if the filter for title functions.
-- **Before**: The user needs to be logged in
-- **Actions**:
-  - I go to `/thesis` Route
-  - I write "sustainable" and then click on the only suggestion (`Sustainable Energy Sources Research`).
-  - I click on `Smart Cities Urban Planning` to add it as a parameter.
-  - I click on the Searcch button.
-  - The only thesis that appear are `Sustainable Energy Sources Research` and `Smart Cities Urban Planning`.
-  - I remove `Smart Cities Urban Planning` as a parameter bi clicking on the X next to it.
-  - The only thesis that appear is `Sustainable Energy Sources Research`.
-- **Result**: The filter worked properly
 
 
 ### BE testing

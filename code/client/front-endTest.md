@@ -50,4 +50,30 @@ The `ProposalForm` component is designed to allow professors to create new thesi
   - The only thesis that appear is `Sustainable Energy Sources Research`.
 - **Result**: The filter worked properly
 
+
+# ThesisApplications
+
+The `ThesisApplicationsBro` component is responsible for rendering a table of thesis applications based on the user's role. It dynamically fetches and displays applications for teachers and students, and provides a fallback message if no applications are available.
+
+## Scenario 1: Teacher Role - Applications Available
+
+**Test Steps:**
+1. Log in as a user with a teacher role.
+2. Navigate to the Thesis Applications page.
+
+**Expected Result:**
+- The component should render a table with columns: StudentID, Student, Thesis, Type, Date, and Status.
+- If applications are available, they should be listed in the table.
+
+## Scenario 2: Student Role - No Applications Available
+
+**Test Steps:**
+1. Log in as a user with a student role.
+2. Navigate to the Thesis Applications page.
+
+**Expected Result:**
+- The component should render a table with columns: Teacher, Thesis, Type, Date, and Status.
+- The component should display a message indicating that there are no applications available for students.
+
+
   
