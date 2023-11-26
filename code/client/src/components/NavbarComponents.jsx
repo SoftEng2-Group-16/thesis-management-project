@@ -40,11 +40,12 @@ function NavHeader(props) {
           {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} setShowClock={setShowClock} currentDate={props.currentDate} newDate={props.newDate} setNewDate={props.setNewDate} setCurrentDate={props.setCurrentDate} /> : null) : null}
           {props.loggedIn ?
             <Nav className="me-auto">
-              {
-                props.user.role == 'student' ?
+              { props.user.role == 'student' ?
                 <Nav.Link className='link' onClick={() => navigate('/thesis')}> All Thesis</Nav.Link>
               : null}
-              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link> : null}
+              {props.user.role === 'teacher' ? 
+              <Nav.Link className='link' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link> : null}
+              <Nav.Link className='link' onClick={() => navigate('/applications')}>Applications</Nav.Link>
             </Nav> : null}
           <Nav className='me-4 d-flex align-items-center'>
             {props.loggedIn ?

@@ -44,7 +44,6 @@ function ThesisProposals(props) {
     const fetchThesis = async () => {
       try {
         const proposals = await API.getThesisProposals();
-        console.log(proposals)
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -52,19 +51,18 @@ function ThesisProposals(props) {
           filterByTeacher(proposals);
           filterByCosupervisor(proposals);
         } else {
-          const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
-          setTitle(uniqueByTitle);
-          //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
-          setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
-          setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
-          setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
-          setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
-          setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
-          setCds(removeDuplicates(proposals.map(item => ({ value: item.cds, label: item.cds }))));
-          setFilter("title")
-          setOptions(uniqueByTitle);
+        const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
+        setTitle(uniqueByTitle);
+        //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
+        setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
+        setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
+        setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
+        setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
+        setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
+        setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
+        setFilter("title")
+        setOptions(uniqueByTitle);
         }
-
       } catch (error) {
         console.error(error);
         // Handle error
@@ -72,13 +70,13 @@ function ThesisProposals(props) {
     };
 
     if (props.loggedIn || props.update == true) {
-      console.log(props.loggedIn);
+
       fetchThesis();
       props.setUpdate(false);
     }
   }, [props.loggedIn, props.update]);
 
-// this function is used to give back all the thesis list
+  // this function is used to give back all the thesis list
   function handleReset() {
     setSelections([]);
     setThesis([...Allthesis]);
@@ -90,7 +88,7 @@ function ThesisProposals(props) {
   */
   function changeParameter(parameter) {
     console.log(groups);
-    setVersion(version +1)
+    setVersion(version + 1)
     setFilter(parameter)
     setSelections([]);
     if (parameter === "title") setOptions(title);
@@ -112,7 +110,9 @@ function ThesisProposals(props) {
         if (filter === "title" && selections.includes(item.title)) return true;
         if (filter === "supervisor" && selections.includes(item.supervisor)) return true;
         if (filter === "type" && selections.includes(item.type)) return true;
-        if (filter === "cds" && selections.includes(item.cds)) return true;
+        if (filter === "cds") {
+          return item.cds.some((cds) => selections.includes(cds));
+        }
         if (filter === "level" && selections.includes(item.level)) return true;
         if (filter === "keywords") {
           return item.keywords.some((keyword) => selections.includes(keyword));
@@ -129,12 +129,12 @@ function ThesisProposals(props) {
 
   // function called every time we add or remove a selection from Select component
   function changeSelection(selection) {
-      let array = []
-      selection.forEach(item => {
-        array.push(item.value)
-      })
-      setSelections(array)
-    
+    let array = []
+    selection.forEach(item => {
+      array.push(item.value)
+    })
+    setSelections(array)
+
   }
 
   function filterByTeacher(proposals) {
@@ -177,7 +177,7 @@ function ThesisProposals(props) {
               <option value="type">Type</option>
               <option value="groups">Groups</option>
               <option value="level">Level</option>
-              <option value="cds">Course of study</option>
+              {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
             </Form.Select>
             <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
             <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
