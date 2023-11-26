@@ -23,5 +23,18 @@ const insertApplication = async (studentId, proposalId,teacherid) => {
     }
 }
 
-const studentAPI = { insertApplication };
+const getThesisProposals = async() => {
+    const response = await fetch(SERVER_URL + '/api/thesis/student/', {
+      credentials: 'include',
+    });
+  
+    const proposals = await response.json();
+    if(response.ok) {
+      return proposals;
+    } else {
+      throw proposals;
+    }
+  }
+
+const studentAPI = { insertApplication, getThesisProposals };
 export default studentAPI;

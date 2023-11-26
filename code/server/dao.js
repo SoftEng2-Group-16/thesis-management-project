@@ -27,6 +27,48 @@ exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teach
 
 exports.getThesisProposals = (degCode) => {
   return new Promise((resolve, reject) => {
+    const sql = 'SELECT * from thesis_proposals'
+    db.all(
+      sql,
+      [],
+      (err, rows) => {
+        if(err){
+          reject(err);
+        } else if(rows.length === 0) {
+          resolve( {error: `No thesis proposals found for study course ${degCode}`} );
+        } else {
+          const proposals = rows
+              .filter(r => r.cds.match(degCode) !== null)
+              .map((row) => ({
+                id: row.id,
+                title: row.title,
+                supervisor: row.supervisor,
+                cosupervisors: row.cosupervisors.split('-'),
+                keywords: row.keywords.split(','),
+                type: row.type,
+                groups: row.groups.split(','),
+                description: row.description,
+                requirements: row.requirements,
+                notes: row.notes,
+                expiration: row.expiration,
+                level: row.level,
+                cds: row.cds.split(','),
+              }
+              ));
+
+            if (proposals.length == 0) {
+              resolve({ error: `No thesis proposals found for study course ${degCode}` });
+            } else {
+              resolve(proposals);
+            }
+        }
+      }
+    )
+  });
+}
+
+/*exports.getThesissProposals = (degCode) => {
+  return new Promise((resolve, reject) => {
     const sql = 'SELECT * from thesis_proposals';
 
     db.all(
@@ -90,7 +132,7 @@ exports.getThesisProposals = (degCode) => {
         }
       });
   });
-};
+};*/
 
 exports.getStudentById = (studentId) => {
   return new Promise((resolve, reject) => {
@@ -150,6 +192,48 @@ exports.getApplicationsForStudent = (studentId) => {
 }
 
 // PROFESSOR SECTION
+exports.getOwnProposals = (teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM thesis_proposals'
+    db.all(
+      sql,
+      [],
+      (err,rows) => {
+        if(err){
+          reject(err);
+        } else if(rows.length === 0) {
+          resolve( {error: `No thesis proposals found for teacher ${teacherId}`} );
+        } else {
+          const proposals = rows
+              .filter(r => r.supervisor.match(teacherId) !== null)
+              .map((row) => ({
+                id: row.id,
+                title: row.title,
+                supervisor: row.supervisor,
+                cosupervisors: row.cosupervisors.split('-'),
+                keywords: row.keywords.split(','),
+                type: row.type,
+                groups: row.groups.split(','),
+                description: row.description,
+                requirements: row.requirements,
+                notes: row.notes,
+                expiration: row.expiration,
+                level: row.level,
+                cds: row.cds.split(','),
+              }
+              ));
+
+            if (proposals.length == 0) {
+              resolve({ error: `No thesis proposals found for teacher ${teacherId}` });
+            } else {
+              resolve(proposals);
+            }
+        }
+      }
+    )
+  });
+}
+
 exports.getProfessors = () => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT id, name, surname, department_code FROM teachers'

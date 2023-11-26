@@ -95,3 +95,11 @@ content-type: application/json
     "studentId":200001
 }
 
+###
+# test student gets thesis proposals
+GET http://localhost:3001/api/thesis/student/LM-1
+
+
+###
+# test teacher gets own proposals
+GET http://localhost:3001/api/thesis/teacher/268555

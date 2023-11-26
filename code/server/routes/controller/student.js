@@ -43,8 +43,11 @@ const getApplicationsForStudent = async (req,res) => {
     }
 }
 
-/*const getThesisProposals = async (req,res) => {
-    const studentCourse = req.params.degreeCode
+const getThesisProposals = async (req,res) => {
+    //same principle for the getApplications: for manual testing purposes at the moment the degree
+    //code is taken as param; ideally, it should be taken from the req.user object
+    //const studentCourse = req.params.degreeCode
+    const studentCourse = req.user.degree_code
     try {
         const proposals = await dao.getThesisProposals(studentCourse);
         if(proposals.error){
@@ -55,9 +58,9 @@ const getApplicationsForStudent = async (req,res) => {
     } catch (e) {
         return res.status(500).json(e.message);
     }
-}*/
+}
  module.exports = {
      insertNewApplication,
      getApplicationsForStudent,
-     //getThesisProposals
+     getThesisProposals
  };
