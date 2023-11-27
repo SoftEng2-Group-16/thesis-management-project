@@ -23,9 +23,9 @@ function ThesisApplications(props) {
 
     useEffect(() => {
         if (props.user && props.user.role === 'teacher') {
-             fetchData(professorAPI.getApplications);
+            fetchData(professorAPI.getApplications);
         } else if (props.user && props.user.role === 'student') {
-             fetchData(studentAPI.getApplications);
+            fetchData(studentAPI.getApplications);
         }
     }, [props.user.id, props.user.role]);
 
@@ -48,6 +48,7 @@ function ThesisApplications(props) {
     };
 
     const handleGoBack = () => {
+        props.setMessage('');
         // Navigate back to
         navigate('/thesis');
     }
@@ -55,14 +56,14 @@ function ThesisApplications(props) {
     return (
 
         <>
-            { applications.length === 0 && NoApplications ? (
-                <NotFoundApllications handleGoBack={handleGoBack} />
+            {applications.length === 0 && NoApplications ? (
+                <NotFoundApplications handleGoBack={handleGoBack} />
             ) : props.loggedIn && props.user.role === 'teacher' ? (
-                <ProfessorApplications applications={applications} />
+                <ProfessorApplications applications={applications} user={props.user} />
             ) : props.loggedIn && props.user.role === 'student' ? (
-                <StudentApplications applications={applications}/>
+                <StudentApplications applications={applications} user={props.user} />
                 // Nothing to see here...go Log in!
-            ) : navigate('/login')} 
+            ) : navigate('/login')}
         </>
 
 
@@ -71,7 +72,7 @@ function ThesisApplications(props) {
 }
 
 
-function StudentApplications({ applications }) {
+function StudentApplications({ applications, user }) {
 
 
     return (
@@ -97,7 +98,7 @@ function StudentApplications({ applications }) {
                                 <tr key={index} style={{ fontWeight: 'bold' }}>
                                     <td>{appl.teacherInfo.surname + ' ' + appl.teacherInfo.name}<br /><small>{appl.teacherInfo.email}</small> </td>
                                     <td>
-                                        <Link to={`/application/${index}`} state={{ applicationDetails: appl }}>
+                                        <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
                                             {appl.thesisInfo.title}
                                         </Link>
                                     </td>
@@ -117,7 +118,7 @@ function StudentApplications({ applications }) {
 }
 
 
-function ProfessorApplications({ applications }) {
+function ProfessorApplications({ applications, user }) {
 
 
     return (
@@ -145,7 +146,7 @@ function ProfessorApplications({ applications }) {
                                     <td>{appl.studentId}</td>
                                     <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br /><small>{appl.studentInfo.email}</small> </td>
                                     <td>
-                                        <Link to={`/application/${index}`} state={{ applicationDetails: appl }}>
+                                        <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
                                             {appl.thesisInfo.title}
                                         </Link>
                                     </td>
@@ -164,7 +165,7 @@ function ProfessorApplications({ applications }) {
     );
 }
 
-function NotFoundApllications(props) {
+function NotFoundApplications(props) {
 
     return (
         <Card className="thesis-card">

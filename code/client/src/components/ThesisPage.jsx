@@ -12,6 +12,7 @@ function ThesisPage(props) {
 
   useEffect(() => {
     console.log(state)
+    props.setMessage('');
     if (!state || !state.thesisDetails) {
       console.error('Thesis details not available.');
       return;

@@ -19,7 +19,7 @@ function NavHeader(props) {
   const onLogout = async() => {
    await props.handleLogout();
     // Go back to main screen
-    console.log(props.user);
+    //console.log(props.user);
     navigate("/login");
 }
 
@@ -41,9 +41,9 @@ function NavHeader(props) {
           {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} setShowClock={setShowClock} currentDate={props.currentDate} newDate={props.newDate} setNewDate={props.setNewDate} setCurrentDate={props.setCurrentDate} /> : null) : null}
           {props.loggedIn ?
             <Nav className="me-auto">
-              <Nav.Link className='link' onClick={() => navigate('/thesis')}>Thesis</Nav.Link>
-              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/proposal')}>Proposal</Nav.Link> : null}
-              <Nav.Link className='link' onClick={() => navigate('/applications')}>Applications</Nav.Link>
+              <Nav.Link className='link' onClick={() =>{props.setMessage('');navigate('/thesis')}}>Thesis</Nav.Link>
+              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() =>{navigate('/proposal'); props.setMessage('')}}>Proposal</Nav.Link> : null}
+              <Nav.Link className='link' onClick={() =>{props.setMessage(''); navigate('/applications')}}>Applications</Nav.Link>
             </Nav> : null}
           <Nav>
             {props.loggedIn ?

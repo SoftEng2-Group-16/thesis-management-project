@@ -325,7 +325,7 @@ exports.rejectApplication = (thesisId, teacherId,studentId) => {
 
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ?';
+    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
 
     db.run(
       sql,
@@ -350,7 +350,7 @@ exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
 
 exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ?  AND teacherId = ?';
+    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ?  AND teacherId = ? and status="pending"';
 
     db.run(
       sql,
