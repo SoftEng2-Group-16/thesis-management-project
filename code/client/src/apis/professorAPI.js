@@ -56,5 +56,23 @@ const getApplications = async () => {
   }
 }
 
-const professorAPI = {getPossibleCosupervisors,getDegreesInfo,insertProposal,getApplications}
+const setDecision = async (decision) => {
+  const response = await fetch(SERVER_URL + `/api/teacher/applications/${decision.thesisid}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(decision.body),
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else{
+    throw res;
+  }
+}
+
+const professorAPI = {getPossibleCosupervisors,getDegreesInfo,insertProposal,getApplications,setDecision}
 export default professorAPI;

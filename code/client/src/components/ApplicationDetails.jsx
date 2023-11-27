@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, CardText } from 'react-bootstrap';
+import API from '../apis/professorAPI';
+import MessageContext from "../messageCtx.jsx"
 import '../App.css';
 
-function ApplicationDetails() {
+function ApplicationDetails(props) {
   const { state } = useLocation();
   const navigate = useNavigate();
+    const { handleErrors } = useContext(MessageContext);
   const [applInfo, setApplInfo] = useState();
   const [statusStyle,setStatusStyle]=useState();
   
@@ -20,14 +23,28 @@ function ApplicationDetails() {
     setStatusStyle(getStatusStyle(state.applicationDetails.status))
   }, [state]);
 
-  const handleGoBack = () => {
-    // Navigate back to the list of applications
-    navigate('/applications');
-  }
-  console.log(applInfo);
-  if (!state || !state.applicationDetails || !applInfo) {
-    return <div>Data Unavailable</div>;
-  }
+    const handleGoBack = () => {
+        // Navigate back to the list of applications
+        navigate('/applications');
+    }
+
+    const handleDecision = (decision) => {
+      console.log(decision);
+      const data = {thesisid: applInfo.thesisInfo.id, body: {decision: decision, studentId: applInfo.studentInfo.id}};
+      API.setDecision(data).then(() => {
+        props.setMessage({ msg: 'Application accepted successfully!', type: (decision === "accepted" ? "success" : "warning") });
+        // Navigate back to the list of applications
+        navigate('/applications');
+      })
+      .catch ((err) => {
+        handleErrors(err);
+      });
+    }
+
+    console.log(applInfo);
+    if (!state || !state.applicationDetails || !applInfo) {
+        return <div>Data Unavailable</div>;
+    }
 
   return (
     <Container className="mt-5">
@@ -94,16 +111,31 @@ function ApplicationDetails() {
                 <Card.Text className="mt-2"><strong>Keywords:</strong> {applInfo.thesisInfo.keywords.join(', ')}</Card.Text>
               </Row>
 
-              {/* Go back button */}
-              <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBack}>
-                Go Back
-              </Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
-  );
+                <Row className="mb-4">
+                  <Col md={6} className="d-flex justify-content-start">
+                     {/* Go back button */}
+                     <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                  {applInfo.status === 'pending' && <Col md={6} className="d-flex justify-content-end">
+                    {/* Reject button */}
+                    <Button variant="dark" className="mt-3 ms-2" onClick={() => {handleDecision("rejected")}}>
+                      Reject
+                    </Button>
+
+                    {/* Accept button */}
+                    <Button variant="success" className="mt-3 ms-2" onClick={()=>{handleDecision("accepted")}}>
+                    Accept
+                    </Button>
+                  </Col>}
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+        </Container>
+      );
 }
 
 
