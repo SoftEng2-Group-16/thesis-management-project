@@ -13,14 +13,16 @@ router.get('/sessions/current', auth.getCurrentSession);
 router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 
 /* general routes*/
-router.get('/thesis', general.getThesisProposals); 
+//router.get('/thesis', general.getThesisProposals); 
+router.get('/thesis/student/', student.getThesisProposals);
+router.get('/thesis/teacher/', professor.getOwnProposals);
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication',auth.isLoggedIn, student.insertNewApplication);
 
 // remove the :studentId param when api is protected, it will be taken from req.user
 // REMEMBER to update documentation
-router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForStudent);
+router.get('/student/applications/:studentId', /*auth.isLoggedIn,*/ student.getApplicationsForStudent);
 
 //router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);

@@ -9,7 +9,7 @@ import MessageContext from './messageCtx.jsx';
 import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
 import ProposalForm from './components/ProposalForm.jsx';
-import ThesisProposals from './components/ThesisProposals.jsx';
+import ThesisProposals from './components/ThesisProposalsBro.jsx';
 import ThesisPage from './components/ThesisPage.jsx';
 import ThesisApplications from './components/Applications.jsx';
 import ApplicationDetails from './components/ApplicationDetails.jsx';
