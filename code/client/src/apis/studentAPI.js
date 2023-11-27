@@ -23,18 +23,18 @@ const insertApplication = async (studentId, proposalId,teacherid) => {
     }
 }
 
-
-const getApplications = async () => {
-    const response = await fetch(SERVER_URL + `/api/student/applications`, {
-        credentials: 'include',
+const getThesisProposals = async() => {
+    const response = await fetch(SERVER_URL + '/api/thesis/student/', {
+      credentials: 'include',
     });
-    const res = await response.json();
-    if (response.ok) {
-      return res; // list of applications related to the logged user
-    }
-    else{
-      throw res;
+  
+    const proposals = await response.json();
+    if(response.ok) {
+      return proposals;
+    } else {
+      throw proposals;
     }
   }
-const studentAPI = { insertApplication,getApplications};
+
+const studentAPI = { insertApplication, getThesisProposals };
 export default studentAPI;

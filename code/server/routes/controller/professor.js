@@ -133,10 +133,6 @@ const decideApplication = async (req, res) => {
             const application = await dao.acceptApplication(thesisId,teacherId,studentId); 
             await dao.cancellPendingApplicationsForAThesis(thesisId,teacherId); 
             await dao.cancellPendingApplicationsOfAStudent(studentId,teacherId);
-
-            //archive the thesis proposal so other students cannot apply to it
-            const proposal=await dao.getThesisProposalById(thesisId);
-            await dao.archiveProposal(proposal)
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
@@ -156,6 +152,23 @@ const decideApplication = async (req, res) => {
 
 }
 
+const getOwnProposals = async (req,res) => {
+    // for testing purposes, at the moment the id of the teacher is taken from params
+    //const teacherId = req.params.teacherId;
+    // decomment this when calling it from FE
+    const teacherId = req.user.id;
+    try {
+        const proposals = await dao.getOwnProposals(teacherId);
+        if(proposals.error){
+            return res.status(404).json(proposals);
+        } else {
+            return res.status(200).json(proposals);
+        } 
+    } catch(e) {
+        return res.status(500).json(e.message);
+
+    }
+}
 
 
 module.exports = {
@@ -163,5 +176,6 @@ module.exports = {
     insertNewProposal,
     getDegreesInfo,
     getAllApplicationsByProf,
-    decideApplication
+    decideApplication,
+    getOwnProposals,
 }
