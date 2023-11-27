@@ -133,6 +133,10 @@ const decideApplication = async (req, res) => {
             const application = await dao.acceptApplication(thesisId,teacherId,studentId); 
             await dao.cancellPendingApplicationsForAThesis(thesisId,teacherId); 
             await dao.cancellPendingApplicationsOfAStudent(studentId,teacherId);
+
+            //archive the thesis proposal so other students cannot apply to it
+            const proposal=await dao.getThesisProposalById(thesisId);
+            await dao.archiveProposal(proposal)
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);

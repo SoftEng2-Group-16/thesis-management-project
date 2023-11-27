@@ -333,9 +333,11 @@ exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
       function (err) {
         if (err) {
           reject(err);
-        } else if (this.changes === 0) {
+        } 
+        /*else if (this.changes === 0) {
           reject(new Error('No matching application found or unauthorized.'))
-        } else {
+        } 
+        */else {
           // return application updated
           const updatedApplication = {
             id: thesisId,
@@ -358,9 +360,11 @@ exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
       function (err) {
         if (err) {
           reject(err);
-        } else if (this.changes === 0) {
+        }
+        /*else if (this.changes === 0) {
           reject(new Error('No matching application found or unauthorized.'))
-        } else {
+        }
+        */ else {
           // return application updated
           const updatedApplication = {
             id: studentId,
