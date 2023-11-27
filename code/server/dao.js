@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { Applications, Application, Student, ThesisProposal } = require('./model');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -26,6 +26,48 @@ exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teach
 }
 
 exports.getThesisProposals = (degCode) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * from thesis_proposals'
+    db.all(
+      sql,
+      [],
+      (err, rows) => {
+        if(err){
+          reject(err);
+        } else if(rows.length === 0) {
+          resolve( {error: `No thesis proposals found for study course ${degCode}`} );
+        } else {
+          const proposals = rows
+              .filter(r => r.cds.match(degCode) !== null)
+              .map((row) => ({
+                id: row.id,
+                title: row.title,
+                supervisor: row.supervisor,
+                cosupervisors: row.cosupervisors.split('-'),
+                keywords: row.keywords.split(','),
+                type: row.type,
+                groups: row.groups.split(','),
+                description: row.description,
+                requirements: row.requirements,
+                notes: row.notes,
+                expiration: row.expiration,
+                level: row.level,
+                cds: row.cds.split(','),
+              }
+              ));
+
+            if (proposals.length == 0) {
+              resolve({ error: `No thesis proposals found for study course ${degCode}` });
+            } else {
+              resolve(proposals);
+            }
+        }
+      }
+    )
+  });
+}
+
+/*exports.getThesissProposals = (degCode) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * from thesis_proposals';
 
@@ -90,7 +132,7 @@ exports.getThesisProposals = (degCode) => {
         }
       });
   });
-};
+};*/
 
 exports.getStudentById = (studentId) => {
   return new Promise((resolve, reject) => {
@@ -133,12 +175,15 @@ exports.getApplicationsForStudent = (studentId) => {
           reject(err);
         } else {
           if (rows.length == 0 || rows == null || rows == undefined) {
-            resolve({ status:404, error: `No applications found for student ${studentId}` });
+            resolve({ error: `No applications found for student ${studentId}` });
           } else {
-            const applications = rows.map(row => (
-              new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
-            ));
-            console.log(applications);
+            const applications = rows.map(row => ({
+              studentId: row.studentid,
+              thesisId: row.thesisid,
+              timestamp: dayjs(row.timestamp),
+              status: row.status,
+              teacherId: row.teacherid
+            }));
             resolve(applications);
           }
         }
@@ -147,6 +192,48 @@ exports.getApplicationsForStudent = (studentId) => {
 }
 
 // PROFESSOR SECTION
+exports.getOwnProposals = (teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM thesis_proposals'
+    db.all(
+      sql,
+      [],
+      (err,rows) => {
+        if(err){
+          reject(err);
+        } else if(rows.length === 0) {
+          resolve( {error: `No thesis proposals found for teacher ${teacherId}`} );
+        } else {
+          const proposals = rows
+              .filter(r => r.supervisor.match(teacherId) !== null)
+              .map((row) => ({
+                id: row.id,
+                title: row.title,
+                supervisor: row.supervisor,
+                cosupervisors: row.cosupervisors.split('-'),
+                keywords: row.keywords.split(','),
+                type: row.type,
+                groups: row.groups.split(','),
+                description: row.description,
+                requirements: row.requirements,
+                notes: row.notes,
+                expiration: row.expiration,
+                level: row.level,
+                cds: row.cds.split(','),
+              }
+              ));
+
+            if (proposals.length == 0) {
+              resolve({ error: `No thesis proposals found for teacher ${teacherId}` });
+            } else {
+              resolve(proposals);
+            }
+        }
+      }
+    )
+  });
+}
+
 exports.getProfessors = () => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT id, name, surname, department_code FROM teachers'
@@ -382,10 +469,10 @@ exports.getAllApplicationsByProf = (idProfessor) => {
         if (err) {
           reject(err);
         } else if (rows.length == 0) {
-          resolve({status:404, error: 'No Applications found for professor ' + idProfessor });
+          resolve({ error: 'No Applications found for professor ' + idProfessor });
         } else {
           const applications = rows.map(row => (
-            new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+            new Application(row.id, row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
           ));
           resolve(applications);
         }
@@ -431,33 +518,7 @@ exports.getThesisProposalById = (thesisId) => {
   });
 };
 
-exports.getTeacherById = (teacherId) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT * from teachers where id=? ';
-    db.all(
-      sql,
-      [teacherId],
-      (err, rows) => {
-        if (err) {
-          reject(err);
-        } else if (rows.length === 0) {
-          resolve(
-            { error: `No teacher found for id ${teacherId}` }
-          );
-        } else {
-          const teacher = new Teacher(
-            rows[0].id,
-            rows[0].surname,
-            rows[0].name,
-            rows[0].email,
-            rows[0].group_code,
-            rows[0].department_code
-          );
-          resolve(teacher);
-        }
-      });
-  });
-};
+
 
 //VIRTUAL CLOCK ONLY 
 exports.getExpiredProposals = (selectedTimestamp) => {

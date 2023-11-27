@@ -19,7 +19,7 @@ function NavHeader(props) {
   const onLogout = async() => {
    await props.handleLogout();
     // Go back to main screen
-    console.log(props.user);
+    //console.log(props.user);
     navigate("/login");
 }
 
@@ -41,11 +41,11 @@ function NavHeader(props) {
           {props.loggedIn ?
             <Nav className="me-auto">
               { props.user.role == 'student' ?
-                <Nav.Link className='link' onClick={() => navigate('/thesis')}> All Thesis</Nav.Link>
+                <Nav.Link className='link' onClick={() =>{props.setMessage('');navigate('/thesis')}}> All Thesis</Nav.Link>
               : null}
               {props.user.role === 'teacher' ? 
               <Nav.Link className='link' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link> : null}
-              <Nav.Link className='link' onClick={() => navigate('/applications')}>Applications</Nav.Link>
+              <Nav.Link className='link' onClick={() => {props.setMessage(''); navigate('/applications')}}>Applications</Nav.Link>
             </Nav> : null}
           <Nav className='me-4 d-flex align-items-center'>
             {props.loggedIn ?

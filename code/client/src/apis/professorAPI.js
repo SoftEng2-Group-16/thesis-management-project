@@ -44,7 +44,7 @@ const insertProposal = async (proposal) => {
   };
 
 const getApplications = async () => {
-  const response = await fetch(SERVER_URL + `/api/teacher/applications`, {
+  const response = await fetch(SERVER_URL + '/api/teacher/applications', {
       credentials: 'include',
   });
   const res = await response.json();
@@ -56,5 +56,18 @@ const getApplications = async () => {
   }
 }
 
-const professorAPI = {getPossibleCosupervisors,getDegreesInfo,insertProposal,getApplications}
+const getOwnThesisProposals = async() => {
+  const response = await fetch(SERVER_URL + '/api/thesis/teacher/', {
+    credentials: 'include',
+  });
+
+  const proposals = await response.json();
+  if(response.ok) {
+    return proposals;
+  } else {
+    throw proposals;
+  }
+}
+
+const professorAPI = {getPossibleCosupervisors,getDegreesInfo,insertProposal,getApplications,getOwnThesisProposals}
 export default professorAPI;

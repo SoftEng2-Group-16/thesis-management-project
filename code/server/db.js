@@ -11,7 +11,7 @@ const db = new sqlite.Database(dbType, async (err) => {
     if (err){ 
         throw err; 
     }
-    if(process.env.NODE_ENV === 'test'){
+    if(process.env.NODE_ENV === 'nope'){ //! this was ==='test' but the sql file is obsolete
         //console.log('Connected to the in-memory SQlite database.')
         const dbData = fs.readFileSync('./db_TM.sql', 'utf8');
         await new Promise((resolve, reject) => {

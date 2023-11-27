@@ -111,7 +111,7 @@ function App() {
           <Route
             element={
               <>
-                <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} />
+                <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} setMessage={setMessage}/>
                 <div className="mt-3 ms-4 me-4 mb-3 text-center">
                   <Container fluid className="text-center">
                     {message && (
@@ -128,10 +128,10 @@ function App() {
             }
           >
             <Route path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm loggedIn={loggedIn} />)} />
-            <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} /> : <ThesisProposals user={user} />} ></Route>
+            <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} setMessage={setMessage}/> : <ThesisProposals user={user} />} ></Route>
             <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <LoginForm login={handleLogin} />}></Route>
-            <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors}/> : <LoginForm login={handleLogin} />} />
-            <Route path="/application/:id" element={loggedIn ? <ApplicationDetails /> : <LoginForm login={handleLogin} />} />
+            <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors} setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
+            <Route path="/application/:id" element={loggedIn ? <ApplicationDetails setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
 
             <Route path="*" element={<NotFoundLayout />} />

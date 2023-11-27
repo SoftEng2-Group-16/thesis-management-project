@@ -1,66 +1,78 @@
-"use strict";
+// studentController.test.js
 
-//const jwt = require('jsonwebtoken');
-const dao = require('../dao.js');
+const dayjs = require('dayjs');
 const { insertNewApplication } = require('../routes/controller/student.js');
+const dao = require('../dao');
 
-/**
- * Defines code to be executed before each test case is launched
- */
-beforeEach(() => {
-    jest.clearAllMocks()
-});
+// here we go again with jest
 
-describe("Insert new thesis Application", () => {
-    test("Should successfully insert new application", async () => {
-        const mockReq = {
-            body: {"studentId": "200001", "proposalId": "45"},
-        };
-        const mockRes = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-        
-        const changes = 1;
-        jest.spyOn(dao, 'addApplicationForThesis').mockResolvedValue(changes);
+jest.mock('../dao'); // Mock the dao module
 
-        await insertNewApplication(mockReq, mockRes);
+describe('tests for insertNewApplication', () => {
+  let mockRequest;
+  let mockResponse;
 
-        expect(mockRes.status).toHaveBeenCalledWith(201);
-        expect(mockRes.json).toHaveBeenCalledWith(changes);
+  beforeEach(() => {
+    mockRequest = {
+      body: {
+        studentId: 'student123',
+        proposalId: 'proposal456',
+        teacherId: 'teacher789'
+      },
+      user: {
+        id: 'student123'
+      }
+    };
+
+    mockResponse = {
+      status: jest.fn(() => mockResponse),
+      json: jest.fn()
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should insert a new application successfully', async () => {
+    dao.addApplicationForThesis.mockResolvedValueOnce(1);
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith(1);
+  });
+
+  test('should handle a student not matching the logged-in user', async () => {
+    mockRequest.user.id = 'differentStudent';
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      error: "the student who is sending the application is not the logged in one"
     });
+  });
 
-    test("Should return error if student already applied", async () => {
-        const mockReq = {
-            body: {"studentId": "200001", "proposalId": "45"},
-        };
-        const mockRes = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-        const response = "Application already submitted, wait for professor response";
-        jest.spyOn(dao, 'addApplicationForThesis').mockRejectedValue(new Error('{ message: "SQLITE_CONSTRAINT" }'));
+  test('should handle a SQLite constraint violation', async () => {
+    const error = new Error('SQLITE_CONSTRAINT');
+    dao.addApplicationForThesis.mockRejectedValueOnce(error);
 
-        await insertNewApplication(mockReq, mockRes);
+    await insertNewApplication(mockRequest, mockResponse);
 
-        expect(mockRes.status).toHaveBeenCalledWith(500);
-        expect(mockRes.json).toHaveBeenCalledWith(response);
-    });
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      "Application already submitted, wait for professor response"
+    );
+  });
 
-    test("Should return error if db failed", async () => {
-        const mockReq = {
-            body: {"studentId": "200001", "proposalId": "45"},
-        };
-        const mockRes = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-        const response = "DB failed for some reason";
-        jest.spyOn(dao, 'addApplicationForThesis').mockRejectedValue(new Error('DB failed for some reason'));
+  test('should handle other errors', async () => {
+    const error = new Error('Some other error');
+    dao.addApplicationForThesis.mockRejectedValueOnce(error);
 
-        await insertNewApplication(mockReq, mockRes);
+    await insertNewApplication(mockRequest, mockResponse);
 
-        expect(mockRes.status).toHaveBeenCalledWith(500);
-        expect(mockRes.json).toHaveBeenCalledWith(response);
-    });
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+  });
 });
