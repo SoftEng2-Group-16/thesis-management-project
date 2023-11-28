@@ -14,11 +14,11 @@ router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 
 /* general routes*/
 //router.get('/thesis', general.getThesisProposals); 
-router.get('/thesis/student/', student.getThesisProposals);
-router.get('/thesis/teacher/', professor.getOwnProposals);
+router.get('/thesis/student/', auth.isLoggedIn, student.getThesisProposals);
+router.get('/thesis/teacher/', auth.isLoggedIn, professor.getOwnProposals);
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
-router.post('/newapplication',auth.isLoggedIn, student.insertNewApplication);
+router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
 
 // remove the :studentId param when api is protected, it will be taken from req.user
 // REMEMBER to update documentation
@@ -27,10 +27,10 @@ router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForS
 //router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
-router.post('/newproposal',auth.isLoggedIn, professor.insertNewProposal);
+router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
 
-router.put('/teacher/applications/:thesisid',auth.isLoggedIn, professor.decideApplication);
-router.get('/teacher/applications', auth.isLoggedIn,professor.getAllApplicationsByProf);
+router.put('/teacher/applications/:thesisid', auth.isLoggedIn, professor.decideApplication);
+router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplicationsByProf);
 
 /*student routes*/
 
