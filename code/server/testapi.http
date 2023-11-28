@@ -66,6 +66,15 @@ content-type: application/json
     "selectedTimestamp": "01-01-2024"
 }
 
+###
+# change virtual clock back
+PUT http://localhost:3001/api/clockchanged HTTP/1.1
+content-type: application/json
+
+{
+    "selectedTimestamp": "28-11-2023"
+}
+
 ### 
 POST http://localhost:3001/api/sessions/ HTTP/1.1
 content-type: application/json
