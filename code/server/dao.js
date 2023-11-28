@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
