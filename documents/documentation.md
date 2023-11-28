@@ -1,5 +1,9 @@
 ## SUMMARY
 
+### Changes
+
+
+
 
 
 ## AUTH v.1.0
@@ -22,6 +26,45 @@ The login is performed with email and password, the system check if there is a r
 | luigi.bianchi@polito.it     | 268554        | teacher |
 | giovanna.ferrari@polito.it  | 268555        | teacher |
 | antonio.russo@polito.it     | 268556        | teacher |
+
+## AUTH v.2.0
+
+For demo 2 the application perform authentication using the SAML 2.0 protocol, this is conveniently realized trough passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
+
+```
+passport.use(new SamlStrategy({
+  entryPoint: 'https://group16-thesis-management-system.eu.auth0.com/samlp/7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
+  path: '/login/callback', //motherfucker
+  issuer: 'passport-saml',
+  cert: cert,
+  acceptedClockSkewMs: 30000 // avoid syncerror Error: SAML assertion not yet valid
+}, function (profile, done) {
+
+
+  return done(null, //take from the Saml token the parameters so that will be available in req.user ffs
+    {
+      id: profile['nameID'],
+      email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
+      name: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
+      lastName: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
+    });
+}));
+
+```
+### Strategy Description
+
+- In the main strategy we see parameters used by the strategy in this order:
+  - `entryPoint` of auth0 for Saml2 protocol 
+  - `callback` path, that is the api in which the login request return after performing authentication on the idp, here we have avaialable the SAML assertion
+  -`issuer`, in this case the library itself that that the process
+  - `certificate`, stored in the server, provided by the auth0 tenantsm used by the saml protocol
+  - `acceptedClockSkews` this is an option for saml2 protocol to allow a little bit of gap in terms of time differences between our server clock and auth0's one.
+
+- In the middleware we fetch some data from the response schema, this are used in the callback to perform a lookup in our local db, so we can finally initialize our expression session with all the data related to the user, that are not present in auth0.
+
+
+
 
 
 ### SESSIONS
@@ -210,8 +253,9 @@ Students need to get thesis proposals filtered by their course, and professors n
 
 
 
-### BE testing
-Jest is set up for unit and integration testing.
+### Testing
+
+Jest is set up for unit testing.
 
 ### Implemetation for Integration
 
