@@ -4,34 +4,36 @@ const puppeteer = require('puppeteer');
 describe('Student test', () => {
   let browser;
   let page;
+  let sourceContent;
+  const fs = require('fs').promises;
 
   beforeAll(async () => {  
     // Launch the browser and open a new blank page
     //with headless:false we show the chromium browser
     //with headless:true we don't show the browser running, just the result
-    browser = await puppeteer.launch( {headless: true});
+    browser = await puppeteer.launch( {headless: false});
     page = await browser.newPage();
+    //save the db before the changes we are going to do
+    const sourcePath = '../server/db_TM_dirty.db';
+    sourceContent = await fs.readFile(sourcePath);
   });
 
   afterAll(async () => {
     await browser.close();
-    const fs = require('fs').promises;
+
 
     try {
-      const sourcePath = '../server/cleanDB/db_TM.db';
       const destinationPath = '../server/db_TM_dirty.db';        
-      // Read the content of the source file asynchronously
-      const sourceContent = await fs.readFile(sourcePath);
+
 
       // Write the content to the destination file asynchronously
       await fs.writeFile(destinationPath, sourceContent);
 
-      console.log(`Database copied from ${sourcePath} to ${destinationPath}`);
+      console.log(`Database restored`);
     } catch (error) {
       console.error('Error copying database:', error.message);
     }
   });
-
   test('here a students tries to apply for a thesis that he has already applied for', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -149,7 +151,7 @@ describe('Student test', () => {
       
       console.log("The thesis is the same that we wanted");
     }else{
-      console.log("The thesis is a different one");
+      console.error("The thesis is a different one");
     }
 
     
@@ -163,6 +165,7 @@ describe('Student test', () => {
 
     console.log("It returned to the home page showing everything went fine")
   });
+
 
 
 /*

@@ -1,21 +1,40 @@
 const puppeteer = require('puppeteer');
 
 
-describe('Student test', () => {
+describe('Professor tests', () => {
   let browser;
   let page;
+  let sourceContent;
+  const fs = require('fs').promises;
 
   beforeAll(async () => {  
     // Launch the browser and open a new blank page
     //with headless:false we show the chromium browser
     //with headless:true we don't show the browser running, just the result
-    browser = await puppeteer.launch( {headless: true});
+    browser = await puppeteer.launch( {headless: false});
     page = await browser.newPage();
+    //save the db before the changes we are going to do
+    const sourcePath = '../server/db_TM_dirty.db';
+    sourceContent = await fs.readFile(sourcePath);
   });
 
   afterAll(async () => {
     await browser.close();
+
+
+    try {
+      const destinationPath = '../server/db_TM_dirty.db';        
+
+
+      // Write the content to the destination file asynchronously
+      await fs.writeFile(destinationPath, sourceContent);
+
+      console.log(`Database restored`);
+    } catch (error) {
+      console.error('Error copying database:', error.message);
+    }
   });
+
 
   test('a professor checks the first thesis', async () => {
     // Navigate the page to a URL
