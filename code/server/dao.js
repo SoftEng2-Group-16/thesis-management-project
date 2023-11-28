@@ -166,10 +166,10 @@ exports.getStudentById = (studentId) => {
 
 exports.getApplicationsForStudent = (studentId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM applications WHERE studentid=?';
+    const sql = 'SELECT * FROM applications WHERE studentid=? AND status!=?';
     db.all(
       sql,
-      [studentId],
+      [studentId, "canceled"],
       (err,rows) => {
         if (err) {
           reject(err);
@@ -405,29 +405,41 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
-
     db.run(
       sql,
-      [thesisId, teacherId],
+      [thesisId, teacherId.slice(0,6)],
       function (err) {
         if (err) {
           reject(err);
-        } 
-        /*else if (this.changes === 0) {
-          reject(new Error('No matching application found or unauthorized.'))
-        } 
-        */else {
-          // return application updated
-          const updatedApplication = {
+        } else {
+          /* const updatedApplication = {
             id: thesisId,
             status: 'canceled',
-          };
-          resolve(updatedApplication);
+          }; */
+          resolve(this.changes);
         }
       }
     );
   });
 };
+
+exports.reviveExpiredApplications = (thesisId, newProposalId) => {
+  return new Promise((resolve,reject) => {
+    const sql = 'UPDATE applications SET thesisid=?,status=? WHERE thesisid=? AND status=?'
+    db.run(
+      sql,
+      [newProposalId, "pending", thesisId, "canceled"],
+      function (err){
+          if(err){
+            reject(err);
+          } else {
+            resolve(this.changes);
+          }
+      }
+    )
+  })
+}
+
 
 exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
   return new Promise((resolve, reject) => {
@@ -439,17 +451,12 @@ exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
       function (err) {
         if (err) {
           reject(err);
-        }
-        /*else if (this.changes === 0) {
-          reject(new Error('No matching application found or unauthorized.'))
-        }
-        */ else {
-          // return application updated
-          const updatedApplication = {
+        } else {
+          /* const updatedApplication = {
             id: studentId,
             status: 'canceled',
-          };
-          resolve(updatedApplication);
+          }; */
+          resolve(this.changes);
         }
       }
     );
@@ -630,12 +637,12 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
 
 exports.archiveProposal = (proposal) => {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO archived_thesis_proposals (title, supervisor, cosupervisors, keywords, " +
+    const sql = "INSERT INTO archived_thesis_proposals (id, title, supervisor, cosupervisors, keywords, " +
       "type, groups, description, requirements, notes, expiration, level, cds) " +
-      "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+      "values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
     db.run(
       sql,
-      [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+      [proposal.id, proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
       function (err) {
         if (err) {
           reject(err);
