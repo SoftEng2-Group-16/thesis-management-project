@@ -1,60 +1,16 @@
 "use strict";
 
-//const insertNewProposal = require("../routes/controller/professor");
 const dao = require("../dao.js");
 const professorApi = require("../routes/controller/professor.js")
 
-// Mock delle implementazioni specifiche per professorAPI
-beforeEach(() => {
-    jest.clearAllMocks();
-});
 
+jest.mock('../dao'); // Mock the dao module
 
-
-
-
-/*
 describe("Professor tests", () => {
-    test("should insert a new proposal", async () => {
-        const req = {
-            body: {
-                title: "Sample Title",
-                supervisor: "123, John Doe",
-                cosupervisors: ["Maria Rossi, 268553, DAD"],
-                keywords: "Sample, Keywords",
-                type: "Sample Type",
-                groups: [""],
-                description: "Sample Description",
-                requirements: "Sample Requirements",
-                notes: "Sample Notes",
-                expiration: "01-01-2024", // Assuming date format is dd-mm-yyyy
-                level: "master",
-                cds: ["LM adha"],
-            }
-        };
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-
-
-        jest.spyOn(dao, "getGroupForTeacherById").mockImplementation(async (id) => "ED");
-        jest.spyOn(dao, "saveNewProposal").mockResolvedValue(27);
-
-
-        await professorApi.insertNewProposal(req, res);
-
-
-        expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.json).toHaveBeenCalledWith({ id: 27 });
+    // Mock delle implementazioni specifiche per professorAPI
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
-});
-*/
-
-
-describe("Professor tests", () => {
     test("should get degree info", async () => {
         const req = {
             body: {}
@@ -128,5 +84,109 @@ describe("Professor tests", () => {
     });
 });
 
+describe("Professor sees list of applications", () => {
+    let mockRequest;
+    let mockResponse;
 
+    beforeEach(() => {
+        mockRequest = {
+          user: {
+            id: '268553'
+          }
+        };
+    
+        mockResponse = {
+          status: jest.fn(() => mockResponse),
+          json: jest.fn()
+        };
+      });
+    
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
+    let applications = [
+        {
+            "studentId": 200001,
+            "thesisId": 3,
+            "timestamp": "08/11/2023 16:42:50",
+            "status": "pending",
+            "teacherId": 268553,
+        }
+    ];
+
+    let studentInfo = {
+        "id": 200001,
+        "surname": "Rossi",
+        "name": "Mario",
+        "gender": "M",
+        "nationality": "Italian",
+        "email": "mario.rossi@studenti.polito.it",
+        "degreeCode": "LM-1",
+        "enrollmentYear": "2010"
+    };
+
+    let thesisInfo = {
+        "id": 3,
+        "title": "Blockchain Technology and Cryptocurrencies",
+        "supervisor": "268555, Ferrari Giovanna",
+        "cosupervisors": [
+            "Maria Rossi, 268553, DAD",
+            "Luigi Bianchi, 268554, DAUIN"
+        ],
+        "keywords": [
+            "Blockchain",
+            " Cryptocurrency",
+            " Security"
+        ],
+        "type": "Company Thesis",
+        "groups": [
+            "AI",
+            "SO",
+            "SE"
+        ],
+        "description": "Explore the potential of blockchain technology and cryptocurrencies.",
+        "requirements": "Blockchain Development, Security, Financial Technology",
+        "notes": "This project focuses on the security and applications of blockchain and cryptocurrencies.",
+        "expiration": "31/12/2023",
+        "level": "master",
+        "cds": [
+            "LM-1",
+            "LM-2",
+            "LM-3"
+        ]
+    }
+
+    test("should retrieve the list of applications successfully", async () => {
+        dao.getAllApplicationsByProf.mockResolvedValue(applications);
+        dao.getStudentById.mockResolvedValue(studentInfo);
+        dao.getThesisProposalById.mockResolvedValue(thesisInfo);
+        
+        let res = {enhancedApplications: [{...applications[0], studentInfo, thesisInfo}]};
+        
+        await professorApi.getAllApplicationsByProf(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith(res);
+    });
+
+    test("should return error if no applications found for the teacher", async () => {
+        let noAppls = { error: 'No Applications found for professor ' + mockRequest.user.id }
+        dao.getAllApplicationsByProf.mockResolvedValue(noAppls);
+        
+        await professorApi.getAllApplicationsByProf(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith(noAppls);
+    });
+
+    test("should handle other errors", async () => {
+        let error = new Error('Some other error');
+        dao.getAllApplicationsByProf.mockRejectedValue(error);
+
+        await professorApi.getAllApplicationsByProf(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+})
