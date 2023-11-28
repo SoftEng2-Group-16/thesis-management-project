@@ -1,10 +1,40 @@
-## SUMMARY
+# Table of Contents
+
+# Table of Contents
+
+1. [Changes](#changes)
+2. [Stories](#stories)
+3. [General Information about the project implementation](#general-information-about-the-project-implementation)
+   1. [AUTH v.1.0](#auth-v10)
+      1. [Database Structure](#database-structure)
+         1. [STUDENTS](#students)
+         2. [TEACHERS](#teachers)
+         3. [CAREERS](#careers)
+         4. [DEGREES](#degrees)
+         5. [THESIS_PROPOSALS](#thesis-proposals)
+   2. [AUTH v.2.0](#auth-v20)
+      1. [Strategy Description](#strategy-description)
+   3. [SESSIONS](#sessions)
+4. [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
+   1. [Update get thesis proposals](#update-get-thesis-proposals)
+5. [React Client Application Routes](#react-client-application-routes)
+   1. [Main Component](#main-component)
+6. [API Server](#api-server)
+   1. [Template for API Description](#template-for-api-description)
+7. [Testing](#testing)
+8. [Implementation for Integration (OBSOLETE)](#implementation-for-integration-obsolete)
+   1. [Commands](#commands)
+
 
 ### Changes
 
+*we should put here the changes between the sprint*
 
+### Stories
 
+*put here the table of stories committed with references to the sprint*
 
+# General Information about the project implementation
 
 ## AUTH v.1.0
 
@@ -101,27 +131,27 @@ professor:
 
 ## Database Structure
 
-STUDENTS
+#### STUDENTS
 | id  | surname  | name | gender | nationality | email | degree_code | enrollment_year
 |---  |---    |---  |--- |--- |--- |--- |---
 200001 | Rossi | Mario | M | Italian | <mario.rossi@studenti.polito.it> | LM-1 | 2010
 
-TEACHERS
+#### TEACHERS
 | id  | surname  | name | email | group_code | department_code
 |---  |---    |---  |--- |--- |---
 268553 | Rossi | Maria | <maria.rossi@polito.it> | AI | DAD
 
-CAREERS
+#### CAREERS
 | student_id  | course_code  | course_title | cfu | garde | date_registered
 |---  |---    |---  |--- |--- |---
 200023 | 02PQRST | Physics | 19 | 30L | 20-10-2018
 
-DEGREES
+#### DEGREES
 | degree_code | degree_title
 |---  |---
 LM-1 | Computer Engineering
 
-THESIS_PROPOSALS
+#### THESIS_PROPOSALS
 | id  | title  | supervisor | cosupervisors | keywords | type | groups | description | requirements | notes | expiration | level | cds
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
@@ -255,9 +285,11 @@ Students need to get thesis proposals filtered by their course, and professors n
 
 ### Testing
 
-Jest is set up for unit testing.
+`Jest` is set up for unit testing as demo1, but for demo2 we opted for a different library for e2e, still based on Jest.
 
 ### Implemetation for Integration
+(OBSOLETE)
+
 
 - setup process.env.NODE_ENV as 'test' in the integration test file
 - import the server, which will start listening on port 3001
@@ -273,4 +305,4 @@ This commands are executed only on test files under `thesis-management-project/c
 
 - `npm test`: runs all test 
 - `npm test:unit`: runs only unit tests with coverage
-- `npm run test:integration`: runs only integration tests with coverage
+- `npm run test:integration`: obsolete, still present but integration test are no more mmeaningfull
