@@ -136,6 +136,7 @@ const decideApplication = async (req, res) => {
             //archive the thesis proposal so other students cannot apply to it
             const proposal = await dao.getThesisProposalById(thesisId);
             await dao.archiveProposal(proposal)
+            //await dao.deleteProposal(proposal.id);
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
