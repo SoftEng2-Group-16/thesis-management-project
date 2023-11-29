@@ -33,7 +33,7 @@ const rearrangeProposals = async (req,res) => {
                 ))
                     .then(() => {
                         dao.deleteProposal(p.id);
-                        dao.cancellPendingApplicationsForAThesis(p.id, p.supervisor);
+                        dao.cancellPendingApplicationsForAThesis(p.id, p.supervisor.slice(0,6));
                         counterMovedProposals++;
                     })
                     .catch( (e) => {

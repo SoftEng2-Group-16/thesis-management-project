@@ -180,7 +180,7 @@ exports.getApplicationsForStudent = (studentId) => {
             const applications = rows.map(row => (
               new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
             ));
-            console.log(applications);
+            //console.log(applications);
             resolve(applications);
           }
         }
@@ -403,11 +403,12 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 };
 
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
+  console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
     db.run(
       sql,
-      [thesisId, teacherId.slice(0,6)],
+      [thesisId, teacherId],
       function (err) {
         if (err) {
           reject(err);
@@ -441,13 +442,14 @@ exports.reviveExpiredApplications = (thesisId, newProposalId) => {
 }
 
 
-exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
+exports.cancellPendingApplicationsOfAStudent= (studentId) => {
+  //console.log(`Gotten student ${studentId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ?  AND teacherId = ? and status="pending"';
+    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ? and status="pending"';
 
     db.run(
       sql,
-      [studentId, teacherId],
+      [studentId],
       function (err) {
         if (err) {
           reject(err);

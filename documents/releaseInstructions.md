@@ -3,7 +3,9 @@
 - Docker
 - Docker Compose
 - Internet access (if you want to pull the avaliable pre-built images)
-- Preferably but not mandatory, a bash shell (Linux and MacOS users will be fine with the terminal, Windows users will need either WSL or a VM)
+
+*Optional*:
+- If you want to use the provided scripts, you'll need a bash shell (Linux and MacOS users will be fine with the terminal, Windows users will need either WSL or a VM)
 ## How to run the project
 
 ### Development
@@ -19,11 +21,11 @@
     ```sh
     nodemon index.js 
     ```
-    if you want the logging functionalities provided by `nodemon`, or
+    if you want the logging functionalities provided by `nodemon` (remember, you need to install it manually and make it global to have it function properly), or
     ```sh
     node index.js
     ```
-    to simply start it withoud logging and auto restart.
+    to simply start it withoud logging and auto restart options.
 
 #### Client:
 1. Install the dependecies needed by the client by running
@@ -38,12 +40,14 @@
 3. Open up a browser and visit the [homepage](http://localhost:5173/)
 
 ### Released version
-**Important**: the final version (up to the second sprint) is going to be provided by using Docker containers. Make sure to have Docker and Docker Compose installed on you machine (next sections will contain both instructions for building images locally and pulling them from Docker Hub [repositories](https://hub.docker.com/repositories/atorre98))
+**Important**: the final version (up to the second sprint) is going to be provided by using Docker containers. Make sure to have Docker and Docker Compose installed on you machine (next sections will contain both instructions for building images locally and pulling them from Docker Hub [repositories](https://hub.docker.com/repositories/atorre98)).
+
+As a general first step for this part, start up Docker on your machine (either the Docker daemon or Docker Desktop, both are perfectly fine).
 
 ### (OPTIONAL) Building the images
 The build process relies on two Dockerfiles, one for the client (`code/client/Dockerfile`) and one for the server (`code/client/Dockerfile`). If you don't want to use the pre-built images avaliable (more on that later), you can build them locally by using the provided `code/build_local_images.sh` script.
 
-**NOTE**: The other script (`code/build_and_push_images.sh`) is intended to be used by the owner of the Docker Hub repositories; it will create a local multi-architecture build context, build the client and server images for both `amd64` and `arm64` architectures and push them on Docker Hub (so Apple Silicon users won't have performance problems due to Rosetta emulation).
+**NOTE**: The other script (`code/build_and_push_images.sh`) is intended to be used by the owner of the Docker Hub repositories; it will create a local multi-architecture build context, build the client and server images for both `amd64` and `arm64` architectures and push them on Docker Hub (so both x86 and Apple Silicon users will be able to pull native images).
 
 ### Running the containers
 To create and run the containers, you can use the provided `docker-compose.yml` file.
