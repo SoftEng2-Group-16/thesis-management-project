@@ -190,3 +190,127 @@ describe("Professor sees list of applications", () => {
         expect(mockResponse.json).toHaveBeenCalledWith(error.message);
     });
 })
+
+describe("Professor accepts or rejects application", () => {
+    let mockRequest;
+    let mockResponse;
+
+    beforeEach(() => {
+        mockRequest = {
+          user: {
+            id: '268554'
+          },
+          params: {
+            thesisid: '27'
+          },
+          body: {
+            decision: 'accepted', studentId: '200006'
+          }
+        };
+    
+        mockResponse = {
+          status: jest.fn(() => mockResponse),
+          json: jest.fn()
+        };
+      });
+    
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("should successfully accept an application", async () => {
+        let res = { id: mockRequest.params.thesisId, status: 'accepted'};
+
+        dao.acceptApplication.mockResolvedValue(res);
+        dao.cancellPendingApplicationsForAThesis.mockResolvedValue();
+        dao.cancellPendingApplicationsOfAStudent.mockResolvedValue();
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith(res);
+    });
+
+    test("should successfully reject an application", async () => {
+        mockRequest.body.decision = 'rejected';
+        let res = { id: mockRequest.params.thesisId, status: 'rejected'};
+
+        dao.rejectApplication.mockResolvedValue(res);
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith(res);
+    });
+
+    test("should return error if invalid decision", async () => {
+        mockRequest.body.decision = 'being confused';
+        let err = {error: "Invalid decision field"};
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith(err);
+    });
+
+    test("should return error if undefined teacherid", async () => {
+        mockRequest.user = {};
+        let err = { error: "problem with the authentication" };
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(503);
+        expect(mockResponse.json).toHaveBeenCalledWith(err);
+    });
+
+    test("should return error if empty decision in body", async () => {
+        mockRequest.body.decision = '';
+        let err = { error: "decision is missing in body" };
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(422);
+        expect(mockResponse.json).toHaveBeenCalledWith(err);
+    });
+
+    test("should return error if empty studentId in body", async () => {
+        mockRequest.body.studentId = '';
+        let err = { error: "studentId is missing in body" };
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(422);
+        expect(mockResponse.json).toHaveBeenCalledWith(err);
+    });
+
+    test("should return error if invalid param thesisid", async () => {
+        mockRequest.params = {};
+        let err = { error: "thesisId non valido" };
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(422);
+        expect(mockResponse.json).toHaveBeenCalledWith(err);
+    });
+
+    test("should handle other errors during acceptance", async () => {
+        let error = new Error('Some other error');
+        dao.acceptApplication.mockRejectedValue(error);
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+
+    test("should handle other errors during rejection", async () => {
+        mockRequest.body.decision = 'rejected';
+        let error = new Error('Some other error');
+        dao.rejectApplication.mockRejectedValue(error);
+
+        await professorApi.decideApplication(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+})
