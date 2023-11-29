@@ -38,8 +38,15 @@ const getApplicationsForStudent = async (req,res) => {
             //add the 2 fields with details to the object
             for (const appl of applications) {
                 const teacherInfo = await dao.getTeacherById(appl.teacherId);
-                const thesisInfo = await dao.getThesisProposalById(appl.thesisId);
-                const studentInfo=await dao.getStudentById(appl.studentId);
+                const thesisInfo = await dao.getThesisProposalById(appl.thesisId, appl.status)
+                    .then(t => {
+                        if(t.error){
+                            return dao.getThesisProposalById(appl.thesisId)
+                        } else {
+                            return t;
+                        }
+                    });
+                const studentInfo = await dao.getStudentById(appl.studentId);
 
                 enhancedApplications.push({
                     ...appl,

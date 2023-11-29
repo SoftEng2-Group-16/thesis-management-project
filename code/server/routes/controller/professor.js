@@ -90,7 +90,14 @@ const getAllApplicationsByProf = async (req, res) => {
             //add the 2 fields with details to the object
             for (const appl of applications) {
                 const studentInfo = await dao.getStudentById(appl.studentId);
-                const thesisInfo = await dao.getThesisProposalById(appl.thesisId);
+                const thesisInfo = await dao.getThesisProposalById(appl.thesisId, appl.status)
+                    .then(t => {
+                        if (t.error) {
+                            return dao.getThesisProposalById(appl.thesisId)
+                        } else {
+                            return t;
+                        }
+                    });
 
                 enhancedApplications.push({
                     ...appl,
@@ -134,9 +141,29 @@ const decideApplication = async (req, res) => {
             await dao.cancellPendingApplicationsForAThesis(thesisId, teacherId);
             await dao.cancellPendingApplicationsOfAStudent(studentId, teacherId);
             //archive the thesis proposal so other students cannot apply to it
-            const proposal = await dao.getThesisProposalById(thesisId);
+            const proposal = await dao.getThesisProposalById(thesisId)
+                .then(p => {
+                    console.log(p);
+                    const p2 = new models.ThesisProposal(
+                        p.id, //can be whatever, DB handles autoincrement id
+                        p.title,
+                        p.supervisor,
+                        p.cosupervisors.join('-'),
+                        p.keywords.join(','),
+                        p.type,
+                        p.groups.join(','),
+                        p.description,
+                        p.requirements,
+                        p.notes,
+                        p.expiration,
+                        p.level,
+                        p.cds.join(',')
+                    );
+                    console.log(p2);
+                    return p2;
+                });
             await dao.archiveProposal(proposal)
-            //await dao.deleteProposal(proposal.id);
+            await dao.deleteProposal(proposal.id);
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
