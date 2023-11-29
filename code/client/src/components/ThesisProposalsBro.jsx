@@ -33,7 +33,6 @@ function ThesisProposals(props) {
   //the associative array list of all suggestions for the Select component
   const [title, setTitle] = useState([]);
   const [supervisor, setSupervisor] = useState([]);
-  const [cosupervisorsThesis, setCosupervisorsThesis] = useState([]);
   const [keywords, setKeywords] = useState([]);
   const [type, setType] = useState([]);
   const [level, setLevel] = useState([]);
@@ -51,15 +50,10 @@ function ThesisProposals(props) {
         } else {
           proposals = await professorAPI.getOwnThesisProposals(props.user.id);
         }
-        //const proposals = await API.getThesisProposals();
-        //console.log(proposals)
+
         setAllThesis(proposals);
         setThesis(proposals)
 
-        if(props.user.role == 'teacher') {
-          filterByTeacher(proposals);
-          filterByCosupervisor(proposals);
-        } else {
         const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
         setTitle(uniqueByTitle);
         //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
@@ -71,7 +65,7 @@ function ThesisProposals(props) {
         setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
         setFilter("title")
         setOptions(uniqueByTitle);
-        }
+      
       } catch (error) {
         console.error(error);
         // Handle error
@@ -146,37 +140,9 @@ function ThesisProposals(props) {
 
   }
 
-  function filterByTeacher(proposals) {
-    let teacherThesis = [];
-    proposals.forEach(thesis => {
-      let spv = thesis.supervisor.split(', ');
-      if (spv[0] == props.user.id && spv[1].includes(props.user.name) && spv[1].includes(props.user.surname)) {
-        teacherThesis.push(thesis);
-      }
-
-    })
-    setThesis(teacherThesis);
-  }
-
-    function filterByCosupervisor(proposals) {
-      let cosupervisorThesis = [];
-      proposals.forEach(thesis => {
-        thesis.cosupervisors.forEach(cosupervisor => {
-        console.log("cosupervisor", cosupervisor);
-        let spv = cosupervisor.split(', ');
-        console.log("spv", spv);
-        if (spv[1] == props.user.id && spv[0].includes(props.user.name) && spv[0].includes(props.user.surname)) {
-          cosupervisorThesis.push(thesis);
-        }
-      });
-    });
-    console.log("cosupervisorThesis", cosupervisorThesis);
-    setCosupervisorsThesis(cosupervisorThesis);
-  }
-
   return (
     <>
-      {props.loggedIn && props.user.role != undefined && props.user.role == 'student'?
+      {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
         <>
           <Form className="d-flex">
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
@@ -228,10 +194,10 @@ function ThesisProposals(props) {
        <>
           <Row>
             <Row className="text-start">
-              <h3>As a Supervisor</h3>
+              <h3>Your Proposals</h3>
             </Row>
             <Col xs={12}>
-              <Table striped bordered hover>
+              <Table striped bordered hover responsive>
                 <thead>
                   <tr>
                     <th>Type</th>
@@ -259,43 +225,15 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
-          <Row>
-            <Row className="text-start">
-                <h3>As a Cosupervisor</h3>
-            </Row>
-            <Col xs={12}>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Title</th>
-                    <th>Groups</th>
-                    <th>Supervisor</th>
-                    <th>Expiration Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  { cosupervisorsThesis.map((singleThesis) => (
-                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
-                      <td>{singleThesis.type}</td>
-                      <td>
-                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
-                          {singleThesis.title}
-                        </Link>
-                      </td>
-                      <td>{singleThesis.groups.join(', ')}</td>
-                      <td>{singleThesis.supervisor}</td>
-                      <td>{singleThesis.expiration}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Col>
-          </Row>
           </>
        :
-       <div>You need to LOGIN!</div>
-      }
+        props.loggedIn && thesis == []?
+        <>
+          <Row>
+              <h3>None thesis proposals to show yet.</h3>
+          </Row>
+        </>
+       : <div>You need to LOGIN!</div>}
     </>
   );
 }
