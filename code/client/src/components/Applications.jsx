@@ -82,7 +82,7 @@ function StudentApplications({ applications, user }) {
             <Row style={{ marginTop: '20px' }}>
                 <Col style={{ marginBottom: '15px' }}><h2> Thesis applications </h2></Col>
                 <Col xs={12}>
-                    <Table striped bordered hover>
+                    <Table striped bordered hover responsive>
                         <thead>
                             <tr>
                                 <th>Teacher</th>
@@ -128,7 +128,7 @@ function ProfessorApplications({ applications, user }) {
             <Row style={{ marginTop: '20px' }}>
                 <Col style={{ marginBottom: '15px' }}><h2> Thesis applications </h2></Col>
                 <Col xs={12}>
-                    <Table striped bordered hover>
+                    <Table striped bordered hover responsive>
                         <thead>
                             <tr>
                                 <th>StudentID</th>

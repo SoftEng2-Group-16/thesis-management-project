@@ -153,7 +153,7 @@ function ThesisProposals(props) {
 
           <Row style={{ marginTop: '20px' }}>
             <Col xs={12}>
-              <Table striped bordered hover>
+              <Table striped bordered hover responsive>
                 <thead>
                   <tr>
                     <th>Type</th>

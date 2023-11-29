@@ -161,7 +161,7 @@ function ThesisProposals(props) {
 
           <Row>
             <Col xs={12}>
-              <Table striped bordered hover>
+              <Table striped bordered hover responsive>
                 <thead>
                   <tr>
                     <th>Type</th>
