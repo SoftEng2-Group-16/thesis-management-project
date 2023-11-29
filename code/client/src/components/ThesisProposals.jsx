@@ -51,8 +51,7 @@ function ThesisProposals(props) {
         } else {
           proposals = await professorAPI.getOwnThesisProposals(props.user.id);
         }
-        //const proposals = await API.getThesisProposals();
-        //console.log(proposals)
+
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -67,6 +66,7 @@ function ThesisProposals(props) {
         setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
         setFilter("title")
         setOptions(uniqueByTitle);
+      
       } catch (error) {
         console.error(error);
         // Handle error
@@ -143,8 +143,8 @@ function ThesisProposals(props) {
 
   return (
     <>
-      {props.loggedIn ? (
-        <div style={{ marginTop: '10px' }} >
+      {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
+        <>
           <Form className="d-flex">
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
               <option value="title">Title</option>
@@ -160,7 +160,7 @@ function ThesisProposals(props) {
             <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
           </Form>
 
-          <Row style={{ marginTop: '20px' }}>
+          <Row>
             <Col xs={12}>
               <Table striped bordered hover responsive>
                 <thead>
@@ -190,10 +190,51 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
-        </div>
-      ) : (
-        <div>You need to LOGIN!</div>
-      )}
+        </>
+       : props.user.role == 'teacher'? 
+       <>
+          <Row>
+            <Row className="text-start">
+              <h3>Your Proposals</h3>
+            </Row>
+            <Col xs={12}>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  { thesis.map((singleThesis) => (
+                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                      <td>{singleThesis.type}</td>
+                      <td>
+                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                          {singleThesis.title}
+                        </Link>
+                      </td>
+                      <td>{singleThesis.groups.join(', ')}</td>
+                      <td>{singleThesis.supervisor}</td>
+                      <td>{singleThesis.expiration}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+          </>
+       :
+        props.loggedIn && thesis == []?
+        <>
+          <Row>
+              <h3>None thesis proposals to show yet.</h3>
+          </Row>
+        </>
+       : <div>You need to LOGIN!</div>}
     </>
   );
 }
