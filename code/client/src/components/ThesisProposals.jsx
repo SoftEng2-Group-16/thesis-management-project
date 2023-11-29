@@ -145,23 +145,27 @@ function ThesisProposals(props) {
     <>
       {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
         <>
-          <Form className="d-flex">
-            <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
-              <option value="title">Title</option>
-              <option value="supervisor">Supervisor</option>
-              <option value="keywords">Keywords</option>
-              <option value="type">Type</option>
-              <option value="groups">Groups</option>
-              <option value="level">Level</option>
-              {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
-            </Form.Select>
-            <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
-            <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
-            <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
-          </Form>
+          <Row className="d-flex justify-content-center mt-5" >
+            <Col lg={9} xs={12} md={12} sm={12}>
+              <Form className="d-flex">
+                <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
+                  <option value="title">Title</option>
+                  <option value="supervisor">Supervisor</option>
+                  <option value="keywords">Keywords</option>
+                  <option value="type">Type</option>
+                  <option value="groups">Groups</option>
+                  <option value="level">Level</option>
+                  {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
+                </Form.Select>
+                <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
+                <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
+                <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
+              </Form>
+            </Col>
+          </Row>
 
-          <Row>
-            <Col xs={12}>
+          <Row className="d-flex justify-content-center mt-4">
+            <Col lg={9} xs={12} md={12} sm={12}>
               <Table striped bordered hover responsive>
                 <thead>
                   <tr>
