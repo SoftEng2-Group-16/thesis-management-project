@@ -101,20 +101,20 @@ const getAllApplicationsByProf = async (req, res) => {
             return res.status(200).json({
                 enhancedApplications
             });
-                 }
+        }
     } catch (err) {
         return res.status(500).json(err.message);
     }
 }
 
 const decideApplication = async (req, res) => {
-    
+
     const thesisId = req.params.thesisid;
     const decision = req.body.decision;
-    const studentId=req.body.studentId;
-    const teacherId=req.user.id; //sent to the query to double check the logged in professor is the one referred in the application
-    
-    if(!teacherId){
+    const studentId = req.body.studentId;
+    const teacherId = req.user.id; //sent to the query to double check the logged in professor is the one referred in the application
+
+    if (!teacherId) {
         return res.status(503).json({ error: "problem with the authentication" });
     }
 
@@ -130,9 +130,13 @@ const decideApplication = async (req, res) => {
 
     if (decision === "accepted") {
         try {
-            const application = await dao.acceptApplication(thesisId,teacherId,studentId); 
-            await dao.cancellPendingApplicationsForAThesis(thesisId,teacherId); 
-            await dao.cancellPendingApplicationsOfAStudent(studentId,teacherId);
+            const application = await dao.acceptApplication(thesisId, teacherId, studentId);
+            await dao.cancellPendingApplicationsForAThesis(thesisId, teacherId);
+            await dao.cancellPendingApplicationsOfAStudent(studentId, teacherId);
+            //archive the thesis proposal so other students cannot apply to it
+            const proposal = await dao.getThesisProposalById(thesisId);
+            await dao.archiveProposal(proposal)
+            //await dao.deleteProposal(proposal.id);
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
@@ -140,7 +144,7 @@ const decideApplication = async (req, res) => {
     }
     else if (decision === "rejected") {
         try {
-            const application = await dao.rejectApplication(thesisId,teacherId,studentId);
+            const application = await dao.rejectApplication(thesisId, teacherId, studentId);
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
@@ -152,19 +156,19 @@ const decideApplication = async (req, res) => {
 
 }
 
-const getOwnProposals = async (req,res) => {
+const getOwnProposals = async (req, res) => {
     // for testing purposes, at the moment the id of the teacher is taken from params
     //const teacherId = req.params.teacherId;
     // decomment this when calling it from FE
     const teacherId = req.user.id;
     try {
         const proposals = await dao.getOwnProposals(teacherId);
-        if(proposals.error){
+        if (proposals.error) {
             return res.status(404).json(proposals);
         } else {
             return res.status(200).json(proposals);
-        } 
-    } catch(e) {
+        }
+    } catch (e) {
         return res.status(500).json(e.message);
 
     }

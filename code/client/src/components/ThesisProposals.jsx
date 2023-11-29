@@ -2,6 +2,8 @@
 import { useContext, useEffect, useState } from 'react';
 import MessageContext from '../messageCtx.jsx';
 import API from '../apis/generalAPI.js';
+import professorAPI from '../apis/professorAPI.js';
+import studentAPI from '../apis/studentAPI.js';
 import { LoadingLayout } from './PageLayout.jsx';
 import Button from 'react-bootstrap/Button';
 import { Col, Row } from 'react-bootstrap';
@@ -40,10 +42,17 @@ function ThesisProposals(props) {
   const animatedComponents = makeAnimated();
 
   useEffect(() => {
-    
+
     const fetchThesis = async () => {
       try {
-        const proposals = await API.getThesisProposals();
+        let proposals = [];
+        if(props.user.role === 'student') {
+          proposals = await studentAPI.getThesisProposals(props.user.degree_code);
+        } else {
+          proposals = await professorAPI.getOwnThesisProposals(props.user.id);
+        }
+        //const proposals = await API.getThesisProposals();
+        //console.log(proposals)
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -65,7 +74,7 @@ function ThesisProposals(props) {
     };
 
     if (props.loggedIn || props.update == true) {
-
+      console.log(props.loggedIn);
       fetchThesis();
       props.setUpdate(false);
     }

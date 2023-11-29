@@ -1,6 +1,41 @@
-## SUMMARY
+# Table of Contents
+
+# Table of Contents
+
+1. [Changes](#changes)
+2. [Stories](#stories)
+3. [General Information about the project implementation](#general-information-about-the-project-implementation)
+   1. [AUTH v.1.0](#auth-v10)
+      
+   2. [AUTH v.2.0](#auth-v20)
+      1. [Strategy Description](#strategy-description)
+   3. [SESSIONS](#sessions)
+   4. [Database Structure](#database-structure)
+         1. [STUDENTS](#students)
+         2. [TEACHERS](#teachers)
+         3. [CAREERS](#careers)
+         4. [DEGREES](#degrees)
+         5. [THESIS_PROPOSALS](#thesis-proposals)
+4. [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
+   1. [Update get thesis proposals](#update-get-thesis-proposals)
+5. [React Client Application Routes](#react-client-application-routes)
+   1. [Main Component](#main-component)
+6. [API Server](#api-server)
+   1. [Template for API Description](#template-for-api-description)
+7. [Testing](#testing)
+8. [Implementation for Integration (OBSOLETE)](#implementation-for-integration-obsolete)
+   1. [Commands](#commands)
 
 
+### Changes
+
+*we should put here the changes between the sprint*
+
+### Stories
+
+*put here the table of stories committed with references to the sprint*
+
+# General Information about the project implementation
 
 ## AUTH v.1.0
 
@@ -22,6 +57,45 @@ The login is performed with email and password, the system check if there is a r
 | luigi.bianchi@polito.it     | 268554        | teacher |
 | giovanna.ferrari@polito.it  | 268555        | teacher |
 | antonio.russo@polito.it     | 268556        | teacher |
+
+## AUTH v.2.0
+
+For demo 2 the application perform authentication using the SAML 2.0 protocol, this is conveniently realized trough passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
+
+```
+passport.use(new SamlStrategy({
+  entryPoint: 'https://group16-thesis-management-system.eu.auth0.com/samlp/7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
+  path: '/login/callback', //motherfucker
+  issuer: 'passport-saml',
+  cert: cert,
+  acceptedClockSkewMs: 30000 // avoid syncerror Error: SAML assertion not yet valid
+}, function (profile, done) {
+
+
+  return done(null, //take from the Saml token the parameters so that will be available in req.user ffs
+    {
+      id: profile['nameID'],
+      email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
+      name: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
+      lastName: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
+    });
+}));
+
+```
+### Strategy Description
+
+- In the main strategy we see parameters used by the strategy in this order:
+  - `entryPoint` of auth0 for Saml2 protocol 
+  - `callback` path, that is the api in which the login request return after performing authentication on the idp, here we have avaialable the SAML assertion
+  -`issuer`, in this case the library itself that that the process
+  - `certificate`, stored in the server, provided by the auth0 tenantsm used by the saml protocol
+  - `acceptedClockSkews` this is an option for saml2 protocol to allow a little bit of gap in terms of time differences between our server clock and auth0's one.
+
+- In the middleware we fetch some data from the response schema, this are used in the callback to perform a lookup in our local db, so we can finally initialize our expression session with all the data related to the user, that are not present in auth0.
+
+
+
 
 
 ### SESSIONS
@@ -58,27 +132,27 @@ professor:
 
 ## Database Structure
 
-STUDENTS
+#### STUDENTS
 | id  | surname  | name | gender | nationality | email | degree_code | enrollment_year
 |---  |---    |---  |--- |--- |--- |--- |---
 200001 | Rossi | Mario | M | Italian | <mario.rossi@studenti.polito.it> | LM-1 | 2010
 
-TEACHERS
+#### TEACHERS
 | id  | surname  | name | email | group_code | department_code
 |---  |---    |---  |--- |--- |---
 268553 | Rossi | Maria | <maria.rossi@polito.it> | AI | DAD
 
-CAREERS
+#### CAREERS
 | student_id  | course_code  | course_title | cfu | garde | date_registered
 |---  |---    |---  |--- |--- |---
 200023 | 02PQRST | Physics | 19 | 30L | 20-10-2018
 
-DEGREES
+#### DEGREES
 | degree_code | degree_title
 |---  |---
 LM-1 | Computer Engineering
 
-THESIS_PROPOSALS
+#### THESIS_PROPOSALS
 | id  | title  | supervisor | cosupervisors | keywords | type | groups | description | requirements | notes | expiration | level | cds
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
@@ -210,10 +284,13 @@ Students need to get thesis proposals filtered by their course, and professors n
 
 
 
-### BE testing
-Jest is set up for unit and integration testing.
+### Testing
+
+`Jest` is set up for unit testing as demo1, but for demo2 we opted for a different library for e2e, still based on Jest.
 
 ### Implemetation for Integration
+(OBSOLETE)
+
 
 - setup process.env.NODE_ENV as 'test' in the integration test file
 - import the server, which will start listening on port 3001
@@ -229,4 +306,4 @@ This commands are executed only on test files under `thesis-management-project/c
 
 - `npm test`: runs all test 
 - `npm test:unit`: runs only unit tests with coverage
-- `npm run test:integration`: runs only integration tests with coverage
+- `npm run test:integration`: obsolete, still present but integration test are no more mmeaningfull

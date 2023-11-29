@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -32,35 +32,35 @@ exports.getThesisProposals = (degCode) => {
       sql,
       [],
       (err, rows) => {
-        if(err){
+        if (err) {
           reject(err);
-        } else if(rows.length === 0) {
-          resolve( {error: `No thesis proposals found for study course ${degCode}`} );
+        } else if (rows.length === 0) {
+          resolve({ error: `No thesis proposals found for study course ${degCode}` });
         } else {
           const proposals = rows
-              .filter(r => r.cds.match(degCode) !== null)
-              .map((row) => ({
-                id: row.id,
-                title: row.title,
-                supervisor: row.supervisor,
-                cosupervisors: row.cosupervisors.split('-'),
-                keywords: row.keywords.split(','),
-                type: row.type,
-                groups: row.groups.split(','),
-                description: row.description,
-                requirements: row.requirements,
-                notes: row.notes,
-                expiration: row.expiration,
-                level: row.level,
-                cds: row.cds.split(','),
-              }
-              ));
-
-            if (proposals.length == 0) {
-              resolve({ error: `No thesis proposals found for study course ${degCode}` });
-            } else {
-              resolve(proposals);
+            .filter(r => r.cds.match(degCode) !== null)
+            .map((row) => ({
+              id: row.id,
+              title: row.title,
+              supervisor: row.supervisor,
+              cosupervisors: row.cosupervisors.split('-'),
+              keywords: row.keywords.split(','),
+              type: row.type,
+              groups: row.groups.split(','),
+              description: row.description,
+              requirements: row.requirements,
+              notes: row.notes,
+              expiration: row.expiration,
+              level: row.level,
+              cds: row.cds.split(','),
             }
+            ));
+
+          if (proposals.length == 0) {
+            resolve({ error: `No thesis proposals found for study course ${degCode}` });
+          } else {
+            resolve(proposals);
+          }
         }
       }
     )
@@ -166,31 +166,27 @@ exports.getStudentById = (studentId) => {
 
 exports.getApplicationsForStudent = (studentId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM applications WHERE studentid=?';
+    const sql = 'SELECT * FROM applications WHERE studentid=? AND status!=?';
     db.all(
       sql,
-      [studentId],
+      [studentId, "canceled"],
       (err,rows) => {
         if (err) {
           reject(err);
         } else {
           if (rows.length == 0 || rows == null || rows == undefined) {
-            resolve({ error: `No applications found for student ${studentId}` });
+            resolve({ status:404, error: `No applications found for student ${studentId}` });
           } else {
-            const applications = rows.map(row => ({
-              studentId: row.studentid,
-              thesisId: row.thesisid,
-              timestamp: dayjs(row.timestamp),
-              status: row.status,
-              teacherId: row.teacherid
-            }));
+            const applications = rows.map(row => (
+              new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+            ));
+            //console.log(applications);
             resolve(applications);
           }
         }
     });
   });
 }
-
 // PROFESSOR SECTION
 exports.getOwnProposals = (teacherId) => {
   return new Promise((resolve, reject) => {
@@ -198,36 +194,36 @@ exports.getOwnProposals = (teacherId) => {
     db.all(
       sql,
       [],
-      (err,rows) => {
-        if(err){
+      (err, rows) => {
+        if (err) {
           reject(err);
-        } else if(rows.length === 0) {
-          resolve( {error: `No thesis proposals found for teacher ${teacherId}`} );
+        } else if (rows.length === 0) {
+          resolve({ error: `No thesis proposals found for teacher ${teacherId}` });
         } else {
           const proposals = rows
-              .filter(r => r.supervisor.match(teacherId) !== null)
-              .map((row) => ({
-                id: row.id,
-                title: row.title,
-                supervisor: row.supervisor,
-                cosupervisors: row.cosupervisors.split('-'),
-                keywords: row.keywords.split(','),
-                type: row.type,
-                groups: row.groups.split(','),
-                description: row.description,
-                requirements: row.requirements,
-                notes: row.notes,
-                expiration: row.expiration,
-                level: row.level,
-                cds: row.cds.split(','),
-              }
-              ));
-
-            if (proposals.length == 0) {
-              resolve({ error: `No thesis proposals found for teacher ${teacherId}` });
-            } else {
-              resolve(proposals);
+            .filter(r => r.supervisor.match(teacherId) !== null)
+            .map((row) => ({
+              id: row.id,
+              title: row.title,
+              supervisor: row.supervisor,
+              cosupervisors: row.cosupervisors.split('-'),
+              keywords: row.keywords.split(','),
+              type: row.type,
+              groups: row.groups.split(','),
+              description: row.description,
+              requirements: row.requirements,
+              notes: row.notes,
+              expiration: row.expiration,
+              level: row.level,
+              cds: row.cds.split(','),
             }
+            ));
+
+          if (proposals.length == 0) {
+            resolve({ error: `No thesis proposals found for teacher ${teacherId}` });
+          } else {
+            resolve(proposals);
+          }
         }
       }
     )
@@ -359,19 +355,17 @@ exports.deleteProposal = (proposalId) => {
   });
 }
 
-exports.acceptApplication = (thesisId, teacherId,studentId) => {
-  console.log(thesisId,teacherId,studentId);
+exports.acceptApplication = (thesisId, teacherId, studentId) => {
+  console.log(thesisId, teacherId, studentId);
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "accepted" WHERE thesisid = ?  AND teacherId = ? AND studentid=?';
+    const sql = 'UPDATE applications SET status = "accepted" WHERE thesisid = ?  AND teacherId = ? AND studentid=? and status="pending"';
 
     db.run(
       sql,
-      [thesisId, teacherId,studentId],
+      [thesisId, teacherId, studentId],
       function (err) {
         if (err) {
           reject(err);
-        } else if (this.changes === 0) {
-          reject(new Error('No matching application found or unauthorized.'))
         } else {
           // return application updated
           const updatedApplication = {
@@ -386,18 +380,16 @@ exports.acceptApplication = (thesisId, teacherId,studentId) => {
 };
 
 
-exports.rejectApplication = (thesisId, teacherId,studentId) => {
+exports.rejectApplication = (thesisId, teacherId, studentId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "rejected" WHERE thesisid = ?  AND teacherId = ? AND studentid=? ';
+    const sql = 'UPDATE applications SET status = "rejected" WHERE thesisid = ?  AND teacherId = ? AND studentid=? and status="pending"';
 
     db.run(
       sql,
-      [thesisId, teacherId,studentId],
+      [thesisId, teacherId, studentId],
       function (err) {
         if (err) {
           reject(err);
-        } else if (this.changes === 0) {
-          reject(new Error('No matching application found or unauthorized.'));
         } else {
           const updatedApplication = {
             id: thesisId,
@@ -411,49 +403,62 @@ exports.rejectApplication = (thesisId, teacherId,studentId) => {
 };
 
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
+  console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ?';
-
+    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
     db.run(
       sql,
       [thesisId, teacherId],
       function (err) {
         if (err) {
           reject(err);
-        } else if (this.changes === 0) {
-          reject(new Error('No matching application found or unauthorized.'))
         } else {
-          // return application updated
-          const updatedApplication = {
+          /* const updatedApplication = {
             id: thesisId,
             status: 'canceled',
-          };
-          resolve(updatedApplication);
+          }; */
+          resolve(this.changes);
         }
       }
     );
   });
 };
 
-exports.cancellPendingApplicationsOfAStudent= (studentId, teacherId) => {
+exports.reviveExpiredApplications = (thesisId, newProposalId) => {
+  return new Promise((resolve,reject) => {
+    const sql = 'UPDATE applications SET thesisid=?,status=? WHERE thesisid=? AND status=?'
+    db.run(
+      sql,
+      [newProposalId, "pending", thesisId, "canceled"],
+      function (err){
+          if(err){
+            reject(err);
+          } else {
+            resolve(this.changes);
+          }
+      }
+    )
+  })
+}
+
+
+exports.cancellPendingApplicationsOfAStudent= (studentId) => {
+  //console.log(`Gotten student ${studentId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ?  AND teacherId = ?';
+    const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ? and status="pending"';
 
     db.run(
       sql,
-      [studentId, teacherId],
+      [studentId],
       function (err) {
         if (err) {
           reject(err);
-        } else if (this.changes === 0) {
-          reject(new Error('No matching application found or unauthorized.'))
         } else {
-          // return application updated
-          const updatedApplication = {
+          /* const updatedApplication = {
             id: studentId,
             status: 'canceled',
-          };
-          resolve(updatedApplication);
+          }; */
+          resolve(this.changes);
         }
       }
     );
@@ -469,10 +474,10 @@ exports.getAllApplicationsByProf = (idProfessor) => {
         if (err) {
           reject(err);
         } else if (rows.length == 0) {
-          resolve({ error: 'No Applications found for professor ' + idProfessor });
+          resolve({status:404, error: 'No Applications found for professor ' + idProfessor });
         } else {
           const applications = rows.map(row => (
-            new Application(row.id, row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+            new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
           ));
           resolve(applications);
         }
@@ -518,8 +523,33 @@ exports.getThesisProposalById = (thesisId) => {
   });
 };
 
-
-
+exports.getTeacherById = (teacherId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * from teachers where id=? ';
+    db.all(
+      sql,
+      [teacherId],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else if (rows.length === 0) {
+          resolve(
+            { error: `No teacher found for id ${teacherId}` }
+          );
+        } else {
+          const teacher = new Teacher(
+            rows[0].id,
+            rows[0].surname,
+            rows[0].name,
+            rows[0].email,
+            rows[0].group_code,
+            rows[0].department_code
+          );
+          resolve(teacher);
+        }
+      });
+  });
+};
 //VIRTUAL CLOCK ONLY 
 exports.getExpiredProposals = (selectedTimestamp) => {
   const ts = dayjs(selectedTimestamp, "DD-MM-YYYY");
@@ -609,12 +639,12 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
 
 exports.archiveProposal = (proposal) => {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO archived_thesis_proposals (title, supervisor, cosupervisors, keywords, " +
+    const sql = "INSERT INTO archived_thesis_proposals (id, title, supervisor, cosupervisors, keywords, " +
       "type, groups, description, requirements, notes, expiration, level, cds) " +
-      "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+      "values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
     db.run(
       sql,
-      [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+      [proposal.id, proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
       function (err) {
         if (err) {
           reject(err);

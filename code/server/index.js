@@ -90,8 +90,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 60000,
-    _expires: 60000
+    maxAge: 600000,
+    _expires: 600000
   }
 }));
 
