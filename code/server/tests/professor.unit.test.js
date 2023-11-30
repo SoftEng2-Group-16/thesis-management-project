@@ -5,108 +5,185 @@ const professorApi = require("../routes/controller/professor.js")
 
 
 jest.mock('../dao'); // Mock the dao module
+/*
+ -- TEMPLATE --
+ IMPORT ALL THE RELATIVE MODULES TO MOCK ON TOP
+ USE THE NAME OF THE API IN THE describe BLOCK
+ EXPLOIT BEFOREACH AND AFTEREACH TO MOCK THE NECESSARY FOR THE BLOCK TO AVOI DUPLICATIONS
+ STICK TO MOCKrESOLVE, MOCKREJECT, FORGET SPYON SYNTAX
 
-describe("Professor tests", () => {
-    // Mock delle implementazioni specifiche per professorAPI
+ */
+describe('getPossibleCosupervisors', () => {
+    let mockResponse;
+  
     beforeEach(() => {
-        jest.clearAllMocks();
+      mockResponse = {
+        status: jest.fn(() => mockResponse),
+        json: jest.fn()
+      };
     });
-    test("should get degree info", async () => {
-        const req = {
-            body: {}
-        };
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        dao.getDegrees = jest.fn(() => new Promise((resolve) => resolve(['LM-2 ita'])))
-
-        await professorApi.getDegreesInfo(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith(['LM-2 ita']);
+  
+    afterEach(() => {
+      jest.clearAllMocks();
     });
-
-
-    test("should get cosupervisors", async () => {
-        const req = {
-            body: {}
-        };
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        dao.getProfessors = jest.fn(() => new Promise((resolve) => resolve([{name:"maria",surname:"rossi",id:"213",department_code:"Dauin"}])))
-        dao.getExternals =jest.fn(() => new Promise((resolve) => resolve([{name:"maria",surname:"rossi",company:"ED"}])))
-        
-        await professorApi.getPossibleCosupervisors(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({"externals": ["maria rossi, ED"], "internals": ["maria rossi, 213, Dauin"]});
+  
+    test('should get possible cosupervisors successfully', async () => {
+      const internals = [
+        { name: 'John', surname: 'Doe', id: '123', department_code: 'DAD' },
+        // Add more internal professor objects as needed
+      ];
+      const externals = [
+        { name: 'Jane', surname: 'Smith', company: 'TestCompany' },
+        // Add more external professor objects as needed
+      ];
+  
+      dao.getProfessors.mockResolvedValueOnce(internals);
+      dao.getExternals.mockResolvedValueOnce(externals);
+  
+      await professorApi.getPossibleCosupervisors(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        internals: ['John Doe, 123, DAD'],
+        externals: ['Jane Smith, TESTCOMPANY']
+      });
     });
-
-    test("should insert a new proposal", async () => {
-        const req = {
-            body: {
-                title: "Sample Title",
-                supervisor: "123, John Doe",
-                cosupervisors: ["Maria Rossi, 268553, DAD"],
-                keywords: "Sample, Keywords",
-                type: "Sample Type",
-                groups: [""],
-                description: "Sample Description",
-                requirements: "Sample Requirements",
-                notes: "Sample Notes",
-                expiration: "01-01-2024", // Assuming date format is dd-mm-yyyy
-                level: "master",
-                cds: ["LM adha"],
-            }
-        };
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-
-        dao.getGroupForTeacherById = jest.fn((id) => new Promise((resolve) => resolve(["ED"])))
-        dao.saveNewProposal =jest.fn(() => new Promise((resolve) => resolve("8")))
-        
-        await professorApi.insertNewProposal(req, res);
-
-
-        expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.json).toHaveBeenCalledWith("8");
+  
+    test('should handle no internal professors found', async () => {
+      dao.getProfessors.mockResolvedValueOnce({ error: 'No internal professors found' });
+  
+      await professorApi.getPossibleCosupervisors(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith({ error: 'No internal professors found' });
     });
-
-    test("should insert a new proposal", async () => {
-        const req = {
-            body: {
-            }
-        };
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-
-        dao.getAllApplicationsByProf = jest.fn((id) => new Promise((resolve) => resolve(["ED"])))
-        
-        await professorApi.getAllApplicationsByProf(req, res);
-
-
-        expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.json).toHaveBeenCalledWith("8");
+  
+    test('should handle no external professors found', async () => {
+      dao.getProfessors.mockResolvedValueOnce([]);
+      dao.getExternals.mockResolvedValueOnce({ error: 'No external professors found' });
+  
+      await professorApi.getPossibleCosupervisors(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith({ error: 'No external professors found' });
     });
+  
+    test('should handle an error during the process', async () => {
+      const error = new Error('Some error');
+      dao.getProfessors.mockRejectedValueOnce(error);
+  
+      await professorApi.getPossibleCosupervisors(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+  
+  });
 
-});
+describe('insertNewProposal', () => {
+    let mockRequest;
+    let mockResponse;
+  
+    beforeEach(() => {
+      mockRequest = {
+        body: {
+          title: 'Test Proposal',
+          supervisor: 'John Doe, 123, DAD',
+          cosupervisors: ['Jane Smith, 456, DISMA'],
+          keywords: 'test, proposal',
+          type: 'Thesis',
+          description: 'Test description',
+          requirements: 'Test requirements',
+          notes: 'Test notes',
+          expiration: '31/12/2023',
+          level: 'Master',
+          cds: ['LM-1', 'LM-2']
+        }
+      };
+  
+      mockResponse = {
+        status: jest.fn(() => mockResponse),
+        json: jest.fn()
+      };
+    });
+  
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+  
+    test('should insert a new proposal successfully', async () => {
+      dao.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
+      dao.saveNewProposal.mockResolvedValueOnce(1);
+  
+      await professorApi.insertNewProposal(mockRequest, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.json).toHaveBeenCalledWith(1);
+    });
+  
+    test('should handle an error during proposal insertion', async () => {
+      const error = new Error('Some error');
+      dao.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
+      dao.saveNewProposal.mockRejectedValueOnce(error);
+  
+      await professorApi.insertNewProposal(mockRequest, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+  
+  });
 
-describe("Professor sees list of applications", () => {
+  describe('getDegreesInfo', () => {
+    let mockResponse;
+  
+    beforeEach(() => {
+      mockResponse = {
+        status: jest.fn(() => mockResponse),
+        json: jest.fn()
+      };
+    });
+  
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+  
+    test('should get degrees info successfully', async () => {
+      const degrees = [
+        { code: 'LM-1', name: 'Computer Engineering' },
+        // Add more degree objects as needed
+      ];
+  
+      dao.getDegrees.mockResolvedValueOnce(degrees);
+  
+      await professorApi.getDegreesInfo(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(degrees);
+    });
+  
+    test('should handle no degrees found', async () => {
+      dao.getDegrees.mockResolvedValueOnce({ error: 'No degrees found' });
+  
+      await professorApi.getDegreesInfo(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith({ error: 'No degrees found' });
+    });
+  
+    test('should handle an error during the process', async () => {
+      const error = new Error('Some error');
+      dao.getDegrees.mockRejectedValueOnce(error);
+  
+      await professorApi.getDegreesInfo(null, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+  
+  });
+
+describe("getAllApplicationsByProf", () => {
     let mockRequest;
     let mockResponse;
 
@@ -213,7 +290,7 @@ describe("Professor sees list of applications", () => {
     });
 })
 
-describe("Professor accepts or rejects application", () => {
+describe("decideApplication()", () => {
     let mockRequest;
     let mockResponse;
 
@@ -337,7 +414,7 @@ describe("Professor accepts or rejects application", () => {
     });
 })
 
-describe("Professor sees active proposals", () => {
+describe("getOwnProposals()", () => {
     let mockRequest;
     let mockResponse;
   
