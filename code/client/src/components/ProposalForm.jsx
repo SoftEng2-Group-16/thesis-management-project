@@ -72,10 +72,10 @@ const ProposalForm = (props) => {
                 setCosupervisorsExternal(cosupervisors.externals.map(str => ({ value: str, label: str })));
             })
             .catch((err) => { handleErrors(err); });
-        
+
         professorAPI.getDegreesInfo()
             .then((degreesInfo) => {
-                
+
                 setCdsList(degreesInfo.map(str => ({ value: str, label: str })));
             })
             .catch((err) => { handleErrors(err); });
@@ -131,7 +131,7 @@ const ProposalForm = (props) => {
         if (!expiration || expiration.trim() === '') {
             errors.expiration = 'Expiration date is required';
         } else {
-            const dateParts = expiration.split('-');//format dd-mm-yyyy
+            const dateParts = expiration.split('/');//format dd/mm/yyyy
             const year = parseInt(dateParts[2]);
             const month = parseInt(dateParts[1]);
             const day = parseInt(dateParts[0]);
@@ -384,13 +384,13 @@ const ProposalForm = (props) => {
                                         value={(props.proposal && props.proposal.expiration) ? props.proposal.expiration : expiration}
                                         onChange={(date) => {
                                             const yyyy = date.getFullYear();
-                                            let mm = date.getMonth() + 1; // Months start at 0!
-                                            let dd = date.getDate();
-                                            const formattedDate = dd + '-' + mm + '-' + yyyy;
+                                            let mm = (date.getMonth() + 1).toString().padStart(2, '0'); // Aggiunge uno zero iniziale se il mese è inferiore a 10
+                                            let dd = date.getDate().toString().padStart(2, '0'); // Aggiunge uno zero iniziale se il giorno è inferiore a 10
+                                            const formattedDate = dd + '/' + mm + '/' + yyyy;
                                             setExpiration(formattedDate);
                                         }}
-                                        
-                                        dateFormat="dd/MM/yyyy"  // Puoi personalizzare il formato della data
+
+                                        dateFormat="dd/mm/yyyy"  // Puoi personalizzare il formato della data
                                     />
                                 </Col>
                             </Row>
