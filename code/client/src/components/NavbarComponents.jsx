@@ -44,15 +44,13 @@ function NavHeader(props) {
                 <Nav.Link className='link' id='thesis' onClick={() =>{props.setMessage('');navigate('/thesis')}}> All Thesis</Nav.Link>
               : null}
               {props.user.role === 'teacher' ? 
-              <Nav.Link className='link' id='proposal' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link> : null}
+              <>
+              <Nav.Link className='link' id="myProposals" onClick={() => navigate('/')}>My Proposals</Nav.Link>
+              <Nav.Link className='link' id='proposal' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link>
               <Nav.Link className='link' id='applications' onClick={() => {props.setMessage(''); navigate('/applications')}}>Applications</Nav.Link>
+             </> : null}
             </Nav> : null}
           <Nav className='me-4 d-flex align-items-center'>
-            {props.loggedIn ?
-            <NavbarText>
-              {props.user.role === 'teacher' ? <Nav.Link className='link' onClick={() => navigate('/')}>My Proposals</Nav.Link> : null}
-            </NavbarText>
-            : null}
             {props.loggedIn ?
               <Navbar.Text>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-circle" viewBox="0 0 16 16">
