@@ -167,7 +167,7 @@ function ThesisProposals(props) {
           <Row className="d-flex justify-content-center mt-4">
             <Col lg={9} xs={12} md={12} sm={12}>
               <Table striped bordered hover responsive>
-                <thead>
+                <thead className="align-middle">
                   <tr>
                     <th>Type</th>
                     <th>Title</th>
@@ -176,7 +176,7 @@ function ThesisProposals(props) {
                     <th>Expiration Date</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="align-middle">
                   {thesis.map((singleThesis) => (
                     <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
                       <td>{singleThesis.type}</td>
@@ -198,14 +198,14 @@ function ThesisProposals(props) {
        : props.user.role == 'teacher'? 
        <>
           <Row className="d-flex justify-content-center">
-            <Col lg={9} xs={12} md={12} sm={12} className="mt-5">
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
               <Row className="text-start">
-                <h3>Your Proposals</h3>
+                <h2>Your Proposals</h2>
               </Row>
             </Col>
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
               <Table striped bordered hover responsive>
-                <thead>
+                <thead className="align-middle">
                   <tr>
                     <th>Type</th>
                     <th>Title</th>
@@ -214,7 +214,7 @@ function ThesisProposals(props) {
                     <th>Expiration Date</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="align-middle">
                   { thesis.map((singleThesis) => (
                     <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
                       <td>{singleThesis.type}</td>

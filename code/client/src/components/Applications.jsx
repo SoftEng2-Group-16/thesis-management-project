@@ -128,17 +128,17 @@ function ProfessorApplications({ applications, user }) {
 
     return (
 
-        <div style={{ marginTop: '10px' }}>
-            <Row style={{ marginTop: '20px' }}>
-                <Row style={{ marginBottom: '15px' }}>
-                    <Col lg={9} xs={12} md={12} sm={12}>
+        <div className="mt-4">
+            <Row className="mt-5">
+                <Row className="d-flex justify-content-center mb-4">
+                    <Col lg={9} xs={12} md={12} sm={12} className="text-start">
                         <h2> Thesis applications </h2>
                     </Col>
                 </Row>
-                <Row>
+                <Row className="d-flex justify-content-center">
                     <Col lg={9} xs={12} md={12} sm={12}>
                         <Table striped bordered hover responsive>
-                            <thead>
+                            <thead className="align-middle">
                                 <tr>
                                     <th>StudentID</th>
                                     <th>Student</th>
