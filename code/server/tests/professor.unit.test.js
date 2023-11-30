@@ -336,3 +336,86 @@ describe("Professor accepts or rejects application", () => {
         expect(mockResponse.json).toHaveBeenCalledWith(error.message);
     });
 })
+
+describe("Professor sees active proposals", () => {
+    let mockRequest;
+    let mockResponse;
+  
+    beforeEach(() => {
+      mockRequest = {
+        user: {
+          id: '268553'
+        }
+      };
+  
+      mockResponse = {
+        status: jest.fn(() => mockResponse),
+        json: jest.fn()
+      };
+    });
+  
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+  
+    test("should return successfully the proposals of the teacher", async () => {
+        const proposals = [
+            {
+                id: 1,
+                title: "AI-Driven Healthcare Solutions",
+                supervisor: "268553, Maria Rossi",
+                cosupervisors: [
+                    "Luigi Bianchi, 268554, DAUIN"
+                ],
+                keywords: [
+                    "Artificial Intelligence",
+                    " Healthcare",
+                    " Machine Learning"
+                ],
+                type: "Company Thesis",
+                groups: [
+                    "SO",
+                    "AI"
+                ],
+                description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
+                requirements: "Machine Learning, Medical Science, Data Analysis",
+                notes: "This project focuses on leveraging AI for healthcare advancements.",
+                expiration: "20/11/2024",
+                level: "bachelor",
+                cds: [
+                    "LT-2",
+                    "LT-3"
+                ]
+            }
+        ];
+  
+        dao.getOwnProposals.mockResolvedValueOnce(proposals);
+ 
+        await professorApi.getOwnProposals(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith(proposals);
+    });
+  
+    test("should return error if no proposals found", async () => {
+        let error = { error: `No thesis proposals found for teacher ${mockRequest.user.id}` };
+      
+        dao.getOwnProposals.mockResolvedValueOnce(error);
+  
+        await professorApi.getOwnProposals(mockRequest, mockResponse);
+  
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith(error);
+    });
+  
+    test("should handle other errors", async () => {
+      const error = new Error('Some error');
+      dao.getOwnProposals.mockRejectedValueOnce(error);
+  
+      await professorApi.getOwnProposals(mockRequest, mockResponse);
+  
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    });
+
+})
