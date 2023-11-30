@@ -59,7 +59,7 @@ describe('Student test', () => {
     let cells = await page.$$(`${tableSelector} tr`);
     cells = cells; 
 
-    const rowIndex = 1;
+    const rowIndex = 2;
     const columnIndex = 2;
 
     // Select the cell using CSS selector
@@ -127,7 +127,7 @@ describe('Student test', () => {
     let cells = await page.$$(`${tableSelector} tr`);
     cells = cells; 
 
-    const rowIndex = 2;
+    const rowIndex = 1;
     const columnIndex = 2;
 
     // Select the cell using CSS selector
