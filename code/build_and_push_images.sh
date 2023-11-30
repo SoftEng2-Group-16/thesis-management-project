@@ -25,3 +25,11 @@ rm contextName.txt
 clear
 echo "Images built successfully, exiting.."
 sleep 1
+
+#make user choose if starting the containers or not
+read -p "Do you want to create and start the containers? (y/n)  " answer
+if [[ "$answer" == "y" ]]
+then
+    echo "Using docker-compose.yml file and starting containers in detached mode..."
+    docker compose -p tms up -d
+fi
