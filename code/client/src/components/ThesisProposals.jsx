@@ -197,11 +197,13 @@ function ThesisProposals(props) {
         </>
        : props.user.role == 'teacher'? 
        <>
-          <Row>
-            <Row className="text-start">
-              <h3>Your Proposals</h3>
-            </Row>
-            <Col xs={12}>
+          <Row className="d-flex justify-content-center">
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-5">
+              <Row className="text-start">
+                <h3>Your Proposals</h3>
+              </Row>
+            </Col>
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
               <Table striped bordered hover responsive>
                 <thead>
                   <tr>
