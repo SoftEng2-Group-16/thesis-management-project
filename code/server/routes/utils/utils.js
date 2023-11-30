@@ -74,8 +74,8 @@ const rearrangeProposals = async (req,res) => {
                         p.level,
                         p.cds.join(',')
                     ))
-                        .then((newId) => {
-                            dao.reviveExpiredApplications(p.id, newId)
+                        .then(() => {
+                            dao.reviveExpiredApplications(p.id)
                                 .then(dao.deleteProposalFromArchived(p.id))
                             counterMovedProposals++;
                         })

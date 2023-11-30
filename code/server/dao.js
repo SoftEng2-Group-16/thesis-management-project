@@ -387,12 +387,12 @@ exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
   });
 };
 
-exports.reviveExpiredApplications = (thesisId, newProposalId) => {
+exports.reviveExpiredApplications = (thesisId) => {
   return new Promise((resolve,reject) => {
-    const sql = 'UPDATE applications SET thesisid=?,status=? WHERE thesisid=? AND (status=? OR status=?)'
+    const sql = 'UPDATE applications SET status=? WHERE thesisid=? AND (status=? OR status=?)'
     db.run(
       sql,
-      [newProposalId, "pending", thesisId, "expired", "canceled"],
+      ["pending", thesisId, "expired", "canceled"],
       function (err){
           if(err){
             reject(err);
