@@ -32,7 +32,6 @@ function ThesisApplications(props) {
     const fetchData = async (apiFunction) => {
         try {
             const listApplications = await apiFunction();
-            console.log(listApplications);
             setApplications(listApplications.enhancedApplications);
         } catch (err) {
             if (err.error && err.status === 404) {

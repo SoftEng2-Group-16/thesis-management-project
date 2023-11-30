@@ -19,7 +19,6 @@ function NavHeader(props) {
   const onLogout = async () => {
     await props.handleLogout();
     // Go back to main screen
-    //console.log(props.user);
     navigate("/login");
   }
 

@@ -79,7 +79,6 @@ passport.serializeUser(function (user, cb) {
 });
 
 passport.deserializeUser(function (user, cb) { // this user all the data found in the select user in the db, needs to be cleaned up
-  console.log(user)
   return cb(null, user);
   //! i do not now what happens now, how do i store session data? we should not call here a dao function, maybe in serialize?
   //! solved, moved in the callback login

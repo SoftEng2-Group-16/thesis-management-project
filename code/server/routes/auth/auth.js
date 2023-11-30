@@ -48,7 +48,6 @@ const getCurrentSession = (req, res) => {
 };
 
 const logout = (req, res) => {
-  //console.log(req.user)
   req.logout(() => {
     res.sendStatus(204);
   });

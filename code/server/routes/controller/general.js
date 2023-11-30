@@ -1,9 +1,7 @@
 const dao = require('../../dao');
 
 const getThesisProposals = async (req, res) => {
-    console.log(req.user)
     let studentCourse = "";
-   // if(!req.user){return res.status(500).json({error:"for some reason you are not logged anymore"} )}
     if (req.user.role === "student") {
         studentCourse = req.user.degree_code;
     }

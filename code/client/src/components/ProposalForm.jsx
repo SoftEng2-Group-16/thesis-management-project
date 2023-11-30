@@ -61,7 +61,6 @@ const ProposalForm = (props) => {
 
         professorAPI.getPossibleCosupervisors()
             .then((cosupervisors) => {
-                console.log(cosupervisors);
                 setCosupervisorsInternal(cosupervisors.internals.filter(str => {//removes supervisor from internsals
                     const id1 = (str.split(' ')[2]).replace(',', '');
                     const idSupervisor = (supervisor.split(' ')[0]).replace(',', '');
@@ -86,7 +85,6 @@ const ProposalForm = (props) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(cds);
         const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt;
 
         const errors = {};
@@ -163,8 +161,6 @@ const ProposalForm = (props) => {
                 </div>
             );
         } else {
-            console.log(cosupervisors);
-            console.log(expiration);
             // Send data
             const proposal = {
                 title: title,

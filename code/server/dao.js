@@ -113,7 +113,6 @@ exports.getApplicationsForStudent = (studentId) => {
             const applications = rows.map(row => (
               new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
             ));
-            //console.log(applications);
             resolve(applications);
           }
         }
@@ -254,12 +253,23 @@ exports.getGroupForTeacherById = (id) => {
 //can be used also when virtual clock changes
 exports.saveNewProposal = (proposal) => {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO thesis_proposals (title, supervisor, cosupervisors, keywords, " +
+    let sql = '';
+    let parameters = [];
+    if(proposal.id == -1) {
+      sql = "INSERT INTO thesis_proposals (title, supervisor, cosupervisors, keywords, " +
       "type, groups, description, requirements, notes, expiration, level, cds) " +
-      "values (?,?,?,?,?,?,?,?,?,?,?,?)"
+      "values (?,?,?,?,?,?,?,?,?,?,?,?)";
+      parameters = [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds];
+    } else {
+      sql = "INSERT INTO thesis_proposals (id,title, supervisor, cosupervisors, keywords, " +
+      "type, groups, description, requirements, notes, expiration, level, cds) " +
+      "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      parameters = [proposal.id, proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds];
+    }
+     
     db.run(
       sql,
-      [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds],
+      [...parameters],
       function (err) {
         if (err) {
           reject(err);
@@ -289,7 +299,6 @@ exports.deleteProposal = (proposalId) => {
 }
 
 exports.acceptApplication = (thesisId, teacherId, studentId) => {
-  console.log(thesisId, teacherId, studentId);
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "accepted" WHERE thesisid = ?  AND teacherId = ? AND studentid=? and status="pending"';
 
@@ -336,7 +345,6 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 };
 
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
-  //console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
     db.run(
@@ -359,7 +367,6 @@ exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
 
 
 exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
-  //console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "expired" WHERE thesisid = ?  AND teacherId = ? AND status="pending"';
     db.run(
@@ -408,7 +415,6 @@ exports.cancelApplicationsAfterClockChange = () => { //used to put back as cance
         if(err){
           reject(err);
         } else {
-          console.log('Success?');
           resolve(this.changes);
         }
       }
@@ -418,7 +424,6 @@ exports.cancelApplicationsAfterClockChange = () => { //used to put back as cance
 
 
 exports.cancellPendingApplicationsOfAStudent= (studentId) => {
-  //console.log(`Gotten student ${studentId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "canceled" WHERE studentid = ? and status="pending"';
 
@@ -465,7 +470,7 @@ exports.getAllApplicationsByProf = (idProfessor) => {
 exports.getThesisProposalById = (thesisId, status='none') => {
   return new Promise((resolve, reject) => {
     let sql = '';
-    if(status == 'accepted' || status == 'canceled' || status == 'expired') { //means the thesis is archived, look in the right table
+    if(status == 'accepted' || status == 'canceled' || status == 'expired' || status == 'rejected') { //means the thesis is archived, look in the right table
       sql = 'SELECT * from archived_thesis_proposals where id=?';
     } else {
       sql = 'SELECT * from thesis_proposals where id=? ';

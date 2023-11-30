@@ -51,8 +51,6 @@ function ThesisProposals(props) {
         } else {
           proposals = await professorAPI.getOwnThesisProposals(props.user.id);
         }
-        //const proposals = await API.getThesisProposals();
-        //console.log(proposals)
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -74,7 +72,6 @@ function ThesisProposals(props) {
     };
 
     if (props.loggedIn || props.update == true) {
-      console.log(props.loggedIn);
       fetchThesis();
       props.setUpdate(false);
     }
@@ -91,7 +88,6 @@ function ThesisProposals(props) {
      then we set the Options based on what filter the use chose
   */
   function changeParameter(parameter) {
-    console.log(groups);
     setVersion(version + 1)
     setFilter(parameter)
     setSelections([]);

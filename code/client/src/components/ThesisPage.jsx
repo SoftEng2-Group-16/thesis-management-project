@@ -11,7 +11,7 @@ function ThesisPage(props) {
   const studentId = props.user.id;
 
   useEffect(() => {
-    console.log(state)
+    (state)
     props.setMessage('');
     if (!state || !state.thesisDetails) {
       console.error('Thesis details not available.');
@@ -22,7 +22,6 @@ function ThesisPage(props) {
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
-    console.log(thesisDetails);
     const teacherId=thesisDetails.supervisor.split(",")[0];
     studentAPI.insertApplication(studentId, thesisDetails.id,teacherId)
       .then(() => {
@@ -30,7 +29,6 @@ function ThesisPage(props) {
         navigate('/thesis');
       })
       .catch(e => {
-        console.log(e);
         props.setMessage({ msg: e, type: 'danger' });
       });
   };

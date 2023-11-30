@@ -32,7 +32,6 @@ function ApplicationDetails(props) {
   }
 
   const handleDecision = (decision) => {
-    console.log(decision);
     const data = { thesisid: applInfo.thesisInfo.id, body: { decision: decision, studentId: applInfo.studentInfo.id } };
     API.setDecision(data).then(() => {
       props.setMessage({ msg: (decision==="accepted" ? 'Application accepted successfully!' :'Application rejected!') , type: (decision === "accepted" ? "success" : "warning") });

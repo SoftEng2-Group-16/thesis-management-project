@@ -68,17 +68,13 @@ function App() {
       setLoggedIn(true);
       setMessage({ msg: `Welcome, ${u.role}!`, type: 'success' });
       handleDateChange(currentDate);
-      console.log(currentDate);
     } catch (err) {
-      console.log(err);
       setMessage({ msg: err, type: 'danger' });
     }
   };
 
   const handleLogout = async () => {
-    console.log("false")
     await API.logOut();
-    console.log("here")
     setLoggedIn(false);
     
     // clean up everything

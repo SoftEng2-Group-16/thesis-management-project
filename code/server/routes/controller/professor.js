@@ -143,7 +143,6 @@ const decideApplication = async (req, res) => {
             //archive the thesis proposal so other students cannot apply to it
             const proposal = await dao.getThesisProposalById(thesisId)
                 .then(p => {
-                    console.log(p);
                     const p2 = new models.ThesisProposal(
                         p.id, //can be whatever, DB handles autoincrement id
                         p.title,
@@ -159,7 +158,6 @@ const decideApplication = async (req, res) => {
                         p.level,
                         p.cds.join(',')
                     );
-                    console.log(p2);
                     return p2;
                 });
             await dao.archiveProposal(proposal)
