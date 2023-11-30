@@ -12,7 +12,7 @@ describe('User interactions test', () => {
     // Launch the browser and open a new blank page
     //with headless:false we show the chromium browser
     //with headless:true we don't show the browser running, just the result
-    browser = await puppeteer.launch( {headless: false});
+    browser = await puppeteer.launch( {headless: true});
     page = await browser.newPage();
     //save the db before the changes we are going to do
     const sourcePath = '../server/db_TM_dirty.db';
@@ -127,7 +127,7 @@ describe('User interactions test', () => {
 
 
     await page.click(cellSelector);
-    await page.waitForSelector('div.card-body');
+    await page.waitForSelector('div.thesis-card.card');
     await page.evaluate(() => {
         window.scrollTo(0, document.body.scrollHeight);
       });
@@ -180,7 +180,7 @@ describe('User interactions test', () => {
     console.log("Also in the application page the thesis is rejected")
   });
 
-  test('A professor approves a thesis proposal and the student sees the result', async () => {
+  test('A professor accepts a thesis proposal and the student sees the result', async () => {
    // Navigate the page to a URL
    await page.goto('http://localhost:5173/');
 
@@ -219,7 +219,7 @@ describe('User interactions test', () => {
 
 
    await page.click(cellSelector);
-   await page.waitForSelector('div.card-body');
+   await page.waitForSelector('div.thesis-card.card');
    await page.evaluate(() => {
        window.scrollTo(0, document.body.scrollHeight);
      });
@@ -261,9 +261,9 @@ describe('User interactions test', () => {
 
     result = await page.$eval(cellSelector1, component => component.textContent);
     console.log(result)
-    if(result == 'rejected'){
+    if(result == 'accepted'){
       
-      console.log("The application was rejected");
+      console.log("The application was accepted");
     }else{
       console.error("Something went wrong");
     }
