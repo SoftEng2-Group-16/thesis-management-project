@@ -19,7 +19,6 @@ const rearrangeProposals = async (req,res) => {
                     return ids;
                 }
             });
-        console.log(acceptedProposalsIds)
         
         if(expiredProposals.length > 0 && !expiredProposals.error) {
             for (p of expiredProposals) { 
@@ -77,7 +76,7 @@ const rearrangeProposals = async (req,res) => {
                     ))
                         .then((newId) => {
                             dao.reviveExpiredApplications(p.id, newId)
-                                .then(dao.deleteProposalFromArchived(p.id));
+                                .then(dao.deleteProposalFromArchived(p.id))
                             counterMovedProposals++;
                         })
                         .catch ( (e) => {
@@ -86,6 +85,9 @@ const rearrangeProposals = async (req,res) => {
                 }
             }
         }
+
+        //clean up eventual applications that need to be put back as canceled
+        await dao.cancelApplicationsAfterClockChange();
         
         //if we get here, all went well
         return res.status(200).json(counterMovedProposals);

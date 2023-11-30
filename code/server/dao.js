@@ -361,7 +361,7 @@ exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
 exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
   //console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "expired" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
+    const sql = 'UPDATE applications SET status = "expired" WHERE thesisid = ?  AND teacherId = ? AND status="pending"';
     db.run(
       sql,
       [thesisId, teacherId],
@@ -382,19 +382,38 @@ exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
 
 exports.reviveExpiredApplications = (thesisId, newProposalId) => {
   return new Promise((resolve,reject) => {
-    const sql = 'UPDATE applications SET thesisid=?,status=? WHERE thesisid=? AND status=?'
+    const sql = 'UPDATE applications SET thesisid=?,status=? WHERE thesisid=? AND (status=? OR status=?)'
     db.run(
       sql,
-      [newProposalId, "pending", thesisId, "expired"],
+      [newProposalId, "pending", thesisId, "expired", "canceled"],
       function (err){
           if(err){
             reject(err);
           } else {
+            //this.cancelApplicationsAfterClockChange();
             resolve(this.changes);
           }
       }
     )
   })
+}
+
+exports.cancelApplicationsAfterClockChange = () => { //used to put back as canceled applications that have been revived wrongly
+  return new Promise((resolve,reject) => {
+    const sql = 'UPDATE applications SET status=? WHERE status=? AND studentid IN  ( SELECT studentid FROM applications WHERE status=? )'
+    db.run(
+      sql,
+      ["canceled", "pending", "accepted"],
+      function(err) {
+        if(err){
+          reject(err);
+        } else {
+          console.log('Success?');
+          resolve(this.changes);
+        }
+      }
+    )
+  });
 }
 
 
@@ -512,6 +531,7 @@ exports.getTeacherById = (teacherId) => {
       });
   });
 };
+
 //VIRTUAL CLOCK ONLY 
 exports.getExpiredProposals = (selectedTimestamp) => {
   const ts = dayjs(selectedTimestamp, "DD-MM-YYYY");
@@ -609,11 +629,9 @@ exports.getAcceptedProposalsIds = () => {
         if(err) {
           reject(err);
         } else if(!rows || rows.length == 0) {
-          console.log("ERROR WITH IDS")
           resolve({error: "No accepted applications, can revive all proposals"});
         } else {
           const ids = rows.map(row => row.thesisid);
-          console.log(ids);
           resolve(ids);
         }
       }
