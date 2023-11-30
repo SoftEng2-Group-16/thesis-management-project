@@ -28,7 +28,6 @@ const getUserInfo = async () => {
   });
   const user = await response.json();
   if (response.ok) {
-    //console.log(user);
     return user;
   } else {
     throw user;  // an object with the error coming from the server
@@ -68,7 +67,7 @@ const rearrangeProposals = async (newDate) => {
 
 
 // general purpose apis 
-const getThesisProposals = async () => {
+/*const getThesisProposals = async () => {
   const response = await fetch(SERVER_URL + '/api/thesis', {
     credentials: 'include',
   });
@@ -79,7 +78,7 @@ const getThesisProposals = async () => {
     throw proposals;  // an object with the error coming from the server
   }
 };
+*/
 
-
-const API = { getUserInfo, logIn, logOut, getThesisProposals, rearrangeProposals };
+const API = { getUserInfo, logIn, logOut, /*getThesisProposals,*/ rearrangeProposals };
 export default API;

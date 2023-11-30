@@ -1,66 +1,204 @@
-"use strict";
+// studentController.test.js
 
-//const jwt = require('jsonwebtoken');
-const dao = require('../dao.js');
-const { insertNewApplication } = require('../routes/controller/student.js');
+const dayjs = require('dayjs');
+const { insertNewApplication, getApplicationsForStudent, getThesisProposals } = require('../routes/controller/student.js'); //import the api to mock
+const dao = require('../dao');
 
-/**
- * Defines code to be executed before each test case is launched
- */
-beforeEach(() => {
-    jest.clearAllMocks()
+// here we go again with jest
+
+jest.mock('../dao'); // Mock the dao module
+
+describe('tests for insertNewApplication', () => {
+  let mockRequest;
+  let mockResponse;
+
+  beforeEach(() => {
+    mockRequest = {
+      body: {
+        studentId: 'student123',
+        proposalId: 'proposal456',
+        teacherId: 'teacher789'
+      },
+      user: {
+        id: 'student123'
+      }
+    };
+
+    mockResponse = {
+      status: jest.fn(() => mockResponse),
+      json: jest.fn()
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should insert a new application successfully', async () => {
+    dao.addApplicationForThesis.mockResolvedValueOnce(1);
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith(1);
+  });
+
+  test('should handle a student not matching the logged-in user', async () => {
+    mockRequest.user.id = 'differentStudent';
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      error: "the student who is sending the application is not the logged in one"
+    });
+  });
+
+  test('should handle a SQLite constraint violation', async () => {
+    const error = new Error('SQLITE_CONSTRAINT');
+    dao.addApplicationForThesis.mockRejectedValueOnce(error);
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      "Application already submitted, wait for professor response"
+    );
+  });
+
+  test('should handle other errors', async () => {
+    const error = new Error('Some other error');
+    dao.addApplicationForThesis.mockRejectedValueOnce(error);
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+  });
 });
 
-describe("Insert new thesis Application", () => {
-    test("Should successfully insert new application", async () => {
-        const mockReq = {
-            body: {"studentId": "200001", "proposalId": "45"},
-        };
-        const mockRes = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-        
-        const changes = 1;
-        jest.spyOn(dao, 'addApplicationForThesis').mockResolvedValue(changes);
+describe('getApplicationsForStudent', () => {
+  let mockRequest;
+  let mockResponse;
 
-        await insertNewApplication(mockReq, mockRes);
+  beforeEach(() => {
+    mockRequest = {
+      user: {
+        id: 'student123'
+      }
+    };
 
-        expect(mockRes.status).toHaveBeenCalledWith(201);
-        expect(mockRes.json).toHaveBeenCalledWith(changes);
+    mockResponse = {
+      status: jest.fn(() => mockResponse),
+      json: jest.fn()
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should get applications for a student successfully', async () => {
+    const applications = [
+      { id: 1, teacherId: 'teacher456', thesisId: 'thesis789', studentId: 'student123' },
+      // Add more application objects as needed
+    ];
+
+    dao.getApplicationsForStudent.mockResolvedValueOnce(applications);
+    dao.getTeacherById.mockResolvedValueOnce({ id: 'teacher456', name: 'John Doe' });
+    dao.getThesisProposalById.mockResolvedValueOnce({ id: 'thesis789', title: 'Thesis Title' });
+    dao.getStudentById.mockResolvedValueOnce({ id: 'student123', name: 'Student Name' });
+
+    await getApplicationsForStudent(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      enhancedApplications: [
+        {
+          id: 1,
+          teacherId: 'teacher456',
+          thesisId: 'thesis789',
+          studentId: 'student123',
+          teacherInfo: { id: 'teacher456', name: 'John Doe' },
+          thesisInfo: { id: 'thesis789', title: 'Thesis Title' },
+          studentInfo: { id: 'student123', name: 'Student Name' }
+        },
+        // Add more enhanced application objects as needed
+      ]
     });
+  });
 
-    test("Should return error if student already applied", async () => {
-        const mockReq = {
-            body: {"studentId": "200001", "proposalId": "45"},
-        };
-        const mockRes = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-        const response = "Application already submitted, wait for professor response";
-        jest.spyOn(dao, 'addApplicationForThesis').mockRejectedValue(new Error('{ message: "SQLITE_CONSTRAINT" }'));
+  test('should handle no applications found for a student', async () => {
+    dao.getApplicationsForStudent.mockResolvedValueOnce({ error: 'No applications found' });
 
-        await insertNewApplication(mockReq, mockRes);
+    await getApplicationsForStudent(mockRequest, mockResponse);
 
-        expect(mockRes.status).toHaveBeenCalledWith(500);
-        expect(mockRes.json).toHaveBeenCalledWith(response);
-    });
+    expect(mockResponse.status).toHaveBeenCalledWith(404);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'No applications found' });
+  });
 
-    test("Should return error if db failed", async () => {
-        const mockReq = {
-            body: {"studentId": "200001", "proposalId": "45"},
-        };
-        const mockRes = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-        const response = "DB failed for some reason";
-        jest.spyOn(dao, 'addApplicationForThesis').mockRejectedValue(new Error('DB failed for some reason'));
+  test('should handle an error during the process', async () => {
+    const error = new Error('Some error');
+    dao.getApplicationsForStudent.mockRejectedValueOnce(error);
 
-        await insertNewApplication(mockReq, mockRes);
+    await getApplicationsForStudent(mockRequest, mockResponse);
 
-        expect(mockRes.status).toHaveBeenCalledWith(500);
-        expect(mockRes.json).toHaveBeenCalledWith(response);
-    });
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+  });
+});
+
+describe('getThesisProposals', () => {
+  let mockRequest;
+  let mockResponse;
+
+  beforeEach(() => {
+    mockRequest = {
+      user: {
+        degree_code: 'LM-1'
+      }
+    };
+
+    mockResponse = {
+      status: jest.fn(() => mockResponse),
+      json: jest.fn()
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should get thesis proposals for a student course successfully', async () => {
+    const proposals = [
+      { id: 1, title: 'Proposal 1', degreeCode: 'LM-1' },
+      // Add more proposal objects as needed
+    ];
+
+    dao.getThesisProposals.mockResolvedValueOnce(proposals);
+
+    await getThesisProposals(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith(proposals);
+  });
+
+  test('should handle no thesis proposals found for a student course', async () => {
+    dao.getThesisProposals.mockResolvedValueOnce({ error: 'No thesis proposals found' });
+
+    await getThesisProposals(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(404);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'No thesis proposals found' });
+  });
+
+  test('should handle an error during the process', async () => {
+    const error = new Error('Some error');
+    dao.getThesisProposals.mockRejectedValueOnce(error);
+
+    await getThesisProposals(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+  });
 });

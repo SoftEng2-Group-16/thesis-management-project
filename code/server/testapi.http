@@ -22,8 +22,8 @@ POST http://localhost:3001/api/newapplication HTTP/1.1
 content-type: application/json
 
 {
-    "studentId": "200001",
-    "proposalId": "3"
+    "studentId": "200003",
+    "proposalId": "4"
 }
 
 ###
@@ -65,7 +65,50 @@ content-type: application/json
 {
     "selectedTimestamp": "01-01-2024"
 }
-    "expiration": "22-10-2028",
-    "level": "Bachelor",
-    "cds": ["LM-1", "LM-2"]
+
+###
+# change virtual clock back
+PUT http://localhost:3001/api/clockchanged HTTP/1.1
+content-type: application/json
+
+{
+    "selectedTimestamp": "29-11-2023"
 }
+
+### 
+POST http://localhost:3001/api/sessions/ HTTP/1.1
+content-type: application/json
+
+{
+    "email": "maria.rossi@polito.it",
+    "password": "268553"
+}
+###
+#test the API for getting applications for a proposal
+
+GET http://localhost:3001/api/teacher/applications/
+
+###
+# test api for retrieving student applications
+GET http://localhost:3001/api/student/applications/200001 HTTP/1.1 
+#seems ok
+
+GET http://localhost:3001/api/applications/
+
+###
+PUT http://localhost:3001/api/applications/1 
+content-type: application/json
+
+{
+    "decision":"rejected",
+    "studentId":200001
+}
+
+###
+# test student gets thesis proposals
+GET http://localhost:3001/api/thesis/student/LM-1
+
+
+###
+# test teacher gets own proposals
+GET http://localhost:3001/api/thesis/teacher/268555

@@ -1,6 +1,41 @@
-## SUMMARY
+# Table of Contents
+
+# Table of Contents
+
+1. [Changes](#changes)
+2. [Stories](#stories)
+3. [General Information about the project implementation](#general-information-about-the-project-implementation)
+   1. [AUTH v.1.0](#auth-v10)
+      
+   2. [AUTH v.2.0](#auth-v20)
+      1. [Strategy Description](#strategy-description)
+   3. [SESSIONS](#sessions)
+   4. [Database Structure](#database-structure)
+         1. [STUDENTS](#students)
+         2. [TEACHERS](#teachers)
+         3. [CAREERS](#careers)
+         4. [DEGREES](#degrees)
+         5. [THESIS_PROPOSALS](#thesis-proposals)
+4. [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
+   1. [Update get thesis proposals](#update-get-thesis-proposals)
+5. [React Client Application Routes](#react-client-application-routes)
+   1. [Main Component](#main-component)
+6. [API Server](#api-server)
+   1. [Template for API Description](#template-for-api-description)
+7. [Testing](#testing)
+8. [Implementation for Integration (OBSOLETE)](#implementation-for-integration-obsolete)
+   1. [Commands](#commands)
 
 
+### Changes
+
+*we should put here the changes between the sprint*
+
+### Stories
+
+*put here the table of stories committed with references to the sprint*
+
+# General Information about the project implementation
 
 ## AUTH v.1.0
 
@@ -22,6 +57,45 @@ The login is performed with email and password, the system check if there is a r
 | luigi.bianchi@polito.it     | 268554        | teacher |
 | giovanna.ferrari@polito.it  | 268555        | teacher |
 | antonio.russo@polito.it     | 268556        | teacher |
+
+## AUTH v.2.0
+
+For demo 2 the application perform authentication using the SAML 2.0 protocol, this is conveniently realized trough passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
+
+```
+passport.use(new SamlStrategy({
+  entryPoint: 'https://group16-thesis-management-system.eu.auth0.com/samlp/7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
+  path: '/login/callback', //motherfucker
+  issuer: 'passport-saml',
+  cert: cert,
+  acceptedClockSkewMs: 30000 // avoid syncerror Error: SAML assertion not yet valid
+}, function (profile, done) {
+
+
+  return done(null, //take from the Saml token the parameters so that will be available in req.user ffs
+    {
+      id: profile['nameID'],
+      email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
+      name: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
+      lastName: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
+    });
+}));
+
+```
+### Strategy Description
+
+- In the main strategy we see parameters used by the strategy in this order:
+  - `entryPoint` of auth0 for Saml2 protocol 
+  - `callback` path, that is the api in which the login request return after performing authentication on the idp, here we have avaialable the SAML assertion
+  -`issuer`, in this case the library itself that that the process
+  - `certificate`, stored in the server, provided by the auth0 tenantsm used by the saml protocol
+  - `acceptedClockSkews` this is an option for saml2 protocol to allow a little bit of gap in terms of time differences between our server clock and auth0's one.
+
+- In the middleware we fetch some data from the response schema, this are used in the callback to perform a lookup in our local db, so we can finally initialize our expression session with all the data related to the user, that are not present in auth0.
+
+
+
 
 
 ### SESSIONS
@@ -58,27 +132,27 @@ professor:
 
 ## Database Structure
 
-STUDENTS
+#### STUDENTS
 | id  | surname  | name | gender | nationality | email | degree_code | enrollment_year
 |---  |---    |---  |--- |--- |--- |--- |---
 200001 | Rossi | Mario | M | Italian | <mario.rossi@studenti.polito.it> | LM-1 | 2010
 
-TEACHERS
+#### TEACHERS
 | id  | surname  | name | email | group_code | department_code
 |---  |---    |---  |--- |--- |---
 268553 | Rossi | Maria | <maria.rossi@polito.it> | AI | DAD
 
-CAREERS
+#### CAREERS
 | student_id  | course_code  | course_title | cfu | garde | date_registered
 |---  |---    |---  |--- |--- |---
 200023 | 02PQRST | Physics | 19 | 30L | 20-10-2018
 
-DEGREES
+#### DEGREES
 | degree_code | degree_title
 |---  |---
 LM-1 | Computer Engineering
 
-THESIS_PROPOSALS
+#### THESIS_PROPOSALS
 | id  | title  | supervisor | cosupervisors | keywords | type | groups | description | requirements | notes | expiration | level | cds
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
@@ -88,6 +162,8 @@ THESIS_PROPOSALS
 
 
 ## Useful ideas and future development needs
+### Update get thesis proposals
+Students need to get thesis proposals filtered by their course, and professors need to get only their own thesis proposals (so the ones containing the corresponding teacher id), so it might be a good idea to split the two apis into one since the filtering needs to be done on a different field. Tests need to be update accordingly.
 
 ## React Client Application Routes
 
@@ -95,10 +171,12 @@ THESIS_PROPOSALS
 - Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
 - Route `/login`: to perform login
 - Route `*`: for non existing pages
-
 ## Main Component
 - `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
 - `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
+- `ThesisProposalBro`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
+- `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there is only a go back button (for now, later we will add the fact that we can modify it only if he is the owner). If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis.
+- `Applications`: This component renders a table of thesis applications, dynamically adapting its display based on the user's role (teacher or student). It efficiently utilizes the ApplicationsTable component to provide a clean and intuitive interface for managing thesis applications within the application..
 
 
 ## API Server
@@ -129,8 +207,8 @@ THESIS_PROPOSALS
 
 - POST `/api/newapplication`
   - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal
-    - object{`studentId`, `proposalId`}
+  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
+    - object{`studentId`, `proposalId`,`teacherId`}
   - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
   - Response body: number, indicating the number of applications inserted (should always be 1)
 
@@ -149,12 +227,12 @@ THESIS_PROPOSALS
     - { `internals`: [...], `externals`: [...] } 
 
 - GET `/api/degrees`
-- Description: retrieves all possible degrees a professore can insert a new thesis proposal for
+  - Description: retrieves all possible degrees a professore can insert a new thesis proposal for
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the possible degrees
 
 - POST `/api/newproposal`
-- Description: inserts a new thesis proposal
+  - Description: inserts a new thesis proposal
   - Request body: an object describing the proposal to insert
     - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
 `cds` } 
@@ -165,29 +243,54 @@ THESIS_PROPOSALS
   - Response body: the id of the newly created proposal
 
 
-## Utility functions
-### `getJson(httpResponsePromise)`
-- **Description**: A utility function for parsing HTTP responses.
-- **Parameters**:
-  - `httpResponsePromise` (Promise) - A promise representing the HTTP response.
+- GET `/api/student/applications/:studentId`
+  - Description: retrieves all the applications the student has sent (including status)
+  - Request param: the id of the student currently logged in (should be retrieved from the session cookie)
+  - Response: `200 OK` (success), `404 Not Found` (no applications found for the specific studentId), `500 Internal Server Error` (generic server error)
+  - Response body: an array of objects, each describing an application
+    - {`studentId`, `thesisId`, `timestamp`, `status`, `teacherId`}
+    
+    (Note: it will be an array even if the student only inserted one application)
 
-- **Returns**:
-  - A Promise that resolves with the parsed JSON response or rejects with an error message.
 
-- **Behavior**:
-  - If the HTTP response is successful parse the JSON response and resolve the promise with the parsed JSON.
-  - If the response is not successful attempt to parse the response body to extract an error message and reject the promise with the error message.
-  - If there's an error in making the HTTP request (e.g., a network issue), reject the promise with a "Cannot communicate" error message.
-  
-  
+- GET `/api/teacher/applications`
+- Description: retrieves all the applications sent for proposals of the logged if professor
+  - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
+  - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
+  - "enhancedApplications": 
+    - [
+      {
+        - "studentId": 200001,
+        - "thesisId": 3,
+        - "timestamp": "08/11/2023 16:42:50",
+        - "status": "pending",
+        - "teacherId": 268553,
+        - **"studentInfo"**: { info taken from teacher table },
+        - **"thesisInfo"**: { info taken from thesis table }
+     },
+      // ... more entries ...
+    ]
 
-This utility function is helpful when working with API requests, ensuring that you can handle HTTP responses in a consistent manner, whether they represent success or errors.
 
-## Testing
+    
+- PUT `/api/teacher/applications/:id`
+  - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter. Also when an application is accepetd all the other applications of the same student and for the same thesis are canceled.
+  - Request body: object containing the decision "accepted" or "rejected" and the id of the student sending the application
+  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
+  - Response body: the updated application {id, status}
 
-Jest setted up for unit and integration testing.
+
+
+
+
+
+### Testing
+
+`Jest` is set up for unit testing as demo1, but for demo2 we opted for a different library for e2e, still based on Jest.
 
 ### Implemetation for Integration
+(OBSOLETE)
+
 
 - setup process.env.NODE_ENV as 'test' in the integration test file
 - import the server, which will start listening on port 3001
@@ -203,4 +306,4 @@ This commands are executed only on test files under `thesis-management-project/c
 
 - `npm test`: runs all test 
 - `npm test:unit`: runs only unit tests with coverage
-- `npm run test:integration`: runs only integration tests with coverage
+- `npm run test:integration`: obsolete, still present but integration test are no more mmeaningfull

@@ -9,8 +9,10 @@ import MessageContext from './messageCtx.jsx';
 import API from './apis/generalAPI.js';
 import { LoginForm } from './components/AuthComponents';
 import ProposalForm from './components/ProposalForm.jsx';
-import ThesisProposals from './components/ThesisProposalsBro.jsx';
+import ThesisProposals from './components/ThesisProposals.jsx';
 import ThesisPage from './components/ThesisPage.jsx';
+import ThesisApplications from './components/Applications.jsx';
+import ApplicationDetails from './components/ApplicationDetails.jsx';
 import dayjs from 'dayjs';
 
 function App() {
@@ -66,9 +68,7 @@ function App() {
       setLoggedIn(true);
       setMessage({ msg: `Welcome, ${u.role}!`, type: 'success' });
       handleDateChange(currentDate);
-      console.log(currentDate);
     } catch (err) {
-      console.log(err);
       setMessage({ msg: err, type: 'danger' });
     }
   };
@@ -76,6 +76,7 @@ function App() {
   const handleLogout = async () => {
     await API.logOut();
     setLoggedIn(false);
+    
     // clean up everything
     setMessage('');
     setUser(null);
@@ -106,7 +107,7 @@ function App() {
           <Route
             element={
               <>
-                <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} />
+                <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} setMessage={setMessage} />
                 <Container fluid className="mt-3 text-center">
                   {message && (
                     <Row>
@@ -121,10 +122,11 @@ function App() {
               </>
             }
           >
-            <Route path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm login={handleLogin} />)} />
-            <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} /> : <ThesisProposals user={user} />} ></Route>
+            <Route path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm loggedIn={loggedIn} />)} />
+            <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} setMessage={setMessage}/> : <ThesisProposals user={user} />} ></Route>
             <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <LoginForm login={handleLogin} />}></Route>
-
+            <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors} setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
+            <Route path="/application/:id" element={loggedIn ? <ApplicationDetails setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
 
             <Route path="*" element={<NotFoundLayout />} />

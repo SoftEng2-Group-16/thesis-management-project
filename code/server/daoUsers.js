@@ -23,7 +23,6 @@ const { check } = require('express-validator');
 
 exports.getUser = (email, password) => 
 {
-  //console.log(email,password) 
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM auth WHERE email = ?';
 
@@ -39,7 +38,6 @@ exports.getUser = (email, password) =>
           const salt = row.salt;
           const hashedPassword = crypto.scryptSync(pass, salt, 64).toString('hex');
           if (hashedPassword === row.password) {
-            //console.log(row);
             resolve(row);
           } else {
             resolve(false);
@@ -68,6 +66,31 @@ exports.getProfessorById = (id) => {
   return new Promise((resolve, reject) => {
     const query = `SELECT * FROM teachers WHERE id = ?`;
     db.get(query, [id], (error, row) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+} 
+
+exports.getStudentByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM students WHERE email = ?`;
+    db.get(query, [email], (error, row) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+} 
+exports.getProfessorByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM teachers WHERE email = ?`;
+    db.get(query, [email], (error, row) => {
       if (error) {
         reject(error);
       } else {
