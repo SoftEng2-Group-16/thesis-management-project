@@ -6,7 +6,7 @@ import professorAPI from '../apis/professorAPI.js';
 import studentAPI from '../apis/studentAPI.js';
 import { LoadingLayout } from './PageLayout.jsx';
 import Button from 'react-bootstrap/Button';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
 import makeAnimated from 'react-select/animated';
@@ -40,6 +40,7 @@ function ThesisProposals(props) {
   const [groups, setGroups] = useState([]);
   const [version, setVersion] = useState(0);
   const animatedComponents = makeAnimated();
+  const [NoProposals, setNoProposals] = useState(false);
 
   useEffect(() => {
 
@@ -53,6 +54,10 @@ function ThesisProposals(props) {
         }
         setAllThesis(proposals);
         setThesis(proposals)
+
+        if (proposals.length === 0) {
+          setNoProposals(true);
+        }
 
         const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
         setTitle(uniqueByTitle);
@@ -68,6 +73,7 @@ function ThesisProposals(props) {
       } catch (error) {
         console.error(error);
         // Handle error
+        setNoProposals(true);
       }
     };
 
@@ -81,6 +87,12 @@ function ThesisProposals(props) {
   function handleReset() {
     setSelections([]);
     setThesis([...Allthesis]);
+    if (thesis.length == 0){
+      setNoProposals(true);
+    }
+    else{
+      setNoProposals(false);
+    }
   }
 
   /* this function is called when we have a ne filter type
@@ -139,7 +151,7 @@ function ThesisProposals(props) {
 
   return (
     <>
-      {props.loggedIn ? (
+      {props.loggedIn && !NoProposals ? (
         <div style={{ marginTop: '10px' }} >
           <Form className="d-flex">
             <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
@@ -187,10 +199,25 @@ function ThesisProposals(props) {
             </Col>
           </Row>
         </div>
+      ) : props.loggedIn && NoProposals ? (
+            <NoThesisProposalsFound />
       ) : (
         <div>You need to LOGIN!</div>
       )}
     </>
+  );
+}
+
+function NoThesisProposalsFound() {
+
+  return (
+      <Card className="thesis-card">
+          <Card.Title>
+              No active proposals to show!
+          </Card.Title>
+          <Card.Body>
+          </Card.Body>
+      </Card>
   );
 }
 
