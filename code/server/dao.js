@@ -67,73 +67,6 @@ exports.getThesisProposals = (degCode) => {
   });
 }
 
-/*exports.getThesissProposals = (degCode) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT * from thesis_proposals';
-
-    db.all(
-      sql,
-      [],
-      (err, rows) => {
-        if (err) {
-          reject(err);
-        } else if (rows.length === 0) {
-          resolve(
-            degCode === "" ?
-              { error: "No thesis proposals found for all courses" } :
-              { error: `No thesis proposals found for study course ${degCode}` }
-          );
-        } else {
-          if (degCode === "") {
-            // No filtering needed, return all thesis proposals
-            const proposals = rows.map((row) => ({
-              id: row.id,
-              title: row.title,
-              supervisor: row.supervisor,
-              cosupervisors: row.cosupervisors.split('-'),
-              keywords: row.keywords.split(','),
-              type: row.type,
-              groups: row.groups.split(','),
-              description: row.description,
-              requirements: row.requirements,
-              notes: row.notes,
-              expiration: row.expiration,
-              level: row.level,
-              cds: row.cds.split(','),
-            }));
-            resolve(proposals);
-          } else {
-            // Filter proposals based on the study course code
-            const proposals = rows
-              .filter(r => r.cds.match(degCode) !== null)
-              .map((row) => ({
-                id: row.id,
-                title: row.title,
-                supervisor: row.supervisor,
-                cosupervisors: row.cosupervisors.split('-'),
-                keywords: row.keywords.split(','),
-                type: row.type,
-                groups: row.groups.split(','),
-                description: row.description,
-                requirements: row.requirements,
-                notes: row.notes,
-                expiration: row.expiration,
-                level: row.level,
-                cds: row.cds.split(','),
-              }
-              ));
-
-            if (proposals.length == 0) {
-              resolve({ error: `No thesis proposals found for study course ${degCode}` });
-            } else {
-              resolve(proposals);
-            }
-          }
-        }
-      });
-  });
-};*/
-
 exports.getStudentById = (studentId) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * from students where id=? ';
@@ -166,10 +99,10 @@ exports.getStudentById = (studentId) => {
 
 exports.getApplicationsForStudent = (studentId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM applications WHERE studentid=? AND status!=?';
+    const sql = 'SELECT * FROM applications WHERE studentid=?';
     db.all(
       sql,
-      [studentId, "canceled"],
+      [studentId],
       (err,rows) => {
         if (err) {
           reject(err);
@@ -403,9 +336,32 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 };
 
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
-  console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
+  //console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
+    db.run(
+      sql,
+      [thesisId, teacherId],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          /* const updatedApplication = {
+            id: thesisId,
+            status: 'canceled',
+          }; */
+          resolve(this.changes);
+        }
+      }
+    );
+  });
+};
+
+
+exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
+  //console.log(`Got thesis ${thesisId} and teacher ${teacherId}`)
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE applications SET status = "expired" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
     db.run(
       sql,
       [thesisId, teacherId],
@@ -429,7 +385,7 @@ exports.reviveExpiredApplications = (thesisId, newProposalId) => {
     const sql = 'UPDATE applications SET thesisid=?,status=? WHERE thesisid=? AND status=?'
     db.run(
       sql,
-      [newProposalId, "pending", thesisId, "canceled"],
+      [newProposalId, "pending", thesisId, "expired"],
       function (err){
           if(err){
             reject(err);
@@ -464,6 +420,7 @@ exports.cancellPendingApplicationsOfAStudent= (studentId) => {
     );
   });
 };
+
 exports.getAllApplicationsByProf = (idProfessor) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM applications where teacherid=?'
@@ -486,10 +443,15 @@ exports.getAllApplicationsByProf = (idProfessor) => {
   });
 }
 
-exports.getThesisProposalById = (thesisId) => {
+exports.getThesisProposalById = (thesisId, status='none') => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * from thesis_proposals where id=? ';
-
+    let sql = '';
+    if(status == 'accepted' || status == 'canceled' || status == 'expired') { //means the thesis is archived, look in the right table
+      sql = 'SELECT * from archived_thesis_proposals where id=?';
+    } else {
+      sql = 'SELECT * from thesis_proposals where id=? ';
+    }
+    
     db.all(
       sql,
       [thesisId],
@@ -631,6 +593,28 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
               }
             ));
           resolve(proposals);
+        }
+      }
+    )
+  });
+}
+
+exports.getAcceptedProposalsIds = () => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT thesisid FROM applications WHERE status=?';
+    db.all(
+      sql,
+      ["accepted"],
+      (err,rows) => {
+        if(err) {
+          reject(err);
+        } else if(!rows || rows.length == 0) {
+          console.log("ERROR WITH IDS")
+          resolve({error: "No accepted applications, can revive all proposals"});
+        } else {
+          const ids = rows.map(row => row.thesisid);
+          console.log(ids);
+          resolve(ids);
         }
       }
     )
