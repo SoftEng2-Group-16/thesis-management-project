@@ -35,7 +35,7 @@ STEPS TO PERFORM:
                                        
     
 THESIS DATA:
-internet of Things (IoT) Security
+Internet of Things (IoT) Security
 IoT Security, Cyber-Physical Systems
 Research	Internship	
 Investigate security challenges in IoT devices and propose robust solutions.This project focuses on enhancing the security of IoT devices through in-depth analysis and solution proposals
