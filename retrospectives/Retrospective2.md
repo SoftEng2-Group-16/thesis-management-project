@@ -16,7 +16,7 @@ sections:
 - Total points committed vs. done - `7` vs `7`
 - Nr of hours planned vs. spent (as a team) - `94h50m` vs `99h50m`
 
-**Remember**a story is done ONLY if it fits the Definition of Done:
+**Remember**: a story is done ONLY if it fits the Definition of Done:
  
 - Unit Tests passing
 - Code review completed
@@ -47,7 +47,7 @@ sections:
   - Total hours estimated: `10h30m` 
   - Total hours spent: `6h30m`
   - Nr of automated unit test cases: `39`
-  - Coverage (if available): `98.93`
+  - Coverage (if available): `95.9%`
 - E2E testing:
   - Total hours estimated: `4h`
   - Total hours spent: `6h`
@@ -55,24 +55,27 @@ sections:
   - Total hours estimated: `6h`
   - Total hours spent: `4h55m`
 
+*Note: the coverage of unit tests is taken from SonarCloud analysis.*
 ## ASSESSMENT
 
 - What caused your errors in estimation (if any)?  
-  Underestimation of tasks related mainly to the virtual clock and for various front end tasks.
+  - Underestimation of the new functionalities of the virtual clock (managing the applications linked to the proposals when they expire), and also of a few frontend related tasks.
 
 - What lessons did you learn (both positive and negative) in this sprint? 
-  - Positive: with end to end testing we were able to controll better our development phase when changing details during the sprint.
-  - Negative: merge all the features before to have more time to solve problems and focus more on the small details like the style.
+  - Positive: by adding automated E2E testing, we were able to control better and speed up our testing phase when changing small details (surely quicker than manual testing).
+  - Negative: we need to merge the different branches onto the reference branch (dev) sooner, so we can have more time to solve problems and focus more on style and appearance.
 
 - Which improvement goals set in the previous retrospective were you able to achieve?
-  - We implemented e2e testing that we commited to improve in the last sprint.
+  - We implemented automated E2E testing.
+  - We arrived to the presentation more prepared, we had some key points to follow and some pre-made data to use during the demo, so the presentation was smooth and easy to follow.
   
 - Which ones you were not able to achieve? Why? 
-  We achieved all our goals
+  - We were able to achieve all the goals we set at the end of the previous sprint.
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
-  - Focus more style of the page
-  - Improve responsiveness of the site
+  > Propose one or two
+  - Improve the overall style, keeping it simple but more appealing
+  - Improve the responsiveness (we have a few components that aren't yet)
 
 - One thing you are proud of as a Team!!
-  - We did a great job in presenting the project and communicated even more then the other sprint
+  - We did a great job in presenting the project, and communication between team members was clear and efficient.
