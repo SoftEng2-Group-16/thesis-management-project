@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Navbar, Container, Button } from 'react-bootstrap';
+import { Navbar, Container, Button, NavbarText } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
 import { LogoutButton } from './AuthComponents';
@@ -23,11 +23,10 @@ function NavHeader(props) {
   }
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="d-flex navbar-expand-lg justify-content-around" bg="primary" variant="dark">
+    <Navbar collapseOnSelect expand="lg" className="d-flex navbar-expand-lg justify-content-between " bg="primary" variant="dark">
       <a></a>
-      <Container>
         <Navbar.Brand
-          className='app-title'
+          className='app-title ms-4'
           onClick={() => {
             if (props.loggedIn)
               setShowClock(!showClock)
@@ -40,11 +39,17 @@ function NavHeader(props) {
           {props.loggedIn ? (showClock ? <Clock onDateChange={handleDateChange} setShowClock={setShowClock} currentDate={props.currentDate} newDate={props.newDate} setNewDate={props.setNewDate} setCurrentDate={props.setCurrentDate} /> : null) : null}
           {props.loggedIn ?
             <Nav className="me-auto">
-              <Nav.Link className='link'id='thesis' onClick={() => { props.setMessage(''); navigate('/thesis') }}>Thesis</Nav.Link>
-              {props.user.role === 'teacher' ? <Nav.Link className='link' id='proposal' onClick={() => { navigate('/proposal'); props.setMessage('') }}>Proposal</Nav.Link> : null}
-              <Nav.Link className='link' id='applications' onClick={() => { props.setMessage(''); navigate('/applications') }}>Applications</Nav.Link>
+              { props.user.role == 'student' ?
+                <Nav.Link className='link' id='thesis' onClick={() =>{props.setMessage('');navigate('/thesis')}}> All Thesis</Nav.Link>
+              : null}
+              {props.user.role === 'teacher' ? 
+              <>
+              <Nav.Link className='link' id="myProposals" onClick={() => navigate('/')}>My Proposals</Nav.Link>
+              <Nav.Link className='link' id='proposal' onClick={() => navigate('/proposal')}>New Proposal</Nav.Link>
+              <Nav.Link className='link' id='applications' onClick={() => {props.setMessage(''); navigate('/applications')}}>Applications</Nav.Link>
+             </> : null}
             </Nav> : null}
-          <Nav>
+          <Nav className='me-4 d-flex align-items-center'>
             {props.loggedIn ?
               <Navbar.Text>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-circle" viewBox="0 0 16 16">
@@ -55,10 +60,8 @@ function NavHeader(props) {
                 <span className="text-light me-3 username">{props.user.id}, {props.user.name} {props.user.surname}</span>
               </Navbar.Text>
               : null}
-          </Nav>
-          <Nav>
             {props.loggedIn ?
-              <Button variant="outline-light" onClick={onLogout}>
+              <Button variant="outline-light h-75" onClick={onLogout}>
                 Logout
               </Button>
               :
@@ -66,7 +69,6 @@ function NavHeader(props) {
             }
           </Nav>
         </Navbar.Collapse>
-      </Container>
     </Navbar>
   );
 }
