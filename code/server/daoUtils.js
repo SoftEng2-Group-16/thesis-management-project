@@ -114,7 +114,6 @@ exports.getAcceptedProposalsIds = () => {
 }
 
 
-
 exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE applications SET status = "expired" WHERE thesisid = ?  AND teacherId = ? AND status="pending"';

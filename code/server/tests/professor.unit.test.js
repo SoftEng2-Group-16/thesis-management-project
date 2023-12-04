@@ -1,10 +1,14 @@
 "use strict";
 
-const dao = require("../dao.js");
+const daoTeacher = require("../daoTeacher.js");
+const daoStudent = require("../daoStudent.js");
+const daoGeneral = require("../daoGeneral.js");
 const professorApi = require("../routes/controller/professor.js")
 
 
-jest.mock('../dao'); // Mock the dao module
+jest.mock('../daoTeacher'); // Mock the daoTeacher module
+jest.mock('../daoStudent'); // Mock the daoTeacher module
+jest.mock('../daoGeneral'); // Mock the daoTeacher module
 /*
  -- TEMPLATE --
  IMPORT ALL THE RELATIVE MODULES TO MOCK ON TOP
@@ -37,8 +41,8 @@ describe('getPossibleCosupervisors', () => {
         // Add more external professor objects as needed
       ];
   
-      dao.getProfessors.mockResolvedValueOnce(internals);
-      dao.getExternals.mockResolvedValueOnce(externals);
+      daoTeacher.getProfessors.mockResolvedValueOnce(internals);
+      daoTeacher.getExternals.mockResolvedValueOnce(externals);
   
       await professorApi.getPossibleCosupervisors(null, mockResponse);
   
@@ -50,7 +54,7 @@ describe('getPossibleCosupervisors', () => {
     });
   
     test('should handle no internal professors found', async () => {
-      dao.getProfessors.mockResolvedValueOnce({ error: 'No internal professors found' });
+      daoTeacher.getProfessors.mockResolvedValueOnce({ error: 'No internal professors found' });
   
       await professorApi.getPossibleCosupervisors(null, mockResponse);
   
@@ -59,8 +63,8 @@ describe('getPossibleCosupervisors', () => {
     });
   
     test('should handle no external professors found', async () => {
-      dao.getProfessors.mockResolvedValueOnce([]);
-      dao.getExternals.mockResolvedValueOnce({ error: 'No external professors found' });
+      daoTeacher.getProfessors.mockResolvedValueOnce([]);
+      daoTeacher.getExternals.mockResolvedValueOnce({ error: 'No external professors found' });
   
       await professorApi.getPossibleCosupervisors(null, mockResponse);
   
@@ -70,7 +74,7 @@ describe('getPossibleCosupervisors', () => {
   
     test('should handle an error during the process', async () => {
       const error = new Error('Some error');
-      dao.getProfessors.mockRejectedValueOnce(error);
+      daoTeacher.getProfessors.mockRejectedValueOnce(error);
   
       await professorApi.getPossibleCosupervisors(null, mockResponse);
   
@@ -112,8 +116,8 @@ describe('insertNewProposal', () => {
     });
   
     test('should insert a new proposal successfully', async () => {
-      dao.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
-      dao.saveNewProposal.mockResolvedValueOnce(1);
+      daoTeacher.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
+      daoTeacher.saveNewProposal.mockResolvedValueOnce(1);
   
       await professorApi.insertNewProposal(mockRequest, mockResponse);
   
@@ -123,8 +127,8 @@ describe('insertNewProposal', () => {
   
     test('should handle an error during proposal insertion', async () => {
       const error = new Error('Some error');
-      dao.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
-      dao.saveNewProposal.mockRejectedValueOnce(error);
+      daoTeacher.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
+      daoTeacher.saveNewProposal.mockRejectedValueOnce(error);
   
       await professorApi.insertNewProposal(mockRequest, mockResponse);
   
@@ -154,7 +158,7 @@ describe('insertNewProposal', () => {
         // Add more degree objects as needed
       ];
   
-      dao.getDegrees.mockResolvedValueOnce(degrees);
+      daoTeacher.getDegrees.mockResolvedValueOnce(degrees);
   
       await professorApi.getDegreesInfo(null, mockResponse);
   
@@ -163,7 +167,7 @@ describe('insertNewProposal', () => {
     });
   
     test('should handle no degrees found', async () => {
-      dao.getDegrees.mockResolvedValueOnce({ error: 'No degrees found' });
+      daoTeacher.getDegrees.mockResolvedValueOnce({ error: 'No degrees found' });
   
       await professorApi.getDegreesInfo(null, mockResponse);
   
@@ -173,7 +177,7 @@ describe('insertNewProposal', () => {
   
     test('should handle an error during the process', async () => {
       const error = new Error('Some error');
-      dao.getDegrees.mockRejectedValueOnce(error);
+      daoTeacher.getDegrees.mockRejectedValueOnce(error);
   
       await professorApi.getDegreesInfo(null, mockResponse);
   
@@ -257,9 +261,9 @@ describe("getAllApplicationsByProf", () => {
     }
 
     test("should retrieve the list of applications successfully", async () => {
-        dao.getAllApplicationsByProf.mockResolvedValue(applications);
-        dao.getStudentById.mockResolvedValue(studentInfo);
-        dao.getThesisProposalById.mockResolvedValue(thesisInfo);
+        daoTeacher.getAllApplicationsByProf.mockResolvedValue(applications);
+        daoStudent.getStudentById.mockResolvedValue(studentInfo);
+        daoGeneral.getThesisProposalById.mockResolvedValue(thesisInfo);
         
         let res = {enhancedApplications: [{...applications[0], studentInfo, thesisInfo}]};
         
@@ -271,7 +275,7 @@ describe("getAllApplicationsByProf", () => {
 
     test("should return error if no applications found for the teacher", async () => {
         let noAppls = { error: 'No Applications found for professor ' + mockRequest.user.id }
-        dao.getAllApplicationsByProf.mockResolvedValue(noAppls);
+        daoTeacher.getAllApplicationsByProf.mockResolvedValue(noAppls);
         
         await professorApi.getAllApplicationsByProf(mockRequest, mockResponse);
     
@@ -281,7 +285,7 @@ describe("getAllApplicationsByProf", () => {
 
     test("should handle other errors", async () => {
         let error = new Error('Some other error');
-        dao.getAllApplicationsByProf.mockRejectedValue(error);
+        daoTeacher.getAllApplicationsByProf.mockRejectedValue(error);
 
         await professorApi.getAllApplicationsByProf(mockRequest, mockResponse);
 
@@ -320,9 +324,9 @@ describe("decideApplication()", () => {
     test("should successfully accept an application", async () => {
         let res = { id: mockRequest.params.thesisId, status: 'accepted'};
 
-        dao.acceptApplication.mockResolvedValue(res);
-        dao.cancellPendingApplicationsForAThesis.mockResolvedValue();
-        dao.cancellPendingApplicationsOfAStudent.mockResolvedValue();
+        daoTeacher.acceptApplication.mockResolvedValue(res);
+        daoGeneral.cancellPendingApplicationsForAThesis.mockResolvedValue();
+        daoGeneral.cancellPendingApplicationsOfAStudent.mockResolvedValue();
 
         await professorApi.decideApplication(mockRequest, mockResponse);
 
@@ -334,7 +338,7 @@ describe("decideApplication()", () => {
         mockRequest.body.decision = 'rejected';
         let res = { id: mockRequest.params.thesisId, status: 'rejected'};
 
-        dao.rejectApplication.mockResolvedValue(res);
+        daoTeacher.rejectApplication.mockResolvedValue(res);
 
         await professorApi.decideApplication(mockRequest, mockResponse);
 
@@ -394,7 +398,7 @@ describe("decideApplication()", () => {
 
     test("should handle other errors during acceptance", async () => {
         let error = new Error('Some other error');
-        dao.acceptApplication.mockRejectedValue(error);
+        daoTeacher.acceptApplication.mockRejectedValue(error);
 
         await professorApi.decideApplication(mockRequest, mockResponse);
 
@@ -405,7 +409,7 @@ describe("decideApplication()", () => {
     test("should handle other errors during rejection", async () => {
         mockRequest.body.decision = 'rejected';
         let error = new Error('Some other error');
-        dao.rejectApplication.mockRejectedValue(error);
+        daoTeacher.rejectApplication.mockRejectedValue(error);
 
         await professorApi.decideApplication(mockRequest, mockResponse);
 
@@ -466,7 +470,7 @@ describe("getOwnProposals()", () => {
             }
         ];
   
-        dao.getOwnProposals.mockResolvedValueOnce(proposals);
+        daoTeacher.getOwnProposals.mockResolvedValueOnce(proposals);
  
         await professorApi.getOwnProposals(mockRequest, mockResponse);
 
@@ -477,7 +481,7 @@ describe("getOwnProposals()", () => {
     test("should return error if no proposals found", async () => {
         let error = { error: `No thesis proposals found for teacher ${mockRequest.user.id}` };
       
-        dao.getOwnProposals.mockResolvedValueOnce(error);
+        daoTeacher.getOwnProposals.mockResolvedValueOnce(error);
   
         await professorApi.getOwnProposals(mockRequest, mockResponse);
   
@@ -487,7 +491,7 @@ describe("getOwnProposals()", () => {
   
     test("should handle other errors", async () => {
       const error = new Error('Some error');
-      dao.getOwnProposals.mockRejectedValueOnce(error);
+      daoTeacher.getOwnProposals.mockRejectedValueOnce(error);
   
       await professorApi.getOwnProposals(mockRequest, mockResponse);
   

@@ -2,11 +2,15 @@
 
 const dayjs = require('dayjs');
 const { insertNewApplication, getApplicationsForStudent, getThesisProposals } = require('../routes/controller/student.js'); //import the api to mock
-const dao = require('../dao');
+const daoStudent = require('../daoStudent');
+const daoGeneral = require('../daoGeneral');
+const daoTeacher = require('../daoTeacher');
 
 // here we go again with jest
 
-jest.mock('../dao'); // Mock the dao module
+jest.mock('../daoStudent'); // Mock the daoStudent module
+jest.mock('../daoGeneral'); // Mock the daoStudent module
+jest.mock('../daoTeacher'); // Mock the daoStudent module
 
 describe('tests for insertNewApplication', () => {
   let mockRequest;
@@ -35,7 +39,7 @@ describe('tests for insertNewApplication', () => {
   });
 
   test('should insert a new application successfully', async () => {
-    dao.addApplicationForThesis.mockResolvedValueOnce(1);
+    daoStudent.addApplicationForThesis.mockResolvedValueOnce(1);
 
     await insertNewApplication(mockRequest, mockResponse);
 
@@ -56,7 +60,7 @@ describe('tests for insertNewApplication', () => {
 
   test('should handle a SQLite constraint violation', async () => {
     const error = new Error('SQLITE_CONSTRAINT');
-    dao.addApplicationForThesis.mockRejectedValueOnce(error);
+    daoStudent.addApplicationForThesis.mockRejectedValueOnce(error);
 
     await insertNewApplication(mockRequest, mockResponse);
 
@@ -68,7 +72,7 @@ describe('tests for insertNewApplication', () => {
 
   test('should handle other errors', async () => {
     const error = new Error('Some other error');
-    dao.addApplicationForThesis.mockRejectedValueOnce(error);
+    daoStudent.addApplicationForThesis.mockRejectedValueOnce(error);
 
     await insertNewApplication(mockRequest, mockResponse);
 
@@ -104,10 +108,10 @@ describe('getApplicationsForStudent', () => {
       // Add more application objects as needed
     ];
 
-    dao.getApplicationsForStudent.mockResolvedValueOnce(applications);
-    dao.getTeacherById.mockResolvedValueOnce({ id: 'teacher456', name: 'John Doe' });
-    dao.getThesisProposalById.mockResolvedValueOnce({ id: 'thesis789', title: 'Thesis Title' });
-    dao.getStudentById.mockResolvedValueOnce({ id: 'student123', name: 'Student Name' });
+    daoStudent.getApplicationsForStudent.mockResolvedValueOnce(applications);
+    daoTeacher.getTeacherById.mockResolvedValueOnce({ id: 'teacher456', name: 'John Doe' });
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce({ id: 'thesis789', title: 'Thesis Title' });
+    daoStudent.getStudentById.mockResolvedValueOnce({ id: 'student123', name: 'Student Name' });
 
     await getApplicationsForStudent(mockRequest, mockResponse);
 
@@ -129,7 +133,7 @@ describe('getApplicationsForStudent', () => {
   });
 
   test('should handle no applications found for a student', async () => {
-    dao.getApplicationsForStudent.mockResolvedValueOnce({ error: 'No applications found' });
+    daoStudent.getApplicationsForStudent.mockResolvedValueOnce({ error: 'No applications found' });
 
     await getApplicationsForStudent(mockRequest, mockResponse);
 
@@ -139,7 +143,7 @@ describe('getApplicationsForStudent', () => {
 
   test('should handle an error during the process', async () => {
     const error = new Error('Some error');
-    dao.getApplicationsForStudent.mockRejectedValueOnce(error);
+    daoStudent.getApplicationsForStudent.mockRejectedValueOnce(error);
 
     await getApplicationsForStudent(mockRequest, mockResponse);
 
@@ -175,7 +179,7 @@ describe('getThesisProposals', () => {
       // Add more proposal objects as needed
     ];
 
-    dao.getThesisProposals.mockResolvedValueOnce(proposals);
+    daoStudent.getThesisProposalsByDegree.mockResolvedValueOnce(proposals);
 
     await getThesisProposals(mockRequest, mockResponse);
 
@@ -184,7 +188,7 @@ describe('getThesisProposals', () => {
   });
 
   test('should handle no thesis proposals found for a student course', async () => {
-    dao.getThesisProposals.mockResolvedValueOnce({ error: 'No thesis proposals found' });
+    daoStudent.getThesisProposalsByDegree.mockResolvedValueOnce({ error: 'No thesis proposals found' });
 
     await getThesisProposals(mockRequest, mockResponse);
 
@@ -194,7 +198,7 @@ describe('getThesisProposals', () => {
 
   test('should handle an error during the process', async () => {
     const error = new Error('Some error');
-    dao.getThesisProposals.mockRejectedValueOnce(error);
+    daoStudent.getThesisProposalsByDegree.mockRejectedValueOnce(error);
 
     await getThesisProposals(mockRequest, mockResponse);
 

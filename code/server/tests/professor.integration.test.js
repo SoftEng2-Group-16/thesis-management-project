@@ -4,7 +4,7 @@ process.env.NODE_ENV = 'test';
 const request = require('supertest');
 const sqlite3 = require('sqlite3');
 
-const dao = require("../dao.js")
+const daoTeacher = require("../daoTeacher.js")
 const { app, server } = require('../index');
 
 beforeAll(async () => {
@@ -102,7 +102,7 @@ describe('professor Integration Tests', () => {
 
     test('should return 500 on database error', async () => {
         // Mock your DAO to throw an error
-        jest.spyOn(dao, 'getDegrees').mockRejectedValue(new Error('Database error'));
+        jest.spyOn(daoTeacher, 'getDegrees').mockRejectedValue(new Error('Database error'));
 
         const response = await request(app).get('/api/degrees');
 
