@@ -1,13 +1,15 @@
-const dao = require('../../dao');
+const daoStudent = require('../../daoStudent');
+const daoTeacher = require('../../daoTeacher');
+const daoGeneral = require('../../daoGeneral');
 const models = require('../../model');
 
 const getPossibleCosupervisors = async (req, res) => {
     try {
-        const internals = await dao.getProfessors();
+        const internals = await daoTeacher.getProfessors();
         if (internals.error) {
             return res.status(404).json(internals);
         }
-        const externals = await dao.getExternals();
+        const externals = await daoTeacher.getExternals();
         if (externals.error) {
             return res.status(404).json(externals);
         } else {
@@ -23,7 +25,7 @@ const getPossibleCosupervisors = async (req, res) => {
 
 const getDegreesInfo = async (req, res) => {
     try {
-        const degrees = await dao.getDegrees();
+        const degrees = await daoTeacher.getDegrees();
         if (degrees.error) {
             return res.status(404).json(degrees);
         } else {
@@ -45,13 +47,13 @@ const insertNewProposal = async (req, res) => {
             let [name, surname, id, departmentCode] = [...splitted];
             surname = surname.replace(',', '');
             id = id.replace(',', '');
-            const group = await dao.getGroupForTeacherById(id);
+            const group = await daoTeacher.getGroupForTeacherById(id);
             if (!groups.includes(group)) {
                 groups.push(group);
             }
         }
     }
-    const group = await dao.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
+    const group = await daoTeacher.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
     if (!groups.includes(group)) {
         groups.push(group);
     }
@@ -72,7 +74,7 @@ const insertNewProposal = async (req, res) => {
     );
 
     try {
-        const lastId = await dao.saveNewProposal(proposal);
+        const lastId = await daoTeacher.saveNewProposal(proposal);
         return res.status(201).json(lastId);
     } catch (e) {
         return res.status(500).json(e.message);
@@ -81,7 +83,7 @@ const insertNewProposal = async (req, res) => {
 }
 const getAllApplicationsByProf = async (req, res) => {
     try {
-        const applications = await dao.getAllApplicationsByProf(req.user.id);
+        const applications = await daoTeacher.getAllApplicationsByProf(req.user.id);
         if (applications.error) {
             return res.status(404).json(applications);
         }
@@ -89,11 +91,11 @@ const getAllApplicationsByProf = async (req, res) => {
             const enhancedApplications = [];
             //add the 2 fields with details to the object
             for (const appl of applications) {
-                const studentInfo = await dao.getStudentById(appl.studentId);
-                const thesisInfo = await dao.getThesisProposalById(appl.thesisId, appl.status)
+                const studentInfo = await daoStudent.getStudentById(appl.studentId);
+                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId, appl.status)
                     .then(t => {
                         if (t.error) {
-                            return dao.getThesisProposalById(appl.thesisId)
+                            return daoGeneral.getThesisProposalById(appl.thesisId)
                         } else {
                             return t;
                         }
@@ -137,11 +139,11 @@ const decideApplication = async (req, res) => {
 
     if (decision === "accepted") {
         try {
-            const application = await dao.acceptApplication(thesisId, teacherId, studentId);
-            await dao.cancellPendingApplicationsForAThesis(thesisId, teacherId);
-            await dao.cancellPendingApplicationsOfAStudent(studentId, teacherId);
+            const application = await daoTeacher.acceptApplication(thesisId, teacherId, studentId);
+            await daoGeneral.cancellPendingApplicationsForAThesis(thesisId, teacherId);
+            await daoGeneral.cancellPendingApplicationsOfAStudent(studentId, teacherId);
             //archive the thesis proposal so other students cannot apply to it
-            const proposal = await dao.getThesisProposalById(thesisId)
+            const proposal = await daoGeneral.getThesisProposalById(thesisId)
                 .then(p => {
                     const p2 = new models.ThesisProposal(
                         p.id, //can be whatever, DB handles autoincrement id
@@ -160,8 +162,8 @@ const decideApplication = async (req, res) => {
                     );
                     return p2;
                 });
-            await dao.archiveProposal(proposal)
-            await dao.deleteProposal(proposal.id);
+            await daoTeacher.archiveProposal(proposal)
+            await daoTeacher.deleteProposal(proposal.id);
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
@@ -169,7 +171,7 @@ const decideApplication = async (req, res) => {
     }
     else if (decision === "rejected") {
         try {
-            const application = await dao.rejectApplication(thesisId, teacherId, studentId);
+            const application = await daoTeacher.rejectApplication(thesisId, teacherId, studentId);
             return res.status(200).json(application);
         } catch (e) {
             return res.status(500).json(e.message);
@@ -187,7 +189,7 @@ const getOwnProposals = async (req, res) => {
     // decomment this when calling it from FE
     const teacherId = req.user.id;
     try {
-        const proposals = await dao.getOwnProposals(teacherId);
+        const proposals = await daoTeacher.getOwnProposals(teacherId);
         if (proposals.error) {
             return res.status(404).json(proposals);
         } else {
@@ -195,7 +197,6 @@ const getOwnProposals = async (req, res) => {
         }
     } catch (e) {
         return res.status(500).json(e.message);
-
     }
 }
 
