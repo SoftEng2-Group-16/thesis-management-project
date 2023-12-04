@@ -59,11 +59,18 @@ function NavHeader(props) {
       <Navbar.Collapse id="responsive-navbar-nav" className="lower-navbar w-100">
       <Nav className="me-auto" variant="pills" defaultActiveKey="/">
           {props.loggedIn && props.user.role === 'student' && (
-            <Nav.Item>
+            <>
+            <Nav.Item class>
               <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => props.setMessage('')}>
                 All Thesis
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link as={Link} to="/applications" className='nav-link' eventKey="/applications" onClick={() => props.setMessage('')}>
+                Applications
+              </Nav.Link>
+            </Nav.Item>
+            </>
           )}
 
           {props.loggedIn && props.user.role === 'teacher' && (
