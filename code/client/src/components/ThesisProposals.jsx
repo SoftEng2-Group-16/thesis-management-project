@@ -52,6 +52,7 @@ function ThesisProposals(props) {
         } else {
           proposals = await professorAPI.getOwnThesisProposals(props.user.id);
         }
+
         setAllThesis(proposals);
         setThesis(proposals)
 
@@ -70,6 +71,7 @@ function ThesisProposals(props) {
         setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
         setFilter("title")
         setOptions(uniqueByTitle);
+      
       } catch (error) {
         console.error(error);
         // Handle error
@@ -151,27 +153,31 @@ function ThesisProposals(props) {
 
   return (
     <>
-      {props.loggedIn && !NoProposals ? (
-        <div style={{ marginTop: '10px' }} >
-          <Form className="d-flex">
-            <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
-              <option value="title">Title</option>
-              <option value="supervisor">Supervisor</option>
-              <option value="keywords">Keywords</option>
-              <option value="type">Type</option>
-              <option value="groups">Groups</option>
-              <option value="level">Level</option>
-              {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
-            </Form.Select>
-            <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
-            <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
-            <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
-          </Form>
+      {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
+        <>
+          <Row className="d-flex justify-content-center mt-5" >
+            <Col lg={9} xs={12} md={12} sm={12}>
+              <Form className="d-flex">
+                <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
+                  <option value="title">Title</option>
+                  <option value="supervisor">Supervisor</option>
+                  <option value="keywords">Keywords</option>
+                  <option value="type">Type</option>
+                  <option value="groups">Groups</option>
+                  <option value="level">Level</option>
+                  {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
+                </Form.Select>
+                <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
+                <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
+                <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
+              </Form>
+            </Col>
+          </Row>
 
-          <Row style={{ marginTop: '20px' }}>
-            <Col xs={12}>
-              <Table striped bordered hover>
-                <thead>
+          <Row className="d-flex justify-content-center mt-4">
+            <Col lg={9} xs={12} md={12} sm={12}>
+              <Table striped bordered hover responsive>
+                <thead className="align-middle">
                   <tr>
                     <th>Type</th>
                     <th>Title</th>
@@ -180,7 +186,7 @@ function ThesisProposals(props) {
                     <th>Expiration Date</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="align-middle">
                   {thesis.map((singleThesis) => (
                     <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
                       <td>{singleThesis.type}</td>
@@ -198,12 +204,53 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
-        </div>
-      ) : props.loggedIn && NoProposals ? (
-            <NoThesisProposalsFound />
-      ) : (
-        <div>You need to LOGIN!</div>
-      )}
+        </>
+       : props.user.role == 'teacher'? 
+       <>
+          <Row className="d-flex justify-content-center">
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
+              <Row className="text-start">
+                <h2>Your Proposals</h2>
+              </Row>
+            </Col>
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
+              <Table striped bordered hover responsive>
+                <thead className="align-middle">
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody className="align-middle">
+                  { thesis.map((singleThesis) => (
+                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                      <td>{singleThesis.type}</td>
+                      <td>
+                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                          {singleThesis.title}
+                        </Link>
+                      </td>
+                      <td>{singleThesis.groups.join(', ')}</td>
+                      <td>{singleThesis.supervisor}</td>
+                      <td>{singleThesis.expiration}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+          </>
+       :
+        props.loggedIn && thesis == []?
+        <>
+          <Row>
+              <h3>None thesis proposals to show yet.</h3>
+          </Row>
+        </>
+       : <div>You need to LOGIN!</div>}
     </>
   );
 }
