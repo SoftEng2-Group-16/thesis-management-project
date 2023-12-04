@@ -48,7 +48,7 @@ function NavHeader(props) {
         </div>
       </div>
       {/* Navbar.Brand */}
-      <div className="mb-3">
+      <div className="mb-4">
         <Navbar.Brand className='app-title ms-4'>
           <img src="/poli_logo.svg" alt="image" />
         </Navbar.Brand>

@@ -177,6 +177,9 @@
   background-color: var(--navy);
   padding: 10px 20px;
 }
+.navbar-brand {
+  margin-bottom: 100px;
+}
 
 .app-title {
   color: white;
