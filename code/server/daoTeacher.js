@@ -3,6 +3,7 @@ const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
 const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { getThesisProposalById } = require('./daoGeneral');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -301,3 +302,21 @@ exports.deleteProposal = (proposalId) => {
         )
     });
 }
+
+
+exports.updateThesisProposal = (thesisId, proposal) => {
+    return new Promise((resolve, reject) => {
+        console.log(thesisId);
+        const sql = 'UPDATE thesis_proposals SET title = ?, supervisor = ?, cosupervisors = ?, keywords = ?, type = ?, groups = ?, description = ?, requirements = ?, notes = ?, expiration = ?, level = ?, cds = ? WHERE id = ?';
+        db.run(sql, [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds,thesisId], function (err) {
+            if (err) {
+                reject(err);
+            }
+            if (this.changes !== 1) {
+                resolve({ error: 'thesis not found.' });
+            } else {
+                resolve(getThesisProposalById(thesisId));
+            }
+        });
+    });
+};

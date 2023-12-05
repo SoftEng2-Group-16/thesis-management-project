@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
@@ -9,6 +9,7 @@ function ThesisPage(props) {
   const { state } = useLocation();
   const [thesisDetails, setThesisDetails] = useState(null);
   const studentId = props.user.id;
+
 
   useEffect(() => {
     (state)
@@ -22,8 +23,8 @@ function ThesisPage(props) {
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
-    const teacherId=thesisDetails.supervisor.split(",")[0];
-    studentAPI.insertApplication(studentId, thesisDetails.id,teacherId)
+    const teacherId = thesisDetails.supervisor.split(",")[0];
+    studentAPI.insertApplication(studentId, thesisDetails.id, teacherId)
       .then(() => {
         props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
         navigate('/thesis');
@@ -32,6 +33,9 @@ function ThesisPage(props) {
         props.setMessage({ msg: e, type: 'danger' });
       });
   };
+
+
+
 
   const handleGoBackClick = () => {
     // Navigate back to /thesis
@@ -85,11 +89,18 @@ function ThesisPage(props) {
                 <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
               </Row>
 
+
               {/* Apply button (visible only for students) */}
               {props.user.role === 'student' && (
                 <Button variant="success" className="mt-3" onClick={handleApplyClick}>
                   Apply
                 </Button>
+              )}
+              {/* Apply button (visible only for students) */}
+              {props.user.role === 'teacher' && (
+                <Link className=" mt-3 ms-2 btn btn-outline-primary" to={"/proposal"} state={{ thesisDetails: state.thesisDetails }}>
+                  Edit
+                </Link>
               )}
 
               {/* Go back button */}

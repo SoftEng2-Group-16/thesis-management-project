@@ -42,6 +42,7 @@ const insertNewProposal = async (req, res) => {
     let groups = [];
 
     for (c of cosupervisors) {
+        console.log(c);
         const splitted = c.split(" ");
         if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
             let [name, surname, id, departmentCode] = [...splitted];
@@ -200,6 +201,59 @@ const getOwnProposals = async (req, res) => {
     }
 }
 
+const updateThesisProposal = async (req, res) => {
+    // Is the id in the body equal to the id in the url?
+    if (req.body.id !== Number(req.params.thesisid)) {
+        return res.status(422).json({ error: 'URL and body id mismatch' });
+    }
+    
+    const cosupervisors = req.body.cosupervisors;
+    const supervisor = req.body.supervisor;
+    console.log(supervisor);
+    let groups = [];
+
+    for (c of cosupervisors) {
+        const splitted = c.split(" ");
+        if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
+            let [name, surname, id, departmentCode] = [...splitted];
+            surname = surname.replace(',', '');
+            id = id.replace(',', '');
+            const group = await daoTeacher.getGroupForTeacherById(id);
+            if (!groups.includes(group)) {
+                groups.push(group);
+            }
+        }
+    }
+    const group = await daoTeacher.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
+    if (!groups.includes(group)) {
+        groups.push(group);
+    }
+    let proposal = new models.ThesisProposal(
+        req.body.id,
+        req.body.title,
+        req.body.supervisor,
+        cosupervisors.join('-'),
+        req.body.keywords,
+        req.body.type,
+        groups.join(','),
+        req.body.description,
+        req.body.requirements,
+        req.body.notes,
+        req.body.expiration,
+        req.body.level,
+        req.body.cds.join(',')
+    );
+
+    try {
+        const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
+        if (result.error)
+            res.status(404).json(result);
+        else
+            res.json(result);
+    } catch (err) {
+        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
+    }
+}
 
 module.exports = {
     getPossibleCosupervisors,
@@ -208,4 +262,5 @@ module.exports = {
     getAllApplicationsByProf,
     decideApplication,
     getOwnProposals,
+    updateThesisProposal
 }
