@@ -18,6 +18,8 @@ function ThesisPage(props) {
       return;
     }
     setThesisDetails(state.thesisDetails);
+    console.log("props", props);
+    console.log("thesisDetails", thesisDetails);
   }, [state]);
 
   const handleApplyClick = () => {
@@ -38,7 +40,7 @@ function ThesisPage(props) {
     props.setMessage('');
     navigate('/thesis');
   };
-
+  
   if (!state || !state.thesisDetails || !thesisDetails) {
     return <div>Data Unavailable</div>;
   }
@@ -85,17 +87,24 @@ function ThesisPage(props) {
                 <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
               </Row>
 
-              {/* Apply button (visible only for students) */}
+              <div className='d-flex justify-content-around'>
               {props.user.role === 'student' && (
                 <Button variant="success" className="mt-3" onClick={handleApplyClick}>
                   Apply
                 </Button>
               )}
-
               {/* Go back button */}
-              <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
+              <Button variant="secondary" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
+
+              {/* Delete button (visible only for supervisor) */}
+              {props.user.role === 'teacher' && (
+                <Button variant="danger" className="mt-3" onClick={handleApplyClick}>
+                  Delete Proposal
+                </Button>
+              )}
+              </div>
             </Card.Body>
           </Card>
         </Col>
