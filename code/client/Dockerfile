@@ -1,4 +1,4 @@
-FROM node:alpine3.18 as buildFrontend
+FROM node:alpine3.18 as buildClient
 WORKDIR /var/tmp
 COPY package*.json .
 RUN npm install --silent
