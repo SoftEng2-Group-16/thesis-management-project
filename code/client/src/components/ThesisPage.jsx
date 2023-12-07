@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
+import professorAPI from '../apis/professorAPI';
 
 function ThesisPage(props) {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ function ThesisPage(props) {
   const [thesisDetails, setThesisDetails] = useState(null);
   const studentId = props.user.id;
 
+  const [isAccepted, setAccepted] = useState(false);
 
   useEffect(() => {
     (state)
@@ -19,6 +21,19 @@ function ThesisPage(props) {
       return;
     }
     setThesisDetails(state.thesisDetails);
+    if (props.user.role === "teacher") {
+      professorAPI.getApplications()
+        .then((applications) => {
+          const acceptedApplications = applications.enhancedApplications.filter(item => item.thesisId === state.thesisDetails.thesisId)
+          if (acceptedApplications.lenght > 0) {
+            setAccepted(true);
+          }
+        })
+        .catch(e => {
+          props.setMessage({ msg: e, type: 'danger' });
+        });
+    }
+
   }, [state]);
 
   const handleApplyClick = () => {
@@ -96,9 +111,14 @@ function ThesisPage(props) {
                   Apply
                 </Button>
               )}
-              {/* Apply button (visible only for students) */}
+
               {props.user.role === 'teacher' && (
-                <Link className=" mt-3 ms-2 btn btn-outline-primary" to={"/proposal"} state={{ thesisDetails: state.thesisDetails }}>
+                <Link
+                  className=" mt-3 ms-2 btn btn-outline-primary"
+                  to={"/proposal"}
+                  state={{ thesisDetails: state.thesisDetails }}
+                  disabled={isAccepted}
+                >
                   Edit
                 </Link>
               )}

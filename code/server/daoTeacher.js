@@ -141,6 +141,7 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 };
 
 exports.getAllApplicationsByProf = (idProfessor) => {
+    console.log(idProfessor);
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM applications where teacherid=?'
         db.all(
@@ -306,9 +307,8 @@ exports.deleteProposal = (proposalId) => {
 
 exports.updateThesisProposal = (thesisId, proposal) => {
     return new Promise((resolve, reject) => {
-        console.log(thesisId);
         const sql = 'UPDATE thesis_proposals SET title = ?, supervisor = ?, cosupervisors = ?, keywords = ?, type = ?, groups = ?, description = ?, requirements = ?, notes = ?, expiration = ?, level = ?, cds = ? WHERE id = ?';
-        db.run(sql, [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds,thesisId], function (err) {
+        db.run(sql, [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds, thesisId], function (err) {
             if (err) {
                 reject(err);
             }
@@ -320,3 +320,23 @@ exports.updateThesisProposal = (thesisId, proposal) => {
         });
     });
 };
+
+//**get the thesis proposals for which an application has been accepted by a professor */
+exports.getThesisAccepted = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT thesisid FROM applications WHERE status="accepted"';
+        db.all(
+            sql,
+            [],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    
+                    const thesisIds = rows.map((row) =>`${row.thesisid}` );
+                    resolve(thesisIds);
+                }
+            }
+        );
+    });
+}

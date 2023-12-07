@@ -116,7 +116,7 @@ GET http://localhost:3001/api/thesis/teacher/268555
 
 ###
 #test update proposal
-PUT http://localhost:3001/api/teacher/proposal/2 
+PUT http://localhost:3001/api/teacher/proposal/2
 content-type: application/json
 
 {   

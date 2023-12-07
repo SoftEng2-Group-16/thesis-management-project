@@ -142,7 +142,7 @@ const decideApplication = async (req, res) => {
         try {
             const application = await daoTeacher.acceptApplication(thesisId, teacherId, studentId);
             await daoGeneral.cancellPendingApplicationsForAThesis(thesisId, teacherId);
-            await daoGeneral.cancellPendingApplicationsOfAStudent(studentId, teacherId);
+            await daoGeneral.cancellPendingApplicationsOfAStudent(studentId);
             //archive the thesis proposal so other students cannot apply to it
             const proposal = await daoGeneral.getThesisProposalById(thesisId)
                 .then(p => {
@@ -201,15 +201,22 @@ const getOwnProposals = async (req, res) => {
     }
 }
 
+
 const updateThesisProposal = async (req, res) => {
+
+    
+    const teacherId = req.user.id;
+    if (!teacherId) {
+        return res.status(503).json({ error: "problem with the authentication" });
+    }
+    
     // Is the id in the body equal to the id in the url?
     if (req.body.id !== Number(req.params.thesisid)) {
         return res.status(422).json({ error: 'URL and body id mismatch' });
     }
-    
+
     const cosupervisors = req.body.cosupervisors;
     const supervisor = req.body.supervisor;
-    console.log(supervisor);
     let groups = [];
 
     for (c of cosupervisors) {
@@ -245,6 +252,12 @@ const updateThesisProposal = async (req, res) => {
     );
 
     try {
+        //**check if there is an already accepted application for this proposal */
+        const acceptedThesis = await daoTeacher.getThesisAccepted();
+        console.log(acceptedThesis);
+        if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
+            res.status(400).json({error:"already accepted thesis"})
+        }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
             res.status(404).json(result);
