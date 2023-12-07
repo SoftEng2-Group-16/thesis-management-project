@@ -19,6 +19,7 @@ import DatePicker from "react-datepicker";
 import AsyncSelect from "react-select/async";
 
 import professorAPI from "../apis/professorAPI";
+import generalAPI from "../apis/generalAPI";
 import Select from "react-select";
 
 const ProposalForm = (props) => {
@@ -38,9 +39,7 @@ const ProposalForm = (props) => {
     const [notes, setNotes] = useState((proposal && proposal.notes) || '');
     const [expiration, setExpiration] = useState((proposal && proposal.expiration) || '');
     const [level, setLevel] = useState((proposal && proposal.level) || '');
-    const [cds, setCds] = useState(
-        (proposal && proposal.cds.map(str => ({ value: str, label: str }))) || []
-    );
+    const [cds, setCds] = useState([]);
 
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -93,7 +92,6 @@ const ProposalForm = (props) => {
 
 
 
-
     useEffect(() => {
         professorAPI.getPossibleCosupervisors()
             .then((cosupervisors) => {
@@ -112,6 +110,15 @@ const ProposalForm = (props) => {
         professorAPI.getDegreesInfo()
             .then((degreesInfo) => {
                 setCdsList(degreesInfo.map(str => ({ value: str, label: str })));
+                console.log(degreesInfo);
+
+                if (proposal && proposal.cds.length > 0) {
+                    const transformedCDS = degreesInfo
+                        .filter(str => proposal.cds.includes(str.split(' ')[0]))
+                        .map(item => item.trim())
+                        .map(str => ({ value: str, label: str }));
+                    setCds(transformedCDS);
+                }
 
             })
             .catch((err) => { handleErrors(err); });
@@ -203,7 +210,7 @@ const ProposalForm = (props) => {
             };
             console.log(newProposal);
             if (proposal) {
-                newProposal.id=proposal.id;
+                newProposal.id = proposal.id;
                 editProposal(newProposal)
             } else {
                 insertProposal(newProposal);

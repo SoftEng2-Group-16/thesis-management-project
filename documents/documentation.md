@@ -174,7 +174,7 @@ Students need to get thesis proposals filtered by their course, and professors n
 ## Main Component
 - `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
 - `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
-- `ThesisProposalBro`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
+- `ThesisProposal`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
 - `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there is only a go back button (for now, later we will add the fact that we can modify it only if he is the owner). If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis.
 - `Applications`: This component renders a table of thesis applications, dynamically adapting its display based on the user's role (teacher or student). It efficiently utilizes the ApplicationsTable component to provide a clean and intuitive interface for managing thesis applications within the application..
 
@@ -279,6 +279,11 @@ Students need to get thesis proposals filtered by their course, and professors n
   - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
   - Response body: the updated application {id, status}
 
+- PUT `/api/teacher/proposal/:thesisid`
+  - Description: update a thesis Proposal by passing new values for the desired fields.
+  - Request body: object containing the proposal with the new data and also the id of the proposal to update
+  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
+  - Response body: the updated thesis proposal
 
 
 

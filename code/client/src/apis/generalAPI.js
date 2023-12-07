@@ -66,19 +66,5 @@ const rearrangeProposals = async (newDate) => {
 }
 
 
-// general purpose apis 
-/*const getThesisProposals = async () => {
-  const response = await fetch(SERVER_URL + '/api/thesis', {
-    credentials: 'include',
-  });
-  const proposals = await response.json();
-  if (response.ok) {
-    return proposals
-  } else {
-    throw proposals;  // an object with the error coming from the server
-  }
-};
-*/
-
-const API = { getUserInfo, logIn, logOut, /*getThesisProposals,*/ rearrangeProposals };
+const API = { getUserInfo, logIn, logOut, rearrangeProposals };
 export default API;
