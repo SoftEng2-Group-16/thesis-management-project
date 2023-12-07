@@ -112,3 +112,15 @@ GET http://localhost:3001/api/thesis/student/LM-1
 ###
 # test teacher gets own proposals
 GET http://localhost:3001/api/thesis/teacher/268555
+
+###
+#test teacher can archive own proposal
+#NOTE: userId is given just for test purposes, in real app this will be taken from req.user
+PUT http://localhost:3001/api/teacher/archiveproposal
+content-type: application/json
+
+
+{
+    "proposalId": "0",
+    "userId": "268555" 
+}

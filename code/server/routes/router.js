@@ -31,7 +31,7 @@ router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
 
 router.put('/teacher/applications/:thesisid', auth.isLoggedIn, professor.decideApplication);
 router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplicationsByProf);
-
+router.put('/teacher/archiveproposal', /*auth.isLoggedIn,*/ professor.archiveProposal);
 /*student routes*/
 
 
