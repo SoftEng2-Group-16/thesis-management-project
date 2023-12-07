@@ -203,9 +203,9 @@ const getOwnProposals = async (req, res) => {
 const archiveProposal = async (req,res)  => {
     const proposalId = req.body.proposalId;
     //for manual testing purposes ONLY
-    const userId = req.body.userId;
+    //const userId = req.body.userId;
     //this is the right way: take identity from req.user
-    //const userId = req.user.id;
+    const userId = req.user.id;
 
     try {
         const proposal = await daoGeneral.getThesisProposalById(proposalId);
