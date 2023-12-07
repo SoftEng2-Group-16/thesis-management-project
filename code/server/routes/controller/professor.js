@@ -209,9 +209,17 @@ const archiveProposal = async (req,res)  => {
 
     try {
         const proposal = await daoGeneral.getThesisProposalById(proposalId);
-        if(proposal.error){
+        const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
+
+        if(proposal.error || applications.error){
             return res.status(404).json(proposal);
-        } else if(!proposal.supervisor.match(userId)) {
+        }
+
+        if ( applications.filter( a => a.status === "accepted").length != 0 ) {
+            return res.status(422).json({error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived`});
+        }
+        
+        if(!proposal.supervisor.match(userId)) {
             return res.status(401).json({"error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED`})
         } else {
             const changes = await daoTeacher.archiveProposal(new models.ThesisProposal(
@@ -228,7 +236,15 @@ const archiveProposal = async (req,res)  => {
                 proposal.expiration,
                 proposal.level,
                 proposal.cds.join(',')
-            ))
+            )) //STILL NEED TO MANAGE APPLICATIONS
+                .then( () => {
+                    for (a of applications) {
+                        console.log(a);
+                        if(a.status === "pending"){
+                            daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
+                        }
+                    }
+                })
                 .then( () => {
                     const c = daoTeacher.deleteProposal(proposal.id);
                     return c;
