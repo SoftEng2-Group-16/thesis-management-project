@@ -3,20 +3,7 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
 
 @keyframes logo-spin {
   from {
@@ -91,13 +78,7 @@
   background: #FF6400;
 }
 
-.navbar-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
+
 
 .datepicker-input {
   width: 60%;
@@ -110,9 +91,7 @@
   cursor: pointer;
 }
 
-.app-title {
-  cursor: pointer;
-}
+
 
 .top5 {
   margin-top: 5px;
@@ -168,4 +147,110 @@
 
 .border-top {
   border-top: 1px solid #dee2e6;
+}
+
+/* restyle */
+/* declare variables in root starting with --*/
+
+:root{
+ --navy : #2a4b98;
+ --orange : #ff8036;
+}
+  
+
+/* -------------------Navbar---------------------------- */
+
+.navbar {
+  background-color: var(--navy);
+  padding: 10px 20px;
+}
+.navbar-brand {
+  margin-bottom: 100px;
+}
+
+.app-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Text color */
+.text-light {
+  color: white;
+}
+
+/* Clock icon styling */
+.text-light span {
+  cursor: pointer;
+}
+
+/* Logout button */
+.btn-outline-light {
+  color: white;
+  border-color: white;
+}
+
+.btn-outline-light:hover {
+  background-color: white;
+  color: var(--navy);
+}
+
+/* Styles for Navbar links in the lower part */
+
+.lower-navbar {
+  background-color: var(--orange);
+  padding: 10px 20px;
+  border: 4px solid white;
+  margin-top: 10px;
+}
+
+.nav-link {
+
+  background-color: var(--orange); 
+  color:  white;
+}
+.nav-link:hover{
+  color:  white;
+  text-decoration: underline;
+}
+
+
+/* Styles for active links in the lower part */
+.lower-navbar .nav-link.active {
+  background-color: white;
+  color:  var(--orange);
+  font-size: 1.2rem; /* Adjust the font size as needed */
+
+
+}
+
+/* Styles for Logout button in the lower part */
+.lower-navbar .btn-outline-light {
+  color: white;
+  border-color: white;
+}
+
+.lower-navbar  {
+  background-color: #ff8036;
+  color: white;
+}
+
+.btn-outline-light:hover {
+  background-color: white;
+  color:  #ff8036;
+}
+.navbar-toggler{
+
+  border-radius: 4px; /* Optional: Add border-radius for rounded corners */
+  background-color: white; /* Set the background color */
+  padding: 10px;
+}
+
+/* Styling for the Navbar collapse button when active (open) */
+.navbar-toggler.collapsed {
+
+  border-radius: 4px; /* Optional: Add border-radius for rounded corners */
+  background-color: white; /* Set the background color */
+  padding: 10px;
 }

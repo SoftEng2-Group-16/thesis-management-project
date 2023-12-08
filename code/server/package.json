@@ -6,7 +6,10 @@
   "scripts": {
     "test": "jest",
     "test:unit": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_unit --colors --testPathPattern=tests/.*\\.unit\\.test\\.js$",
-    "test:integration": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_integration --colors --testPathPattern=tests/.*\\.integration\\.test\\.js$"
+    "test:integration": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_integration --colors --testPathPattern=tests/.*\\.integration\\.test\\.js$",
+    "test:spec": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_spec --colors --testPathPattern=tests/.*\\.spec\\.js$",
+    "test:complete": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_complete --colors --testPathPattern='tests/.*\\.spec\\.js|tests/.*\\.unit\\.test\\.js'"
+
   },
   "author": "",
   "license": "ISC",
