@@ -112,3 +112,25 @@ GET http://localhost:3001/api/thesis/student/LM-1
 ###
 # test teacher gets own proposals
 GET http://localhost:3001/api/thesis/teacher/268555
+
+
+###
+#test update proposal
+PUT http://localhost:3001/api/teacher/proposal/2
+content-type: application/json
+
+{   
+    "id":2,
+    "title": "test title2",
+    "supervisor": "268556,Nome Cognome",
+    "cosupervisors": ["Luigi Bianchi, 268554, DAUIN"],
+    "keywords": "test1, test2",
+    "type": "Abroad Thesis",
+    "groups": [],
+    "description": "test description",
+    "requirements": "test requirements",
+    "notes": "test notes",
+    "expiration": "31/12/2023",
+    "level": "master",
+    "cds": ["LM-1", "LM-2"]
+}

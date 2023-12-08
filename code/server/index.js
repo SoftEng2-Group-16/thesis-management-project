@@ -46,7 +46,7 @@ passport.use(new SamlStrategy({
   path: '/login/callback', //motherfucker
   issuer: 'passport-saml',
   cert: cert,
-  acceptedClockSkewMs: 30000 // avoid syncerror Error: SAML assertion not yet valid
+  acceptedClockSkewMs: -1 // avoid syncerror Error: SAML assertion not yet valid
 }, function (profile, done) {
 
 

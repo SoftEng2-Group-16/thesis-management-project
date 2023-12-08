@@ -13,9 +13,9 @@ router.get('/sessions/current', auth.getCurrentSession);
 router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 
 /* general routes*/
-//router.get('/thesis', general.getThesisProposals); 
 router.get('/thesis/student/', auth.isLoggedIn, student.getThesisProposals);
 router.get('/thesis/teacher/', auth.isLoggedIn, professor.getOwnProposals);
+
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
@@ -28,6 +28,7 @@ router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForS
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
+router.put('/teacher/proposal/:thesisid',auth.isLoggedIn, professor.updateThesisProposal);
 
 router.put('/teacher/applications/:thesisid', auth.isLoggedIn, professor.decideApplication);
 router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplicationsByProf);

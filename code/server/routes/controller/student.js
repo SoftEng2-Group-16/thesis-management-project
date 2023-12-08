@@ -14,6 +14,10 @@ const insertNewApplication = async (req, res) => {
         return res.status(422).json({ error: "the student who is sending the application is not the logged in one" });
     }
     try {
+        const acceptedThesis=await daoStudent.getMyThesisAccepted(studentId);
+        if(acceptedThesis.length>0){
+            return res.status(400).json({ error: "already exist an accepted application for this student" });
+        }
         const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId);
         return res.status(201).json(changes);
     } catch (e) {
