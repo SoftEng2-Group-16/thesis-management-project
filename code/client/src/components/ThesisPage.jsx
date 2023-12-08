@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
 import professorAPI from '../apis/professorAPI';
+import MessageContext from '../messageCtx';
 
 function ThesisPage(props) {
   const navigate = useNavigate();
   const { state } = useLocation();
   const [thesisDetails, setThesisDetails] = useState(null);
   const studentId = props.user.id;
+  const { handleErrors } = useContext(MessageContext);
 
   const [isAccepted, setAccepted] = useState(false);
 
@@ -30,7 +32,8 @@ function ThesisPage(props) {
           }
         })
         .catch(e => {
-          props.setMessage({ msg: e, type: 'danger' });
+          console.log(e);
+          handleErrors(e);
         });
     }
 
@@ -45,7 +48,8 @@ function ThesisPage(props) {
         navigate('/thesis');
       })
       .catch(e => {
-        props.setMessage({ msg: e, type: 'danger' });
+        console.log(e);
+       handleErrors(e);
       });
   };
 

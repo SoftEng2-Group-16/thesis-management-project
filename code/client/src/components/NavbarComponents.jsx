@@ -60,7 +60,7 @@ function NavHeader(props) {
       <Nav className="me-auto" variant="pills" defaultActiveKey="/">
           {props.loggedIn && props.user.role === 'student' && (
             <>
-            <Nav.Item class>
+            <Nav.Item >
               <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => props.setMessage('')}>
                 All Thesis
               </Nav.Link>
