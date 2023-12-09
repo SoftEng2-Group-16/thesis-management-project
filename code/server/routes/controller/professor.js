@@ -42,7 +42,6 @@ const insertNewProposal = async (req, res) => {
     let groups = [];
 
     for (c of cosupervisors) {
-        console.log(c);
         const splitted = c.split(" ");
         if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
             let [name, surname, id, departmentCode] = [...splitted];
@@ -214,7 +213,7 @@ const updateThesisProposal = async (req, res) => {
     if (req.body.id !== Number(req.params.thesisid)) {
         return res.status(422).json({ error: 'URL and body id mismatch' });
     }
-
+    //same logic of the insert
     const cosupervisors = req.body.cosupervisors;
     const supervisor = req.body.supervisor;
     let groups = [];
@@ -254,7 +253,6 @@ const updateThesisProposal = async (req, res) => {
     try {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
-        console.log(acceptedThesis);
         if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
             res.status(400).json({error:"already accepted thesis"})
         }

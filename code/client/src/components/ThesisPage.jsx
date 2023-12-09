@@ -27,12 +27,12 @@ function ThesisPage(props) {
       professorAPI.getApplications()
         .then((applications) => {
           const acceptedApplications = applications.enhancedApplications.filter(item => item.thesisId === state.thesisDetails.thesisId)
+          //check if already exist an accepted application for this thesis 
           if (acceptedApplications.lenght > 0) {
-            setAccepted(true);
+            setAccepted(true); //used to enable/disable the edit button
           }
         })
         .catch(e => {
-          console.log(e);
           handleErrors(e);
         });
     }
@@ -49,7 +49,7 @@ function ThesisPage(props) {
       })
       .catch(e => {
         console.log(e);
-       handleErrors(e);
+        handleErrors(e);
       });
   };
 
@@ -116,6 +116,7 @@ function ThesisPage(props) {
                 </Button>
               )}
 
+              {/*edit button */}
               {props.user.role === 'teacher' && (
                 <Link
                   className=" mt-3 ms-2 btn btn-outline-primary"
