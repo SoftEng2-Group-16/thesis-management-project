@@ -47,7 +47,7 @@ describe('Student test', () => {
     // use # for the id
     await page.type('#username', 'mario.rossi@studenti.polito.it');
     await page.type('#password', '200001');
-    const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
     await page.click(buttonSelector);
 
     //use this part above as a login in every test since it's needed.
@@ -115,7 +115,7 @@ describe('Student test', () => {
     // use # for the id
     await page.type('#username', 'mario.rossi@studenti.polito.it');
     await page.type('#password', '200001');
-    const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
     await page.click(buttonSelector);
 
     //use this part above as a login in every test since it's needed.
