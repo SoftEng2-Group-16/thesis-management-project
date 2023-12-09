@@ -141,7 +141,7 @@ const decideApplication = async (req, res) => {
         try {
             const application = await daoTeacher.acceptApplication(thesisId, teacherId, studentId);
             await daoGeneral.cancellPendingApplicationsForAThesis(thesisId, teacherId);
-            await daoGeneral.cancellPendingApplicationsOfAStudent(studentId, teacherId);
+            await daoGeneral.cancellPendingApplicationsOfAStudent(studentId);
             //archive the thesis proposal so other students cannot apply to it
             const proposal = await daoGeneral.getThesisProposalById(thesisId)
                 .then(p => {
@@ -200,6 +200,71 @@ const getOwnProposals = async (req, res) => {
     }
 }
 
+
+const updateThesisProposal = async (req, res) => {
+
+    
+    const teacherId = req.user.id;
+    if (!teacherId) {
+        return res.status(503).json({ error: "problem with the authentication" });
+    }
+    
+    // Is the id in the body equal to the id in the url?
+    if (req.body.id !== Number(req.params.thesisid)) {
+        return res.status(422).json({ error: 'URL and body id mismatch' });
+    }
+    //same logic of the insert
+    const cosupervisors = req.body.cosupervisors;
+    const supervisor = req.body.supervisor;
+    let groups = [];
+
+    for (c of cosupervisors) {
+        const splitted = c.split(" ");
+        if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
+            let [name, surname, id, departmentCode] = [...splitted];
+            surname = surname.replace(',', '');
+            id = id.replace(',', '');
+            const group = await daoTeacher.getGroupForTeacherById(id);
+            if (!groups.includes(group)) {
+                groups.push(group);
+            }
+        }
+    }
+    const group = await daoTeacher.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
+    if (!groups.includes(group)) {
+        groups.push(group);
+    }
+    let proposal = new models.ThesisProposal(
+        req.body.id,
+        req.body.title,
+        req.body.supervisor,
+        cosupervisors.join('-'),
+        req.body.keywords,
+        req.body.type,
+        groups.join(','),
+        req.body.description,
+        req.body.requirements,
+        req.body.notes,
+        req.body.expiration,
+        req.body.level,
+        req.body.cds.join(',')
+    );
+
+    try {
+        //**check if there is an already accepted application for this proposal */
+        const acceptedThesis = await daoTeacher.getThesisAccepted();
+        if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
+            res.status(400).json({error:"already accepted thesis"})
+        }
+        const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
+        if (result.error)
+            res.status(404).json(result);
+        else
+            res.json(result);
+    } catch (err) {
+        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
+    }
+}
 const deleteProposal = async (req, res) => {
     const teacherId = req.user.id;
     const proposalId = req.params.proposalid;
@@ -243,4 +308,5 @@ module.exports = {
     decideApplication,
     getOwnProposals,
     deleteProposal,
+    updateThesisProposal
 }

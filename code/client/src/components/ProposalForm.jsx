@@ -11,33 +11,36 @@
 
 
 import MessageContext from "../messageCtx.jsx"
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from "react";
-
 import "react-datepicker/dist/react-datepicker.css";
 import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 
 import professorAPI from "../apis/professorAPI";
+import generalAPI from "../apis/generalAPI";
+import Select from "react-select";
 
 const ProposalForm = (props) => {
 
     const { handleErrors } = useContext(MessageContext);
     const navigate = useNavigate();
+    const location = useLocation();
+    //retrieve the propsoal object with the data of the proposal to edit from the ThesisPage Componente
+    const proposal = location.state ? location.state.thesisDetails : null; 
 
-    const [title, setTitle] = useState('');
-    //const [supervisor, setSupervisor] = useState(props.user.name + " " + props.user.surname);
-    const [cosupervisorsInt, setCosupervisorsInt] = useState([]); //to save the choice
-    const [cosupervisorsExt, setCosupervisorsExt] = useState([]); //to save the choice
-    const [keywords, setKeywords] = useState('');
-    const [type, setType] = useState('');
-    //const [groups, setGroups] = useState(['']);
-    const [description, setDescription] = useState('');
-    const [requirements, setRequirements] = useState('');
-    const [notes, setNotes] = useState('');
-    const [expiration, setExpiration] = useState('');
-    const [level, setLevel] = useState('');
+    //state fields are pre filled with the data of the proposal to edit if edit mode
+    const [title, setTitle] = useState((proposal && proposal.title) || '');
+    const [cosupervisorsInt, setCosupervisorsInt] = useState((proposal && proposal.cosupervisors.filter(s => s.split(',').length === 3).map(str => ({ value: str, label: str }))) || []);
+    const [cosupervisorsExt, setCosupervisorsExt] = useState((proposal && proposal.cosupervisors.filter(s => s.split(',').length === 2).map(str => ({ value: str, label: str }))) || []);
+    const [keywords, setKeywords] = useState((proposal && proposal.keywords.join(",")) || '');
+    const [type, setType] = useState((proposal && proposal.type) || '');
+    const [description, setDescription] = useState((proposal && proposal.description) || '');
+    const [requirements, setRequirements] = useState((proposal && proposal.requirements) || '');
+    const [notes, setNotes] = useState((proposal && proposal.notes) || '');
+    const [expiration, setExpiration] = useState((proposal && proposal.expiration) || '');
+    const [level, setLevel] = useState((proposal && proposal.level) || '');
     const [cds, setCds] = useState([]);
 
     const [errorMsg, setErrorMsg] = useState('');
@@ -51,14 +54,48 @@ const ProposalForm = (props) => {
 
 
     const [cdsList, setCdsList] = useState()
-    const [filteredCDS, setFilteredCDS] = useState([]);
-    const [cdsIsDisabled, setCdsDisabled] = useState(true);
+    const [cdsIsDisabled, setCdsDisabled] = useState(proposal ? false : true);
 
     const supervisor = `${props.user.id}, ${props.user.name} ${props.user.surname}`
 
+    //used to load the CDS for the AsyncSelect component
+    const loadOptions = () => {
+        return new Promise((resolve) => {
+            if (!cdsList) {
+                professorAPI.getDegreesInfo()
+                    .then((degreesInfo) => {
+                        const list = degreesInfo.map(str => ({ value: str, label: str }));
+                        setCdsList(list);
+                        const filteredOptions = list.filter(cds => {
+                            if (level === 'master') {
+                                return cds.value.startsWith('LM');
+                            } else if (level === 'bachelor') {
+                                return cds.value.startsWith('LT');
+                            }
+                            return true;
+                        });
+                        resolve(filteredOptions);
+                    })
+                    .catch((err) => { handleErrors(err); });
+            }
+            else {
+                const filteredOptions = cdsList.filter(cds => {
+                    if (level === 'master') {
+                        return cds.value.startsWith('LM');
+                    } else if (level === 'bachelor') {
+                        return cds.value.startsWith('LT');
+                    }
+                    return true;
+                });
+
+                resolve(filteredOptions);
+            }
+        });
+    };
+
+
 
     useEffect(() => {
-
         professorAPI.getPossibleCosupervisors()
             .then((cosupervisors) => {
                 setCosupervisorsInternal(cosupervisors.internals.filter(str => {//removes supervisor from internsals
@@ -75,16 +112,28 @@ const ProposalForm = (props) => {
 
         professorAPI.getDegreesInfo()
             .then((degreesInfo) => {
-
                 setCdsList(degreesInfo.map(str => ({ value: str, label: str })));
+                console.log(degreesInfo);
+
+                if (proposal && proposal.cds.length > 0) {
+                    const transformedCDS = degreesInfo
+                        .filter(str => proposal.cds.includes(str.split(' ')[0]))
+                        .map(item => item.trim())
+                        .map(str => ({ value: str, label: str }));
+                    setCds(transformedCDS);
+                }
+
             })
             .catch((err) => { handleErrors(err); });
+
 
     }, []);
 
 
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log(proposal);
         const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt;
 
         const errors = {};
@@ -96,12 +145,7 @@ const ProposalForm = (props) => {
         if (!supervisor || supervisor.trim() === '') {
             errors.supervisor = 'Supervisor is required';
         }
-
-
-        /*  if (cosupervisors.length === 0 || cosupervisorsInt.length===0) {
-              errors.cosupervisors = 'Cosupervisors are required';
-          }
-         */
+        console.log(keywords);
         if (!keywords || keywords.trim() === '') {
             errors.keywords = 'Keywords are required';
         } else {
@@ -118,15 +162,6 @@ const ProposalForm = (props) => {
         if (!description || description.trim() === '') {
             errors.description = 'Description is required';
         }
-
-        /*if (!requirements || requirements.trim() === '') {
-            errors.requirements = 'Requirements are required';
-        }
-
-        if (!notes || notes.trim() === '') {
-            errors.notes = 'Notes are required';
-        }
-        */
 
         if (!expiration || expiration.trim() === '') {
             errors.expiration = 'Expiration date is required';
@@ -162,7 +197,7 @@ const ProposalForm = (props) => {
             );
         } else {
             // Send data
-            const proposal = {
+            const newProposal = {
                 title: title,
                 supervisor: supervisor,
                 cosupervisors: cosupervisors.map(obj => obj.value),
@@ -176,9 +211,14 @@ const ProposalForm = (props) => {
                 level: level,
                 cds: cds.map(obj => obj.value.split(' ')[0]), //should be just the code like LT-2
             };
-            //maybe call api POST
-            insertProposal(proposal);
-            //navigate("/");            
+            console.log(newProposal);
+            if (proposal) {
+                newProposal.id = proposal.id;//add the id of the proposal to update
+                editProposal(newProposal)
+            } else {
+                insertProposal(newProposal);
+            }
+
             setSuccessMessage('Proposal submitted successfully!');
         }
     }
@@ -189,24 +229,28 @@ const ProposalForm = (props) => {
             .catch(err => { handleErrors(err); })
     }
 
+    const editProposal = (proposal) => {
+        professorAPI.editProposal(proposal)
+            .then(() => { })
+            .catch(err => { handleErrors(err); })
+    }
+
     const handleLevelChange = (ev) => {
         setLevel(ev.target.value);
         setCds([]);
-        if (ev.target.value === 'master') {
-            setFilteredCDS(cdsList.filter(cds => cds.value.startsWith("LM")))
+        if (ev.target.value === "master" || ev.target.value === "bachelor") {
             setCdsDisabled(false);
-        }
-        else if (ev.target.value === 'bachelor') {
-
-            setFilteredCDS(cdsList.filter(cds => cds.value.startsWith("LT")));
-            setCdsDisabled(false);
-
         }
         else {
-            setCdsDisabled(true);
+            setCdsDisabled(true)
         }
-
     }
+
+    const handleGoBack = () => {
+        // Navigate back to /thesis
+        props.setMessage('');
+        navigate(-1)
+    };
 
     return (
         <>
@@ -218,13 +262,13 @@ const ProposalForm = (props) => {
                         {successMessage}
                     </Alert>
                 ) :
-                    <Form onSubmit={handleSubmit}>
+                    <Form onSubmit={handleSubmit} id="form-proposal">
                         <Form.Group controlId="title" >
                             <Form.Label column="lg">Title:</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="title"
-                                value={(props.proposal && props.proposal.title) ? props.proposal.title : title}
+                                value={title}
                                 onChange={ev => setTitle(ev.target.value)}
 
                             />
@@ -241,14 +285,13 @@ const ProposalForm = (props) => {
                                 />
                             </Col>
                         </Form.Group>
-
                         <Row>
                             <Col>
                                 <Form.Group as={Row} className="mb-3 mt-3" controlId="cosupervisors">
                                     <Form.Label column>Select internal Cosupervisors (optional)</Form.Label>
                                     <Col sm={7}>
                                         <Select
-                                            defaultValue={[]}
+                                            value={cosupervisorsInt}
                                             isMulti
                                             name="colors"
                                             options={cosupervisorsInternal}
@@ -266,7 +309,7 @@ const ProposalForm = (props) => {
                                     <Form.Label column>Select external Cosupervisors (optional)</Form.Label>
                                     <Col sm={7}>
                                         <Select
-                                            defaultValue={[]}
+                                            value={cosupervisorsExt}
                                             isMulti
                                             name="cosupervisors"
                                             options={cosupervisorsExternal}
@@ -289,7 +332,7 @@ const ProposalForm = (props) => {
                                         <Form.Control
                                             type="text"
                                             name="keywords"
-                                            value={(props.proposal && props.proposal.keywords) ? props.proposal.keywords : keywords}
+                                            value={keywords}
                                             onChange={ev => setKeywords(ev.target.value)}
                                         />
                                     </Col>
@@ -303,7 +346,7 @@ const ProposalForm = (props) => {
                                         <Form.Control
                                             type="text"
                                             name="type"
-                                            value={(props.proposal && props.proposal.type) ? props.proposal.type : type}
+                                            value={type}
                                             onChange={ev => setType(ev.target.value)}
                                         />
                                     </Col>
@@ -317,7 +360,7 @@ const ProposalForm = (props) => {
                             <Form.Control
                                 as="textarea"
                                 name="description"
-                                value={(props.proposal && props.proposal.description) ? props.proposal.description : description}
+                                value={description}
                                 onChange={ev => setDescription(ev.target.value)}
                             />
                         </Form.Group>
@@ -327,7 +370,7 @@ const ProposalForm = (props) => {
                             <Form.Control
                                 as="textarea"
                                 name="requirements"
-                                value={(props.proposal && props.proposal.requirements) ? props.proposal.requirements : requirements}
+                                value={requirements}
                                 onChange={ev => setRequirements(ev.target.value)}
                             />
                         </Form.Group>
@@ -337,7 +380,7 @@ const ProposalForm = (props) => {
                             <Form.Control
                                 as="textarea"
                                 name="notes"
-                                value={(props.proposal && props.proposal.notes) ? props.proposal.notes : notes}
+                                value={notes}
                                 onChange={ev => setNotes(ev.target.value)}
                             />
                         </Form.Group>
@@ -359,14 +402,12 @@ const ProposalForm = (props) => {
                                 <Form.Group as={Row} className="mb-3 mt-3" controlId="cds">
                                     <Form.Label column>Select cds:</Form.Label>
                                     <Col sm={10}>
-                                        <Select
+                                        <AsyncSelect
+                                            key={level}
                                             value={cds}
-                                            defaultValue={[]}
+                                            defaultOptions
                                             isMulti
-                                            name="cds"
-                                            options={filteredCDS}
-                                            className="basic-multi-select"
-                                            classNamePrefix="select"
+                                            loadOptions={loadOptions}
                                             onChange={selectedOptions => setCds(selectedOptions)}
                                             isDisabled={cdsIsDisabled}
                                         />
@@ -381,7 +422,7 @@ const ProposalForm = (props) => {
                                 <Col>
                                     <DatePicker
                                         className='mydatepicker'
-                                        value={(props.proposal && props.proposal.expiration) ? props.proposal.expiration : expiration}
+                                        value={expiration}
                                         onChange={(date) => {
                                             const yyyy = date.getFullYear();
                                             let mm = (date.getMonth() + 1).toString().padStart(2, '0'); // Aggiunge uno zero iniziale se il mese è inferiore a 10
@@ -398,7 +439,11 @@ const ProposalForm = (props) => {
 
 
                         <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
-                            Submit
+                            {proposal ? "Edit" : "Submit"}
+                        </Button>
+                        &nbsp;
+                        <Button variant="danger" style={{ marginTop: '10px' }} onClick={handleGoBack}>
+                            Go Back
                         </Button>
 
                     </Form>
