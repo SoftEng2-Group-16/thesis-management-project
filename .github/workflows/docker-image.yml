@@ -1,12 +1,14 @@
 name: Build and push images
 
 on: 
-    pull_request:
-        branches:
-            - dev
-            - build-action-attempt
-        types:
-            - closed
+  push:
+    branches: build-action-attempt
+  #pull_request:
+   #   branches:
+    #    - dev
+     #   - build-action-attempt
+      #types:
+       # - closed
 jobs:
     build_and_push:
         name: Build and push Docker images to Docker Hub
