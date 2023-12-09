@@ -161,6 +161,28 @@ exports.getAllApplicationsByProf = (idProfessor) => {
     });
 }
 
+exports.getAllApplicationsByThesisId = (thesisId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM applications where thesisid=?'
+        db.all(
+            sql,
+            [thesisId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length == 0) {
+                    resolve({ error: 'No Application found for thesis proposal ' + thesisId });
+                } else {
+                    const applications = rows.map(row => (
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                    ));
+                    resolve(applications);
+                }
+            }
+        );
+    });
+}
+
 exports.getTeacherById = (teacherId) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * from teachers where id=? ';

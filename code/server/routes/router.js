@@ -28,6 +28,7 @@ router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForS
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
+router.delete('/deleteproposal/:proposalid/', auth.isLoggedIn, professor.deleteProposal);
 
 router.put('/teacher/applications/:thesisid', auth.isLoggedIn, professor.decideApplication);
 router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplicationsByProf);

@@ -112,3 +112,7 @@ GET http://localhost:3001/api/thesis/student/LM-1
 ###
 # test teacher gets own proposals
 GET http://localhost:3001/api/thesis/teacher/268555
+
+###
+# test delete proposal
+DELETE http://localhost:3001/api/deleteproposal/3
