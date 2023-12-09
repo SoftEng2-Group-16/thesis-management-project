@@ -121,15 +121,26 @@ function ThesisPage(props) {
                 <Link
                   className=" mt-3 ms-2 btn btn-outline-primary"
                   to={"/proposal"}
-                  state={{ thesisDetails: state.thesisDetails }}
+                  state={{ proposal: state.thesisDetails, mode: 'edit' }}
                   disabled={isAccepted}
                 >
                   Edit
                 </Link>
               )}
 
+              {/*copy button */}
+              {props.user.role === 'teacher' && (
+                <Link
+                  className=" mt-3 ms-2 btn btn-outline-success"
+                  to={"/proposal"}
+                  state={{ proposal: state.thesisDetails, mode: 'copy' }}
+                >
+                  Copy
+                </Link>
+              )}
+
               {/* Go back button */}
-              <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
+              <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
             </Card.Body>
