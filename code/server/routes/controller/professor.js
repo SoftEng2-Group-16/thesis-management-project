@@ -93,13 +93,12 @@ const getAllApplicationsByProf = async (req, res) => {
             //add the 2 fields with details to the object
             for (const appl of applications) {
                 const studentInfo = await daoStudent.getStudentById(appl.studentId);
-                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId, appl.status)
+                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId)
                     .then(t => {
-                        if (t.error) {
-                            return daoGeneral.getThesisProposalById(appl.thesisId)
-                        } else {
+                        if (t.error || t === undefined)
+                            return daoGeneral.getProposalFromArchivedById(appl.thesisId)
+                        else
                             return t;
-                        }
                     });
 
                 enhancedApplications.push({
@@ -204,12 +203,12 @@ const getOwnProposals = async (req, res) => {
 
 const updateThesisProposal = async (req, res) => {
 
-    
+
     const teacherId = req.user.id;
     if (!teacherId) {
         return res.status(503).json({ error: "problem with the authentication" });
     }
-    
+
     // Is the id in the body equal to the id in the url?
     if (req.body.id !== Number(req.params.thesisid)) {
         return res.status(422).json({ error: 'URL and body id mismatch' });
@@ -255,8 +254,8 @@ const updateThesisProposal = async (req, res) => {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
         console.log(acceptedThesis);
-        if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
-            res.status(400).json({error:"already accepted thesis"})
+        if (acceptedThesis.length > 0 && acceptedThesis.includes(proposal.id)) {
+            res.status(400).json({ error: "already accepted thesis" })
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
