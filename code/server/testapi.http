@@ -145,3 +145,7 @@ content-type: application/json
     "level": "master",
     "cds": ["LM-1", "LM-2"]
 }
+
+###
+# test delete proposal
+DELETE http://localhost:3001/api/deleteproposal/3

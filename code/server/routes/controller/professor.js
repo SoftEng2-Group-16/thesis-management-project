@@ -134,7 +134,7 @@ const decideApplication = async (req, res) => {
         return res.status(422).json({ error: "studentId is missing in body" });
     }
     if (isNaN(thesisId) || !Number.isInteger(parseInt(thesisId))) {
-        return res.status(422).json({ error: "thesisId non valido" });
+        return res.status(422).json({ error: "not valid thesisId" });
     }
 
     if (decision === "accepted") {
@@ -325,6 +325,40 @@ const updateThesisProposal = async (req, res) => {
         res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
     }
 }
+const deleteProposal = async (req, res) => {
+    const teacherId = req.user.id;
+    const proposalId = req.params.proposalid;
+
+    if (!teacherId) {
+        return res.status(503).json({ error: "problem with the authentication" });
+    }
+
+    if (isNaN(proposalId) || !Number.isInteger(parseInt(proposalId))) {
+        return res.status(422).json({ error: "not valid proposalId" });
+    }
+    
+    try {
+        // check user is authorized
+        const thesis_proposal = await daoGeneral.getThesisProposalById(proposalId);
+
+        if (thesis_proposal.error) {
+            return res.status(404).json(thesis_proposal);
+        } else {
+            let id = thesis_proposal.supervisor.split(',');
+            if(id[0] !== teacherId){
+                return res.status(401).json("Unauthorized");
+            }
+            // delete all PENDING applications
+            await daoGeneral.cancellPendingApplicationsForAThesis(proposalId, teacherId);
+            // delete proposal
+            const changes = await daoTeacher.deleteProposal(proposalId);
+
+            return res.status(200).json(changes);
+        }
+    } catch (e) {
+        return res.status(500).json(e.message);
+    }
+}
 
 module.exports = {
     getPossibleCosupervisors,
@@ -333,6 +367,7 @@ module.exports = {
     getAllApplicationsByProf,
     decideApplication,
     getOwnProposals,
+    deleteProposal,
     archiveProposal,
     updateThesisProposal
 }
