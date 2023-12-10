@@ -65,6 +65,30 @@ const rearrangeProposals = async (newDate) => {
   }
 }
 
+const sendEmail = async (emailData) => {
+  try {
+    const response = await fetch(SERVER_URL + '/api/notify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(emailData),
+    });
 
-const API = { getUserInfo, logIn, logOut, rearrangeProposals };
+    const res = await response.json();
+
+    if (response.ok) {
+      console.log('Email sent successfully. Email text:', res.emailText);
+      return res;
+    } else {
+      throw res;
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
+};
+
+const API = { getUserInfo, logIn, logOut, rearrangeProposals, sendEmail };
 export default API;
