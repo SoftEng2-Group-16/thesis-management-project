@@ -1,53 +1,53 @@
 const SERVER_URL = 'http://localhost:3001';
 
-const insertApplication = async (studentId, proposalId,teacherid) => {
-    const data = {
-        studentId: studentId,
-        proposalId: proposalId,
-        teacherId:teacherid
-    }
-    const response = await fetch(SERVER_URL + '/api/newapplication', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(data),
-    });
-    if(response.ok) {
-        const ok = response.json();
-        return ok;
-    } else {
-        const errDetails = await response.text();
-      throw errDetails;
-    }
+const insertApplication = async (studentId, proposalId, teacherid) => {
+  const data = {
+    studentId: studentId,
+    proposalId: proposalId,
+    teacherId: teacherid
+  }
+  const response = await fetch(SERVER_URL + '/api/newapplication', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  const res = await response.json();
+  if (response.ok) {
+
+    return res;
+  } else {
+    throw res;
+  }
 }
 
-const getThesisProposals = async() => {
-    const response = await fetch(SERVER_URL + '/api/thesis/student/', {
-      credentials: 'include',
-    });
-  
-    const proposals = await response.json();
-    if(response.ok) {
-      return proposals;
-    } else {
-      throw proposals;
-    }
-  }
+const getThesisProposals = async () => {
+  const response = await fetch(SERVER_URL + '/api/thesis/student/', {
+    credentials: 'include',
+  });
 
-  const getApplications = async () => {
-    const response = await fetch(SERVER_URL + `/api/student/applications`, {
-        credentials: 'include',
-    });
-    const res = await response.json();
-    if (response.ok) {
-      return res; // list of applications related to the logged user
-    }
-    else{
-      throw res;
-    }
+  const proposals = await response.json();
+  if (response.ok) {
+    return proposals;
+  } else {
+    throw proposals;
   }
+}
 
-const studentAPI = { insertApplication, getThesisProposals,getApplications };
+const getApplications = async () => {
+  const response = await fetch(SERVER_URL + `/api/student/applications`, {
+    credentials: 'include',
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res; // list of applications related to the logged user
+  }
+  else {
+    throw res;
+  }
+}
+
+const studentAPI = { insertApplication, getThesisProposals, getApplications };
 export default studentAPI;
