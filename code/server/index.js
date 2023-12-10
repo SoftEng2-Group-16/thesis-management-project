@@ -1,15 +1,16 @@
 'use strict';
-
+// main express related import
 const express = require('express');
 const dayjs = require('dayjs');
 const http = require('http');
-//import router
 const router = require('./routes/router.js');
+const session = require('express-session');
 
 // init express
 const app = new express();
 const port = 3001;
 
+// middlewares
 const morgan = require('morgan');
 const cors = require('cors');
 const dao = require('./daoUsers.js');
@@ -18,27 +19,19 @@ const { check, validationResult, } = require('express-validator'); // validation
 
 // TODO Passport-related imports + new idp import module
 
+// auth imports
 const passport = require('passport');
-
-// passport strategies
-
 const LocalStrategy = require('passport-local'); // well, not anymore my friend
-
-//const auth0Strategy = require('passport-auth0'); //auth0 has his dedicated strategy
-
 const SamlStrategy = require('passport-saml').Strategy;
-
 const fs = require('fs'); // to read the pem file
-
 const path = require('path');
 
-
-const session = require('express-session');
-
-
+// utility imports middleware and setup
 const certPath = path.join(__dirname, './group16-thesis-management-system.pem');
 const cert = fs.readFileSync(certPath, 'utf-8'); // read the certificate
 const bodyParser = require("body-parser"); //needed to read the token from saml
+
+//-------------------------------AUTH0 stuff for SAML2--------------------------------//
 
 
 passport.use(new SamlStrategy({
@@ -69,10 +62,6 @@ const corsOptions = {
   credentials: true
 }
 app.use(cors(corsOptions));
-
-
-// todo here the new strategy, after the auth tho we can keep our dao to fetch data :) i hope
-
 
 passport.serializeUser(function (user, cb) {
   cb(null, user);
