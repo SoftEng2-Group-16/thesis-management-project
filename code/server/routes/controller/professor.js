@@ -200,6 +200,66 @@ const getOwnProposals = async (req, res) => {
     }
 }
 
+const archiveProposal = async (req,res)  => {
+    const proposalId = req.body.proposalId;
+    //for manual testing purposes ONLY
+    //const userId = req.body.userId;
+    //this is the right way: take identity from req.user
+    const userId = req.user.id;
+
+    try {
+        const proposal = await daoGeneral.getThesisProposalById(proposalId);
+        const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
+
+        if(proposal.error || applications.error){
+            return res.status(404).json(proposal);
+        }
+
+        if ( applications.filter( a => a.status === "accepted").length != 0 ) {
+            return res.status(422).json({error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived`});
+        }
+        
+        if(!proposal.supervisor.match(userId)) {
+            return res.status(401).json({"error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED`})
+        } else {
+            const changes = await daoTeacher.archiveProposal(new models.ThesisProposal(
+                proposal.id, //can be whatever, DB handles autoincrement id
+                proposal.title,
+                proposal.supervisor,
+                proposal.cosupervisors.join('-'),
+                proposal.keywords.join(','),
+                proposal.type,
+                proposal.groups.join('-'),
+                proposal.description,
+                proposal.requirements,
+                proposal.notes,
+                proposal.expiration,
+                proposal.level,
+                proposal.cds.join(',')
+            )) //STILL NEED TO MANAGE APPLICATIONS
+                .then( () => {
+                    for (a of applications) {
+                        console.log(a);
+                        if(a.status === "pending"){
+                            daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
+                        }
+                    }
+                })
+                .then( () => {
+                    const c = daoTeacher.deleteProposal(proposal.id);
+                    return c;
+                });
+            if (changes == 1) {
+                return res.status(200).json(changes);
+            } else {
+                return res.status(500).json({error: "Problem encountered while archiving proposal"});
+            }
+        }
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 
 const updateThesisProposal = async (req, res) => {
 
@@ -273,5 +333,6 @@ module.exports = {
     getAllApplicationsByProf,
     decideApplication,
     getOwnProposals,
+    archiveProposal,
     updateThesisProposal
 }
