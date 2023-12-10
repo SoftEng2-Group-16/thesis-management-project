@@ -39,15 +39,15 @@ const nodemailer = require('nodemailer');
     So that I can accept or reject it
 
 
-   TODO A switch case to build the text will do fine
+   TODO A switch case to build the emails will serve well in this case
 */
 
 // general.js
-const buildText = (type, data) => {
+const buildEmail = (type, data) => {
     switch (type) {
-      case 'application':
+      case 'application-decision':
         const { studentName, thesisTitle, decision } = data;
-        const text = `Dear ${studentName},\n\nYour application for the thesis "${thesisTitle}" has been ${decision === 'accepted' ? 'accepted' : 'rejected'}.\n\nBest regards,\nThe Thesis Management Team`;
+        const text = `Dear ${studentName},\n\nYour application for the thesis "${thesisTitle}" has been ${decision === 'accepted' ? 'ACCEPTED' : 'REJECTED'}.\n\nBest regards,\nThe Thesis Management Team`;
         const to = 'thesismanagementstudent@gmail.com';
         return { text, to };
       // Add more cases for other types as needed
@@ -60,7 +60,7 @@ const buildText = (type, data) => {
     const { subject, type, ...data } = req.body; //...data since we will have different kinds of notifications
   
     // Use these parameters to build the email text and recipient's email address
-    const { text, to } = buildText(type, data);
+    const { text, to } = buildEmail(type, data);
   
     const mailOptions = {
       from: 'thesismanagementnoreply@gmail.com',

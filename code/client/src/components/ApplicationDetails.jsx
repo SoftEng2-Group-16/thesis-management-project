@@ -46,7 +46,7 @@ function ApplicationDetails(props) {
   
       const emailData = {
         subject: `Application ${decision === 'accepted' ? 'Accepted' : 'Rejected'}`,
-        type: 'application', //more data here
+        type: 'application-decision', //more data here
         studentName: applInfo.studentInfo.name,
         thesisTitle: applInfo.thesisInfo.title,
         decision: decision,
