@@ -262,7 +262,7 @@ const updateThesisProposal = async (req, res) => {
         else
             res.json(result);
     } catch (err) {
-        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
+        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisid}: ${err}` });
     }
 }
 
