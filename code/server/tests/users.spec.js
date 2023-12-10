@@ -12,7 +12,7 @@ describe('User interactions test', () => {
     // Launch the browser and open a new blank page
     //with headless:false we show the chromium browser
     //with headless:true we don't show the browser running, just the result
-    browser = await puppeteer.launch( {headless: true});
+    browser = await puppeteer.launch( {headless: false});
     page = await browser.newPage();
     //save the db before the changes we are going to do
     const sourcePath = '../server/db_TM_dirty.db';
@@ -49,7 +49,7 @@ describe('User interactions test', () => {
     // use # for the id
     await page.type('#username', 'mario.rossi@studenti.polito.it');
     await page.type('#password', '200001');
-    const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
     await page.click(buttonSelector);
 
     //use this part above as a login in every test since it's needed.
@@ -102,7 +102,7 @@ describe('User interactions test', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -132,7 +132,7 @@ describe('User interactions test', () => {
         window.scrollTo(0, document.body.scrollHeight);
       });
 
-    await page.click('button.mt-3.ms-2.btn.btn-dark');
+    await page.click('button#reject.mt-3.ms-2.btn.btn-dark');
     await page.waitForSelector('div.fade.alert.alert-warning.alert-dismissible.show');
 
     //the professor now logs out and the student logs in
@@ -194,7 +194,7 @@ describe('User interactions test', () => {
    await page.type('#username', 'maria.rossi@polito.it');
    await page.type('#password', '268553');
    //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-   const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+   const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
    await page.click(buttonSelector);
  
    //use this part above as a login in every test since it's needed.

@@ -61,12 +61,12 @@ function NavHeader(props) {
           {props.loggedIn && props.user.role === 'student' && (
             <>
             <Nav.Item >
-              <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => props.setMessage('')}>
+              <Nav.Link as={Link} to="/thesis" id='all-thesis' className="nav-link" eventKey="/thesis" onClick={() => props.setMessage('')}>
                 All Thesis
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link as={Link} to="/applications" className='nav-link' eventKey="/applications" onClick={() => props.setMessage('')}>
+              <Nav.Link as={Link} to="/applications" id='applications' className='nav-link' eventKey="/applications" onClick={() => props.setMessage('')}>
                 Applications
               </Nav.Link>
             </Nav.Item>
@@ -76,17 +76,17 @@ function NavHeader(props) {
           {props.loggedIn && props.user.role === 'teacher' && (
             <>
               <Nav.Item>
-                <Nav.Link as={Link} to="/" className="nav-link" eventKey="/" onClick={() => navigate('/')}>
+                <Nav.Link as={Link} to="/" id='my-proposals' className="nav-link" eventKey="/" onClick={() => navigate('/')}>
                   My Proposals
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link as={Link} to="/proposal" className="nav-link" eventKey="/proposal" onClick={() => navigate('/proposal')}>
+                <Nav.Link as={Link} to="/proposal" id='new-proposal' className="nav-link" eventKey="/proposal" onClick={() => navigate('/proposal')}>
                   New Proposal
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link as={Link} to="/applications" className="nav-link" eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications') }}>
+                <Nav.Link as={Link} to="/applications" id='applications' className="nav-link"  eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications') }}>
                   Applications
                 </Nav.Link>
               </Nav.Item>
