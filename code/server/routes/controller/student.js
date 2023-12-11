@@ -15,7 +15,7 @@ const insertNewApplication = async (req, res) => {
     }
     try {
         const acceptedThesis = await daoStudent.getMyThesisAccepted(studentId);
-        if (acceptedThesis.length > 0) {
+        if ( acceptedThesis && acceptedThesis.length > 0) {
             return res.status(400).json({ error: "already exist an accepted application for this student" });
         }
         const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId);
@@ -53,7 +53,6 @@ const getApplicationsForStudent = async (req, res) => {
                         }
                     });
                 const studentInfo = await daoStudent.getStudentById(appl.studentId);
-
                 enhancedApplications.push({
                     ...appl,
                     teacherInfo,
