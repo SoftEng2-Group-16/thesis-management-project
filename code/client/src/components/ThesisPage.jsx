@@ -53,9 +53,6 @@ function ThesisPage(props) {
       });
   };
 
-
-
-
   const handleGoBackClick = () => {
     // Navigate back to /thesis
     props.setMessage('');
@@ -63,9 +60,17 @@ function ThesisPage(props) {
   };
 
   const handleDeleteProposal = () => {
-    professorAPI.deleteProposal(thesisDetails.id)
-        .then(() => { navigate('/thesis')})
-        .catch(err => { handleErrors(err); })
+
+    // only supervisor can delete a proposal
+    let supervisor = thesisDetails.supervisor.split(",");
+
+    if (supervisor[0] == props.user.id.toString()){
+      professorAPI.deleteProposal(thesisDetails.id)
+          .then(() => { navigate('/thesis')})
+          .catch(err => { handleErrors(err); })
+    } else {
+        props.setMessage({ msg: "Only the supervisor can delete a thesis proposal." });
+    }
   }
 
   if (!state || !state.thesisDetails || !thesisDetails) {
