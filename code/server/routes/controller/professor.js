@@ -285,13 +285,19 @@ const updateThesisProposal = async (req, res) => {
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await daoTeacher.getGroupForTeacherById(id);
-            if (!groups.includes(group)) {
+            if (group.error) {
+                return res.status(404).json(group);
+            }
+            else if (!groups.includes(group)) {
                 groups.push(group);
             }
         }
     }
     const group = await daoTeacher.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
-    if (!groups.includes(group)) {
+    if (group.error) {
+        return res.status(404).json(group);
+    }
+    else if (!groups.includes(group)) {
         groups.push(group);
     }
     let proposal = new models.ThesisProposal(
@@ -314,15 +320,15 @@ const updateThesisProposal = async (req, res) => {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
         if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
-            res.status(400).json({error:"already accepted thesis"})
+            return res.status(400).json({error:"already accepted thesis"})
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
-            res.status(404).json(result);
+            return res.status(404).json(result);
         else
-            res.json(result);
+            return res.status(201).json(result);
     } catch (err) {
-        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
+        return res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisid}: ${err}` });
     }
 }
 const deleteProposal = async (req, res) => {
