@@ -34,6 +34,7 @@ describe('Student test', () => {
       console.error('Error copying database:', error.message);
     }
   });
+  
   test('here a students tries to apply for a thesis that he has already applied for', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -99,8 +100,6 @@ describe('Student test', () => {
     await page.click("button.mt-3.ms-2.btn.btn-danger")
     console.log("We returned to the thesis page and everything went fine")
   });
-
-
 
   test('here a student applies for a thesis that he did not apply for succesfully', async () => {
     // Navigate the page to a URL
