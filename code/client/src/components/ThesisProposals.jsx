@@ -13,6 +13,8 @@ import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 
 function removeDuplicates(array) {
   return array.filter((value, index, self) => self.findIndex(v => v.value === value.value) === index);
@@ -209,9 +211,14 @@ function ThesisProposals(props) {
        <>
           <Row className="d-flex justify-content-center">
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
-              <Row className="text-start">
-                <h2>Your Proposals</h2>
-              </Row>
+            <ToggleButtonGroup type="radio" name="options" defaultValue={1}>
+              <ToggleButton className="toggle-button" id="activeProposals" value={1}>
+                Active Proposals
+              </ToggleButton>
+              <ToggleButton className="toggle-button" id="ArchivedProposals" value={2}>
+                Archived Proposals
+              </ToggleButton>
+            </ToggleButtonGroup>
             </Col>
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
               <Table striped bordered hover responsive>
