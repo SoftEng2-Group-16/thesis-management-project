@@ -548,8 +548,7 @@ describe("updateThesisProposal", () => {
 
       await professorApi.updateThesisProposal(mockRequest, mockResponse);
 
-      // status code missing in the code
-      //expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith(mockRequest.body);
   });
   test("should handle missing authentication", async () => {
@@ -570,20 +569,19 @@ describe("updateThesisProposal", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({ error: 'URL and body id mismatch' });
   });
 
-  // Not handled by the code
-  test.skip('should handle an error during group information retrieval', async () => {
+  test('should handle an error during group information retrieval', async () => {
     const message = { error: 'Prolem while retrieving group info for teacher 268554' };
     daoTeacher.getGroupForTeacherById.mockResolvedValueOnce(message);
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(500);
-    expect(mockResponse.json).toHaveBeenCalledWith(message.error);
+    expect(mockResponse.status).toHaveBeenCalledWith(404);
+    expect(mockResponse.json).toHaveBeenCalledWith(message);
   });
 
   test("should handle already accepted thesis error", async () => {
     const mockAcceptedThesis = [2];
-    daoTeacher.getGroupForTeacherById.mockResolvedValueOnce('Test Group');
+    daoTeacher.getGroupForTeacherById.mockResolvedValue('Test Group');
     daoTeacher.getThesisAccepted.mockResolvedValueOnce(mockAcceptedThesis);
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
