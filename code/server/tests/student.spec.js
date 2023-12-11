@@ -34,6 +34,7 @@ describe('Student test', () => {
       console.error('Error copying database:', error.message);
     }
   });
+  
   test('here a students tries to apply for a thesis that he has already applied for', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -47,7 +48,7 @@ describe('Student test', () => {
     // use # for the id
     await page.type('#username', 'mario.rossi@studenti.polito.it');
     await page.type('#password', '200001');
-    const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
     await page.click(buttonSelector);
 
     //use this part above as a login in every test since it's needed.
@@ -100,8 +101,6 @@ describe('Student test', () => {
     console.log("We returned to the thesis page and everything went fine")
   });
 
-
-
   test('here a student applies for a thesis that he did not apply for succesfully', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -115,7 +114,7 @@ describe('Student test', () => {
     // use # for the id
     await page.type('#username', 'mario.rossi@studenti.polito.it');
     await page.type('#password', '200001');
-    const buttonSelector = 'button.c320322a4.c480bc568.c20af198f.ce9190a97.cbb0cc1ad';
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
     await page.click(buttonSelector);
 
     //use this part above as a login in every test since it's needed.

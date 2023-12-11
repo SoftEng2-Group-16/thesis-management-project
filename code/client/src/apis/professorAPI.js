@@ -89,5 +89,28 @@ const getOwnThesisProposals = async () => {
   }
 }
 
-const professorAPI = { getPossibleCosupervisors, getDegreesInfo,setDecision, insertProposal, getApplications, getOwnThesisProposals }
+
+const editProposal = async (proposal) => {
+  const response = await fetch(SERVER_URL + `/api/teacher/proposal/${proposal.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(proposal),
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
+
+const professorAPI = {
+  getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
+  getApplications, getOwnThesisProposals, editProposal
+}
 export default professorAPI;

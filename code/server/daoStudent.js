@@ -118,3 +118,24 @@ exports.getThesisProposalsByDegree = (degCode) => {
         )
     });
 }
+
+//**get the thesis proposals for which an application has been accepted by a professor */
+exports.getMyThesisAccepted = (studentId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT thesisid FROM applications WHERE studentid=? AND status="accepted"';
+        db.all(
+            sql,
+            [studentId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length > 1) {
+                    resolve({ error: "a student cannot have more than one application accepted" })
+                } else {
+                    const thesisId = rows;
+                    resolve(thesisId);
+                }
+            }
+        );
+    });
+}
