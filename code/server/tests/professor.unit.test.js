@@ -76,7 +76,7 @@ describe('getPossibleCosupervisors', () => {
       const error = new Error('Some error');
       daoTeacher.getProfessors.mockRejectedValueOnce(error);
   
-      await professorApi.getPogetGroupForTeacherByIdssibleCosupervisors(null, mockResponse);
+      await professorApi.getPossibleCosupervisors(null, mockResponse);
   
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith(error.message);
