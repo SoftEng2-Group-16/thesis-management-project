@@ -62,6 +62,12 @@ function ThesisPage(props) {
     navigate('/thesis');
   };
 
+  const handleDeleteProposal = () => {
+    professorAPI.deleteProposal(thesisDetails.id)
+        .then(() => { navigate('/thesis')})
+        .catch(err => { handleErrors(err); })
+  }
+
   if (!state || !state.thesisDetails || !thesisDetails) {
     return <div>Data Unavailable</div>;
   }
@@ -108,11 +114,6 @@ function ThesisPage(props) {
                 <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
               </Row>
 
-              <div className="d-flex justify-content-around">
-              {/* Go back button */}
-              <Button variant="secondary" className="mt-3 ms-2" onClick={handleGoBackClick}>
-                Go Back
-              </Button>
 
               {/* Apply button (visible only for students) */}
               {props.user.role === 'student' && (
@@ -120,14 +121,6 @@ function ThesisPage(props) {
                   Apply
                 </Button>
               )}
-
-              {/* Delete button (visible only for the supervisor) */}
-              {props.user.role === 'teacher' && (
-                <Button variant="danger" className="mt-3" onClick={handleApplyClick}>
-                  Delete Proposal
-                </Button>
-              )}
-              </div>
 
               {/*edit button */}
               {props.user.role === 'teacher' && (
@@ -150,6 +143,13 @@ function ThesisPage(props) {
                 >
                   Copy
                 </Link>
+              )}
+
+              {/* Delete button (visible only for the supervisor) */}
+              {props.user.role === 'teacher' && (
+                <Button variant="outline-danger" className="mt-3" onClick={handleDeleteProposal}>
+                  Delete Proposal
+                </Button>
               )}
 
               {/* Go back button */}

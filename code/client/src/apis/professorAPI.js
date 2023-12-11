@@ -108,9 +108,27 @@ const editProposal = async (proposal) => {
   }
 }
 
+const deleteProposal = async (proposalID) => {
+
+  const response = await fetch(SERVER_URL + `/api/deleteproposal/${proposalID}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
 
 const professorAPI = {
   getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
-  getApplications, getOwnThesisProposals, editProposal
+  getApplications, getOwnThesisProposals, editProposal, deleteProposal
 }
 export default professorAPI;
