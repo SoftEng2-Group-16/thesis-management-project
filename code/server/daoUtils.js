@@ -167,3 +167,38 @@ exports.deleteProposalFromArchived = (proposalId) => {
         )
     });
 }
+
+exports.getVirtualClockDate = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT date FROM vc_date WHERE id=?';
+        db.all(
+            sql,
+            [0],
+            (err,rows) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    resolve(rows[0].date);
+                }
+            }
+        );
+    });
+}
+
+exports.updateVirtualClockDate = (date) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE vc_date SET date=? WHERE id=?'
+        db.run(
+            sql,
+            [date,0],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    //this.cancelApplicationsAfterClockChange();
+                    resolve(this.changes);
+                }
+            }
+        )
+    })
+}

@@ -3,7 +3,7 @@ const daoUtils= require('../../daoUtils');
 const models = require('../../model');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat")
-
+const it = require('dayjs/locale/it')
 
 dayjs.extend(customParseFormat);
 
@@ -73,6 +73,13 @@ const rearrangeProposals = async (req,res) => {
             }
         }
 
+        //update the date in the db
+        const updated = await daoUtils.updateVirtualClockDate(selectedTimestamp);
+        if(updated != 1){
+            console.log(updated);
+            return res.status(500).json({error: 'Problem while updating the date'});
+        }
+        
         //if we get here, all went well
         return res.status(200).json(counterMovedProposals);
     } catch(e) {
@@ -80,6 +87,16 @@ const rearrangeProposals = async (req,res) => {
     }
 }
 
+const getInitialDate = async (req,res) => {
+    try {
+        const date = await daoUtils.getVirtualClockDate();
+        return res.status(200).json(date);
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 module.exports = {
-    rearrangeProposals
+    rearrangeProposals,
+    getInitialDate
 }

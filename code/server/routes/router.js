@@ -36,6 +36,7 @@ router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplication
 /*student routes*/
 
 
-router.put('/clockchanged', utils.rearrangeProposals)
+router.put('/clockchanged', utils.rearrangeProposals);
+router.get('/initialdate', utils.getInitialDate);
 
 module.exports = router;
