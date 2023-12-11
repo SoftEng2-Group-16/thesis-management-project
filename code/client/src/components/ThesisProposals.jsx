@@ -52,25 +52,26 @@ function ThesisProposals(props) {
         } else {
           proposals = await professorAPI.getOwnThesisProposals(props.user.id);
         }
-
-        setAllThesis(proposals);
-        setThesis(proposals)
-
+        
         if (proposals.length === 0) {
           setNoProposals(true);
+        } else {
+          setAllThesis(proposals);
+          setThesis(proposals)
+  
+  
+          const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
+          setTitle(uniqueByTitle);
+          //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
+          setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
+          setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
+          setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
+          setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
+          setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
+          setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
+          setFilter("title")
+          setOptions(uniqueByTitle);
         }
-
-        const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
-        setTitle(uniqueByTitle);
-        //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
-        setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
-        setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
-        setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
-        setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
-        setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
-        setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
-        setFilter("title")
-        setOptions(uniqueByTitle);
       
       } catch (error) {
         console.error(error);
@@ -153,7 +154,7 @@ function ThesisProposals(props) {
 
   return (
     <>
-      {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
+      {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && !NoProposals?
         <>
           <Row className="d-flex justify-content-center mt-5" >
             <Col lg={9} xs={12} md={12} sm={12}>
@@ -205,7 +206,7 @@ function ThesisProposals(props) {
             </Col>
           </Row>
         </>
-       : props.user.role == 'teacher'? 
+       : props.user.role == 'teacher' && !NoProposals? 
        <>
           <Row className="d-flex justify-content-center">
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
@@ -244,27 +245,14 @@ function ThesisProposals(props) {
           </Row>
           </>
        :
-        props.loggedIn && thesis == []?
+        props.loggedIn && NoProposals?
         <>
-          <Row>
-              <h3>None thesis proposals to show yet.</h3>
+          <Row className='mt-4'>
+              <h3>None thesis proposals to show yet</h3>
           </Row>
         </>
        : <div>You need to LOGIN!</div>}
     </>
-  );
-}
-
-function NoThesisProposalsFound() {
-
-  return (
-      <Card className="thesis-card">
-          <Card.Title>
-              No active proposals to show!
-          </Card.Title>
-          <Card.Body>
-          </Card.Body>
-      </Card>
   );
 }
 
