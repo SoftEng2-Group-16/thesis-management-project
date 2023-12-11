@@ -141,7 +141,6 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 };
 
 exports.getAllApplicationsByProf = (idProfessor) => {
-    console.log(idProfessor);
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM applications where teacherid=?'
         db.all(
