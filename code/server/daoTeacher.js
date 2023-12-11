@@ -3,6 +3,7 @@ const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
 const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { getThesisProposalById } = require('./daoGeneral');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -160,6 +161,49 @@ exports.getAllApplicationsByProf = (idProfessor) => {
         );
     });
 }
+exports.getApplicationsByThesisId = (thesisId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM applications WHERE thesisid=?'
+        db.all(
+            sql,
+            [thesisId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length == 0) {
+                    resolve({ error: `Prolem while retrieving applications for proposal ${thesisId}` });
+                } else {
+                    const applications = rows.map(row => (
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                    ));
+                    resolve(applications);
+                }
+            }
+        )
+    });
+}
+
+exports.getAllApplicationsByThesisId = (thesisId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM applications where thesisid=?'
+        db.all(
+            sql,
+            [thesisId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length == 0) {
+                    resolve({ error: 'No Application found for thesis proposal ' + thesisId });
+                } else {
+                    const applications = rows.map(row => (
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                    ));
+                    resolve(applications);
+                }
+            }
+        );
+    });
+}
 
 exports.getTeacherById = (teacherId) => {
     return new Promise((resolve, reject) => {
@@ -299,5 +343,42 @@ exports.deleteProposal = (proposalId) => {
                 }
             }
         )
+    });
+}
+
+
+exports.updateThesisProposal = (thesisId, proposal) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE thesis_proposals SET title = ?, supervisor = ?, cosupervisors = ?, keywords = ?, type = ?, groups = ?, description = ?, requirements = ?, notes = ?, expiration = ?, level = ?, cds = ? WHERE id = ?';
+        db.run(sql, [proposal.title, proposal.supervisor, proposal.cosupervisors, proposal.keywords, proposal.type, proposal.groups, proposal.description, proposal.requirements, proposal.notes, proposal.expiration, proposal.level, proposal.cds, thesisId], function (err) {
+            if (err) {
+                reject(err);
+            }
+            if (this.changes !== 1) {
+                resolve({ error: 'thesis not found.' });
+            } else {
+                resolve(getThesisProposalById(thesisId));
+            }
+        });
+    });
+};
+
+//**get the thesis proposals for which an application has been accepted by a professor */
+exports.getThesisAccepted = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT thesisid FROM applications WHERE status="accepted"';
+        db.all(
+            sql,
+            [],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    
+                    const thesisIds = rows.map((row) =>`${row.thesisid}` );
+                    resolve(thesisIds);
+                }
+            }
+        );
     });
 }

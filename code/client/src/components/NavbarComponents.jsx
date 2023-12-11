@@ -86,7 +86,7 @@ function NavHeader(props) {
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link as={Link} to="/applications" className="nav-link" eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications') }}>
+                <Nav.Link as={Link} to="/applications" id='applications' className="nav-link"  eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications') }}>
                   Applications
                 </Nav.Link>
               </Nav.Item>
