@@ -254,7 +254,6 @@ const updateThesisProposal = async (req, res) => {
     try {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
-        console.log(acceptedThesis);
         if (acceptedThesis.length > 0 && acceptedThesis.includes(proposal.id)) {
             res.status(400).json({ error: "already accepted thesis" })
         }
