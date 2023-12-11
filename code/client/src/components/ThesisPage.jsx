@@ -147,13 +147,13 @@ function ThesisPage(props) {
 
               {/* Delete button (visible only for the supervisor) */}
               {props.user.role === 'teacher' && (
-                <Button variant="outline-danger" className="mt-3" onClick={handleDeleteProposal}>
+                <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleDeleteProposal}>
                   Delete Proposal
                 </Button>
               )}
 
               {/* Go back button */}
-              <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
+              <Button variant="outline-secondary" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
             </Card.Body>
