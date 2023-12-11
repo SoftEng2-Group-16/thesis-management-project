@@ -80,7 +80,7 @@ describe('tests for insertNewApplication', () => {
     expect(mockResponse.json).toHaveBeenCalledWith(error.message);
   });
   test('should handle an already accepted application for the student', async () => {
-    const acceptedThesis = [{thesisid:3},{thesisid:3}];
+    const acceptedThesis = [{ thesisid: 3 }, { thesisid: 3 }];
     daoStudent.getMyThesisAccepted.mockResolvedValueOnce(acceptedThesis);
 
     await insertNewApplication(mockRequest, mockResponse);
