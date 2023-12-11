@@ -338,23 +338,12 @@ const deleteProposal = async (req, res) => {
     }
     
     try {
-        // check user is authorized
-        const thesis_proposal = await daoGeneral.getThesisProposalById(proposalId);
-
-        if (thesis_proposal.error) {
-            return res.status(404).json(thesis_proposal);
-        } else {
-            let id = thesis_proposal.supervisor.split(',');
-            if(id[0] !== teacherId){
-                return res.status(401).json("Unauthorized");
-            }
-            // delete all PENDING applications
-            await daoGeneral.cancellPendingApplicationsForAThesis(proposalId, teacherId);
-            // delete proposal
-            const changes = await daoTeacher.deleteProposal(proposalId);
-
-            return res.status(200).json(changes);
-        }
+        // delete all PENDING applications
+        await daoGeneral.cancellPendingApplicationsForAThesis(proposalId, teacherId);
+        // delete proposal
+        const changes = await daoTeacher.deleteProposal(proposalId);
+        
+        return res.status(200).json(changes);
     } catch (e) {
         return res.status(500).json(e.message);
     }
