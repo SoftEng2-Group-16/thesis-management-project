@@ -45,7 +45,8 @@ const insertNewProposal = async (req, res) => {
         console.log(c);
         const splitted = c.split(" ");
         if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
-            let [name, surname, id, departmentCode] = [...splitted];
+            let surname = splitted[1];
+            let id = splitted[2];
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await daoTeacher.getGroupForTeacherById(id);

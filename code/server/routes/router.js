@@ -24,7 +24,6 @@ router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
 // REMEMBER to update documentation
 router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForStudent);
 
-//router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);

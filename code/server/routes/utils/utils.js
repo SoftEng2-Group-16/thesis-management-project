@@ -16,7 +16,7 @@ const rearrangeProposals = async (req,res) => {
         const acceptedProposalsIds = await daoUtils.getAcceptedApplicationsIds(); //either array of ids or empty
  
         if(expiredProposals.length > 0 && !expiredProposals.error) {
-            for (p of expiredProposals) {
+            for (const p of expiredProposals) {
                 await daoTeacher.archiveProposal(new models.ThesisProposal(
                     p.id,
                     p.title,
@@ -44,7 +44,7 @@ const rearrangeProposals = async (req,res) => {
         }
         
         if(proposalsToRevive.length > 0 && !proposalsToRevive.error) {
-            for (p of proposalsToRevive) { 
+            for (const p of proposalsToRevive) { 
                 if(!acceptedProposalsIds.includes(p.id)) {
                     await daoTeacher.saveNewProposal(new models.ThesisProposal(
                         p.id,
