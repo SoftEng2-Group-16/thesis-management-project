@@ -44,15 +44,15 @@ const getApplicationsForStudent = async (req, res) => {
             //add the 2 fields with details to the object
             for (const appl of applications) {
                 const teacherInfo = await daoTeacher.getTeacherById(appl.teacherId);
-                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId, appl.status)
+                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId)
                     .then(t => {
-                        if (t.error) {
-                            return daoGeneral.getThesisProposalById(appl.thesisId)
-                        } else {
+                        if(t.error || t === undefined)
+                            return daoGeneral.getProposalFromArchivedById(appl.thesisId)
+                        else
                             return t;
-                        }
                     });
-                const studentInfo = await daoStudent.getStudentById(appl.studentId);
+                console.log(thesisInfo);
+                const studentInfo = await daoStudent.getStudentById(appl.studentId); //Why? Should be in the session cookie
 
                 enhancedApplications.push({
                     ...appl,

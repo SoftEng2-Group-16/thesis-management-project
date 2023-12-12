@@ -44,7 +44,8 @@ const insertNewProposal = async (req, res) => {
     for (c of cosupervisors) {
         const splitted = c.split(" ");
         if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
-            let [name, surname, id, departmentCode] = [...splitted];
+            let surname = splitted[1];
+            let id = splitted[2];
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await daoTeacher.getGroupForTeacherById(id);
@@ -92,13 +93,12 @@ const getAllApplicationsByProf = async (req, res) => {
             //add the 2 fields with details to the object
             for (const appl of applications) {
                 const studentInfo = await daoStudent.getStudentById(appl.studentId);
-                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId, appl.status)
+                const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId)
                     .then(t => {
-                        if (t.error) {
-                            return daoGeneral.getThesisProposalById(appl.thesisId)
-                        } else {
+                        if (t.error || t === undefined)
+                            return daoGeneral.getProposalFromArchivedById(appl.thesisId)
+                        else
                             return t;
-                        }
                     });
 
                 enhancedApplications.push({
@@ -202,9 +202,6 @@ const getOwnProposals = async (req, res) => {
 
 const archiveProposal = async (req,res)  => {
     const proposalId = req.body.proposalId;
-    //for manual testing purposes ONLY
-    //const userId = req.body.userId;
-    //this is the right way: take identity from req.user
     const userId = req.user.id;
 
     try {
@@ -263,12 +260,12 @@ const archiveProposal = async (req,res)  => {
 
 const updateThesisProposal = async (req, res) => {
 
-    
+
     const teacherId = req.user.id;
     if (!teacherId) {
         return res.status(503).json({ error: "problem with the authentication" });
     }
-    
+
     // Is the id in the body equal to the id in the url?
     if (req.body.id !== Number(req.params.thesisid)) {
         return res.status(422).json({ error: 'URL and body id mismatch' });
@@ -285,13 +282,19 @@ const updateThesisProposal = async (req, res) => {
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await daoTeacher.getGroupForTeacherById(id);
-            if (!groups.includes(group)) {
+            if (group.error) {
+                return res.status(404).json(group);
+            }
+            else if (!groups.includes(group)) {
                 groups.push(group);
             }
         }
     }
     const group = await daoTeacher.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
-    if (!groups.includes(group)) {
+    if (group.error) {
+        return res.status(404).json(group);
+    }
+    else if (!groups.includes(group)) {
         groups.push(group);
     }
     let proposal = new models.ThesisProposal(
@@ -313,16 +316,17 @@ const updateThesisProposal = async (req, res) => {
     try {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
+
         if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
-            res.status(400).json({error:"already accepted thesis"})
+            return res.status(400).json({error:"already accepted thesis"})
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
-            res.status(404).json(result);
+            return res.status(404).json(result);
         else
-            res.json(result);
+            return res.status(201).json(result);
     } catch (err) {
-        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
+        return res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisid}: ${err}` });
     }
 }
 const deleteProposal = async (req, res) => {

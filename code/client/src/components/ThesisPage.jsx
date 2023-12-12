@@ -33,7 +33,10 @@ function ThesisPage(props) {
           }
         })
         .catch(e => {
-          handleErrors(e);
+          //no application found for the professor, not a problem in this case
+          if (err.error && err.status !== 404) {
+            handleErrors(e);
+          }
         });
     }
 
@@ -73,7 +76,7 @@ function ThesisPage(props) {
         <Col md={{ span: 8, offset: 2 }}>
           <Card className="thesis-card">
             <Card.Body>
-              <Card.Title className="border-bottom pb-2 mb-4">{thesisDetails.title}</Card.Title>
+              <Card.Title className="border-bottom pb-2 mb-4" id="card-title">{thesisDetails.title}</Card.Title>
 
               {/* Grouping related information */}
               <Row className="mb-4">
