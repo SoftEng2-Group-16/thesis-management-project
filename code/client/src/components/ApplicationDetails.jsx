@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, CardText } from 'react-bootstrap';
 import API from '../apis/professorAPI';
+import APIgeneral from '../apis/generalAPI.js'
 import MessageContext from "../messageCtx.jsx"
 import '../App.css';
 
@@ -31,16 +32,39 @@ function ApplicationDetails(props) {
     navigate('/applications');
   }
 
-  const handleDecision = (decision) => {
-    const data = { thesisid: applInfo.thesisInfo.id, body: { decision: decision, studentId: applInfo.studentInfo.id } };
-    API.setDecision(data).then(() => {
-      props.setMessage({ msg: (decision==="accepted" ? 'Application accepted successfully!' :'Application rejected!') , type: (decision === "accepted" ? "success" : "warning") });
+  const handleDecision = async (decision) => {
+    try {
+      const data = {
+        thesisid: applInfo.thesisInfo.id,
+        body: {
+          decision: decision,
+          studentId: applInfo.studentInfo.id,
+        },
+      };
+  
+      await API.setDecision(data);
+  
+      const emailData = {
+        subject: `Application ${decision === 'accepted' ? 'Accepted' : 'Rejected'}`,
+        type: 'application-decision', //more data here
+        studentName: applInfo.studentInfo.name,
+        thesisTitle: applInfo.thesisInfo.title,
+        decision: decision,
+      };
+  
+      await APIgeneral.sendEmail(emailData);
+  
+      props.setMessage({
+        msg: decision === 'accepted' ? 'Application accepted successfully!' : 'Application rejected!',
+        type: decision === 'accepted' ? 'success' : 'warning',
+      });
+  
       // Navigate back to the list of applications
       navigate('/applications');
-    })
-      .catch((err) => {
-        handleErrors(err);
-      });
+    } catch (error) {
+      // Handle errors for both API calls here
+      handleErrors(error);
+    }
   }
 
   if (!state || !state.applicationDetails || !applInfo) {
