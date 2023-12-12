@@ -196,6 +196,10 @@
   color: var(--navy);
 }
 
+.clock-icon:hover {
+  cursor: pointer;
+}
+
 /* Styles for Navbar links in the lower part */
 
 .lower-navbar {
