@@ -1,4 +1,3 @@
-# Table of Contents
 
 # Table of Contents
 
@@ -16,6 +15,7 @@
          3. [CAREERS](#careers)
          4. [DEGREES](#degrees)
          5. [THESIS_PROPOSALS](#thesis-proposals)
+   5. [Nofification System](#notification-system)
 4. [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
    1. [Update get thesis proposals](#update-get-thesis-proposals)
 5. [React Client Application Routes](#react-client-application-routes)
@@ -29,15 +29,26 @@
 
 ### Changes
 
-*we should put here the changes between the sprint*
+**we should put here the changes between the sprint**
+
+*Sprint 1*:
+- I don't remember
+
+*Sprint 2*:
+- SAML2 for authentication
+- Automated E2E testing
+
+*Sprint 3*:
+- Notification System
 
 ### Stories
 
-*put here the table of stories committed with references to the sprint*
+*put here A TABLE of stories committed with references to the sprint and story points*
 
 # General Information about the project implementation
 
 ## AUTH v.1.0
+(obsolete)
 
 The authentication it's realized with passport framework, email and password are stored in the database with encrypted passwords and randomly (but manually) generated salt for the time being, since there is no registration process yet.
 
@@ -60,7 +71,8 @@ The login is performed with email and password, the system check if there is a r
 
 ## AUTH v.2.0
 
-For demo 2 the application perform authentication using the SAML 2.0 protocol, this is conveniently realized trough passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
+Starting from demo2 the application performs authentication using the SAML 2.0 protocol, this is conveniently realized trough passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
+The credential remain the same of AUTH 1.0.
 
 ```
 passport.use(new SamlStrategy({
@@ -160,6 +172,18 @@ LM-1 | Computer Engineering
 
 *If you need a tool to explore the DB, you can try 'DB Browser for SQLITE' for Windows Desktop*
 
+
+### Notification System
+
+Starting from demo3 the application implements a notification system by email. Since the users in the database are using fake emails but with a real domain `polito.it`, we couldn't use the aforementioned email to actual sending notification, instead, we use a single real `gmail.com` address for each type of user in which all the emails will be received and another account for the system to send the emails.
+
+- `thesismanagementnoreply@gmail.com`: the address that the application uses to send emails.
+- `thesismanagementstudent@gmail.com`: the address in which we receive the emails for any student.
+- `thesismanagementteacher@gmail.com`: the address in which we receive the emails for any teacher.
+
+The email server is realized using a popular js library for express, `nodemailer` and uses SMTP protocol along side the "Password App" authentication configured in the system google account.
+
+- DEMO 3: a notification is sent to the student when a professor takes a decision about his application.
 
 ## Useful ideas and future development needs
 ### Update get thesis proposals
