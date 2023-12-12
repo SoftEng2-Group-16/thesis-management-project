@@ -43,6 +43,7 @@ function ThesisProposals(props) {
   const [version, setVersion] = useState(0);
   const animatedComponents = makeAnimated();
   const [NoProposals, setNoProposals] = useState(false);
+  const [checkedButton, setCheckedButton] = useState(true);
 
   useEffect(() => {
 
@@ -153,6 +154,10 @@ function ThesisProposals(props) {
 
   }
 
+  function changeProposalsButtonState() {
+    setCheckedButton(!checkedButton);
+  }
+
   return (
     <>
       {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
@@ -212,10 +217,10 @@ function ThesisProposals(props) {
           <Row className="d-flex justify-content-center">
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
             <ToggleButtonGroup type="radio" name="options" defaultValue={1}>
-              <ToggleButton className="toggle-button" id="activeProposals" value={1}>
+              <ToggleButton className={checkedButton? "active-toggle-button" : "not-active-toggle-button"} id="activeProposals" value={1} onClick={changeProposalsButtonState}>
                 Active Proposals
               </ToggleButton>
-              <ToggleButton className="toggle-button" id="ArchivedProposals" value={2}>
+              <ToggleButton className={checkedButton? "not-active-toggle-button" : "active-toggle-button"} id="ArchivedProposals" value={2} onClick={changeProposalsButtonState}>
                 Archived Proposals
               </ToggleButton>
             </ToggleButtonGroup>
