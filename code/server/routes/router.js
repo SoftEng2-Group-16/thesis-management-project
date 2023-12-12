@@ -15,6 +15,7 @@ router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 /* general routes*/
 router.get('/thesis/student/', auth.isLoggedIn, student.getThesisProposals);
 router.get('/thesis/teacher/', auth.isLoggedIn, professor.getOwnProposals);
+router.get('/archive/thesis/', auth.isLoggedIn, professor.getOwnArchivedProposals);
 
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
