@@ -103,5 +103,5 @@ const sendEmail = async (emailData) => {
   }
 };
 
-const API = { getUserInfo, logIn, logOut, rearrangeProposals, getInitialDate };
+const API = { getUserInfo, logIn, logOut, rearrangeProposals, getInitialDate, sendEmail };
 export default API;
