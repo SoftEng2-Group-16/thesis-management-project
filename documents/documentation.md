@@ -32,7 +32,7 @@
 **we should put here the changes between the sprint**
 
 *Sprint 1*:
-- I don't remember
+- Beginning of development
 
 *Sprint 2*:
 - SAML2 for authentication
@@ -48,14 +48,14 @@
 # General Information about the project implementation
 
 ## AUTH v.1.0
-(obsolete see AUTH 2.0 that follows)
+(**NOTE**: it's obsolete)
 
-The authentication it's realized with passport framework, email and password are stored in the database with encrypted passwords and randomly (but manually) generated salt for the time being, since there is no registration process yet.
+The authentication is realized with Passport framework, email and password are stored in the database with encrypted passwords and randomly (but manually) generated salt for the time being, since there are no specific requirements for the first sprint.
 
-The Credentials have been generated using https://www.browserling.com/tools/scrypt
+Credentials have been generated using https://www.browserling.com/tools/scrypt
 and can be tested with its relative counterpart tool https://www.browserling.com/tools/scrypt-check
 
-The login is performed with email and password, the system check if there is a related email in the *auth* table that has a correspondant hashed password, then, afther authentication succeds, fetch all the info of the user from the tables *student* or *teachers*, based on the role.
+The login is performed with email and password, with a local strategy. The system checks if there is a related email in the *auth* table that has a correspondant hashed password, then, if authentication succeds, fetches all the info of the user from the tables *student* or *teachers*, based on the role.
 
 
 |   Email                     |   Password    |   Role   |
@@ -71,21 +71,18 @@ The login is performed with email and password, the system check if there is a r
 
 ## AUTH v.2.0
 
-Starting from demo2 the application performs authentication using the SAML 2.0 protocol, this is conveniently realized trough passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
+Starting from demo2 (1st release) the application performs authentication using the SAML 2.0 protocol, this is conveniently realized through Passport but with a new strategy `passport-saml` and https://auth0.com/ as IDP.
 The credential remain the same of AUTH 1.0.
 
-```
+```js
 passport.use(new SamlStrategy({
   entryPoint: 'https://group16-thesis-management-system.eu.auth0.com/samlp/7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
-  path: '/login/callback', //motherfucker
+  path: '/login/callback',
   issuer: 'passport-saml',
   cert: cert,
-  acceptedClockSkewMs: 30000 // avoid syncerror Error: SAML assertion not yet valid
+  acceptedClockSkewMs: -1 // avoid syncerror Error: SAML assertion not yet valid
 }, function (profile, done) {
-
-
-  return done(null, //take from the Saml token the parameters so that will be available in req.user ffs
-    {
+  return done(null, {//take from the Saml token the parameters so that will be available in req.user 
       id: profile['nameID'],
       email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
       displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
@@ -95,54 +92,48 @@ passport.use(new SamlStrategy({
 }));
 
 ```
-### Strategy Description
+### Description
+- Parameters we need to provide:
+  - `entryPoint` of the Auth0 tenant 
+  - `path`, where we need to be redirected (on our server) after performing authentication on the IDP; here, the SAML assertion (result of authentication) is avaliable to determine if login was successful or not
+  - `issuer`, who's managing the authentication, in this case the `passport-saml` library
+  - `certificate`, stored in the server, provided by the Auth0 tenant during the set up phase
+  - `acceptedClockSkews` this is an option for SAML2.0 protocol to allow a little bit of gap in terms of time differences between our server clock and Auth0's one.
 
-- In the main strategy we see parameters used by the strategy in this order:
-  - `entryPoint` of auth0 for Saml2 protocol 
-  - `callback` path, that is the api in which the login request return after performing authentication on the idp, here we have avaialable the SAML assertion
-  -`issuer`, in this case the library itself that that the process
-  - `certificate`, stored in the server, provided by the auth0 tenantsm used by the saml protocol
-  - `acceptedClockSkews` this is an option for saml2 protocol to allow a little bit of gap in terms of time differences between our server clock and auth0's one.
-
-- In the middleware we fetch some data from the response schema, this are used in the callback to perform a lookup in our local db, so we can finally initialize our expression session with all the data related to the user, that are not present in auth0.
-
-
-
+- In the middleware, after interrogating the IDP, we fetch some data based on the response and use it in the callback to perform a lookup in our local db, so we can finally initialize our Express session with all the data related to the current user.
 
 
 ### SESSIONS
 
 The session is initialized with these user data.
-```
-student:
-{
+```json
+student: {
   id: 200001,
-  surname: 'Rossi',
-  name: 'Mario',
-  role: 'student',
-  email: 'mario.rossi@studenti.polito.it',
-  gender: 'M',
-  nationality: 'Italian',
-  degree_code: 'LM-1',
-  enrollment_year: '2010'
+  surname: "Rossi",
+  name: "Mario",
+  role: "student",
+  email: "mario.rossi@studenti.polito.it",
+  gender: "M",
+  nationality: "Italian",
+  degree_code: "LM-1",
+  enrollment_year: "2010"
 }
 
-professor:
-{
+professor: {
   id: 268554,
-  surname: 'Bianchi',
-  name: 'Luigi',
-  role: 'teacher',
-  email: 'luigi.bianchi@polito.it',
-  group_code: 'SO',
-  department_code: 'DAUIN'
+  surname: "Bianchi",
+  name: "Luigi",
+  role: "teacher",
+  email: "luigi.bianchi@polito.it",
+  group_code: "SO",
+  department_code: "DAUIN"
 }
 
 ```
-
 
 
 ## Database Structure
+### Example rows (one for each table)
 
 #### STUDENTS
 | id  | surname  | name | gender | nationality | email | degree_code | enrollment_year
@@ -175,28 +166,27 @@ LM-1 | Computer Engineering
 
 ### Notification System
 
-Starting from demo3 the application implements a notification system by email. Since the users in the database are using fake emails but with a real domain `polito.it`, we couldn't use the aforementioned email to actual sending notification, instead, we use a single real `gmail.com` address for each type of user in which all the emails will be received and another account for the system to send the emails.
+Starting from demo3 the application, implements a notification system by email. Since the users in the database are using fake emails but with a real domain `polito.it`, we couldn't use the aforementioned email to actual sending notification, instead, we use a single real `gmail.com` address for each type of user in which all the emails will be received and another account for the system to send the emails.
 
 - `thesismanagementnoreply@gmail.com`: the address that the application uses to send emails.
 - `thesismanagementstudent@gmail.com`: the address in which we receive the emails for any student.
 - `thesismanagementteacher@gmail.com`: the address in which we receive the emails for any teacher.
 
-The email server is realized using a popular js library for express, `nodemailer` and uses SMTP protocol along side the "Password App" authentication configured in the system google account.
+The email system is realized using a popular js library for Express, `nodemailer` and uses SMTP protocol along side the "Password App" authentication configured in the Google account settings (for the no-reply account).
 
 The backend makes use of an internal method to build the email called `buildEmail`, this method **must** receive two mandatory parameters from the front end api:
 
-- `type`: the type of notification that needs to send, for example "application", used in the switch case to decide how to body of the email and to which address will be sent.
-- `subject`: the text to put in the subject of the email (usually easier to build in the front-end where all data are available)
+- `type`: the type of notification that needs to send, used to decide how the body of the email will be like and who to send the notification to.
+- `subject`: the text to put in the subject of the email (usually easier to build in the front-end where all data is available)
 
-- additional parameters received related to the email will be stored in a **Rest Parameter** `(...data)`, these are used in the switch case to build the text, like *"hello {studentname}"* .
+- additional parameters received related to the email will be stored in a **Rest Parameter** `(...data)`, these are used to build the final email content.
 
 **Notifications implemented:**
 
 - DEMO 3: a notification is sent to the student when a professor takes a decision about his application.
 
 ## Useful ideas and future development needs
-### Update get thesis proposals
-Students need to get thesis proposals filtered by their course, and professors need to get only their own thesis proposals (so the ones containing the corresponding teacher id), so it might be a good idea to split the two apis into one since the filtering needs to be done on a different field. Tests need to be update accordingly.
+None yet...
 
 ## React Client Application Routes
 
@@ -214,44 +204,73 @@ Students need to get thesis proposals filtered by their course, and professors n
 
 ## API Server
 
-## Template for API Desription
+### API Description
 
+### Session APIs:
 - POST `/api/sessions`
   - Description: request for login
   - Request body:
     - object {`username`,`password`}
   - Response: `200 OK` (success)
-    - Response body:
-      - object user {`id`,`username`,`name`}
+  - Response body:
+    - object user {`id`,`username`,`name`}
   - Response: `401 Unauthorized`
-    - response body:
-      - {`error`:"Incorrect username or password"}
+  - Response body:
+    - {`error`:"Incorrect username or password"}
 
 - DELETE `/api/sessions/current`
   - Description: Logout
-  - Response: `200 OK` (success) : {}
+  - Response: `200 OK` (success)
 
 - GET `/api/sessions/current`
   - Description: Verify if the current user is logged in.
   - Response: `200 OK` (success)
-    - Response body: object user
+    - Response body: user object
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
-- POST `/api/newapplication`
-  - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
-    - object{`studentId`, `proposalId`,`teacherId`}
-  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
-  - Response body: number, indicating the number of applications inserted (should always be 1)
+### Proposals APIs:
+- POST `/api/newproposal`
+  - Description: inserts a new thesis proposal
+  - Request body: an object describing the proposal to insert
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` } 
+  - Notes: 
+    - The server automatically finds the right groups for the proposal (based on the supervisor and internal co-supervisor's groups), so an empty array can be passed for the groups field
+    - The id is generated automatically, so any number can be passed for the id field
+  - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
+  - Response body: the `id` of the newly created proposal
 
-- GET `/api/proposals/:degreeCode`
-  - Description: retrieves all the thesis proposals a student can view (based on student's degree code)
-  - Request param: `degreeCode`, the degree of the study course of the student
+- GET `/api/thesis/student`
+  - Description: retrieves all the thesis proposals the currently logged student can view
   - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
   - Response body: an array of objects, each containing a thesis proposal
     - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
-`cds` } 
+`cds` }
+
+- GET `/api/thesis/teacher`
+  - Description: retrieves all the active thesis proposals for the currently logged teacher
+  - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
+  - Response body: an array of objects, each containing a thesis proposal
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` }
+
+- PUT `/api/teacher/proposal/:thesisid`
+  - Description: update a thesis Proposal by passing new values for the desired fields.
+  - Request body: object containing the proposal with the new data and also the id of the proposal to update
+  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
+  - Response body: the updated thesis proposal
+
+- DELETE `/api/teacher/deleteproposal/:proposalid`
+  - Description: Deletes a thesis proposal based on the provided `proposalid`. Requires teacher authentication, allowing only the supervisor of the proposal to delete it.
+  - Request Parameters: `proposalid` which is the id of the proposal to be deleted.
+  - Responses:
+    - `200 OK`: Proposal successfully deleted.
+    - `401 Unauthorized`: Requesting teacher is not the supervisor of the proposal.
+    - `404 Not Found`: Proposal with the given id doesn't exist.
+    - `422 Unprocessable Entity`: `proposalid` is not valid.
+    - `500 Internal Server Error`: Generic server error.
+  - Response Body: number of proposals deleted
 
 - GET `/api/cosupervisors`
   - Description: retrieves all possible co-supervisors for a new thesis proposals 
@@ -264,92 +283,72 @@ Students need to get thesis proposals filtered by their course, and professors n
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the possible degrees
 
-- POST `/api/newproposal`
-  - Description: inserts a new thesis proposal
-  - Request body: an object describing the proposal to insert
-    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
-`cds` } 
-    - Notes: 
-      - The server automatically finds the right groups for the proposal (based on the supervisor and internal co-supervisor's groups), so an empty array can be passed for the groups field
-      - The id is generated automatically, so any number can be passed for the id field
-  - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
-  - Response body: the id of the newly created proposal
+
+### Applications APIs:
+- POST `/api/newapplication`
+  - Description: inserts a new application for a thesis proposal (student)
+  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
+    - object{`studentId`, `proposalId`,`teacherId`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
+  - Response body: number, indicating the number of applications inserted (should always be 1)
 
 
-- GET `/api/student/applications/:studentId`
-  - Description: retrieves all the applications the student has sent (including status)
-  - Request param: the id of the student currently logged in (should be retrieved from the session cookie)
+- GET `/api/student/applications/`
+  - Description: retrieves all the applications the currently logged student has sent (including status)
   - Response: `200 OK` (success), `404 Not Found` (no applications found for the specific studentId), `500 Internal Server Error` (generic server error)
   - Response body: an array of objects, each describing an application
     - {`studentId`, `thesisId`, `timestamp`, `status`, `teacherId`}
-    
+      
     (Note: it will be an array even if the student only inserted one application)
 
-
 - GET `/api/teacher/applications`
-- Description: retrieves all the applications sent for proposals of the logged if professor
+  - Description: retrieves all the applications sent for proposals belonging to the logged professor
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the applications: each application also contains the object representing the application th thesis and student details to be shown in the fron end
   - "enhancedApplications": 
-    - [
-      {
-        - "studentId": 200001,
-        - "thesisId": 3,
-        - "timestamp": "08/11/2023 16:42:50",
-        - "status": "pending",
-        - "teacherId": 268553,
-        - **"studentInfo"**: { info taken from teacher table },
-        - **"thesisInfo"**: { info taken from thesis table }
-     },
-      // ... more entries ...
-    ]
+    - [ { `studentId`, `thesisId`, `timestamp`, `status`, `teacherId`, `{studentInfo}`, `{thesisInfo}` }, ...]
 
-- PUT `/api/teacher/applications/:id`
-  - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter. Also when an application is accepetd all the other applications of the same student and for the same thesis are canceled.
+- PUT `/api/teacher/applications/:thesisid`
+  - Description: update a row in the application table setting the status to accepted/rejected according to the value received in the body. Also when an application is accepetd all the other applications of the same student and for the same thesis are canceled.
+  - Request param: the id of the proposal the application refers to
   - Request body: object containing the decision "accepted" or "rejected" and the id of the student sending the application
   - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
   - Response body: the updated application {id, status}
 
-- PUT `/api/teacher/proposal/:thesisid`
-  - Description: update a thesis Proposal by passing new values for the desired fields.
-  - Request body: object containing the proposal with the new data and also the id of the proposal to update
-  - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
-  - Response body: the updated thesis proposal
+- PUT `/api/teacher/archiveproposal`
+  - Description: archives a thesis proposal by moving it from the active to the archived table and cancelling all the related pending applications.
+  - Request body: object containing the id of the proposal to archive; it also uses the id of the currently logged teacher (retrieved from the session cookie).
+  - Response: `200 OK` (success), `404 Not Found` (no proposal found), `500 Internal Server Error` (generic server error), `401 Unauthorized` (if a professor tries to delete a proposal not owned, should not happen from the client), `422 Unprocessable Content` (happens when trying to archive a proposal which already has an accepted application, should not happen from the client)
+  - Response body: the number of archived proposals (should always be 1)
 
-- DELETE `/api/deleteproposal/:proposalid`
-  - Description: Deletes a thesis proposal based on the provided `proposalid`. Requires teacher authentication, allowing only the supervisor of the proposal to delete it.
-  - Request Parameters: `proposalid` which is the id of the proposal to be deleted.
-  - Responses:
-    - `200 OK`: Proposal successfully deleted.
-    - `401 Unauthorized`: Requesting teacher is not the supervisor of the proposal.
-    - `404 Not Found`: Proposal with the given id doesn't exist.
-    - `422 Unprocessable Entity`: `proposalid` is not valid.
-    - `500 Internal Server Error`: Generic server error.
-  - Response Body: number of proposals deleted
+### General and utils APIs:
+- POST `/api/notify`
+  - Description: used to build the email notification (with the internal function buildEmail) and send it
+  - Description: used to build the email notification (with the internal function `buildEmail`) and send it
+  - Request body: an object containing the details of the email to be sent and useful params to build it
+    - {`subject`, `type`, `data`}
+  - Response: `200 OK` (if message sent succesfully), `500 Internal Server Error` (if something goes wrong)
+  - Response body: an object containing a boolean describing success or failure, and the corresponding message
+    - {`success`, `message`}
 
-  - POST `api/notify`
-    - Request Parameters: `proposalid` which is the id of the proposal to be deleted.
-  - Responses:
-    - `200 OK`: Proposal successfully deleted.
-    - `500 Internal Server Error`: Generic server error.
-  - Response Body: json object `{success: boolean , message/error: string}`
+- POST `/api/clockchanged`
+  - Description: used to manage proposals and applications, based on changes on the virtual date (which is also stored in the DB for sanity and persistance)
+  - Request body: the selected date from the client
+  - Response: `200 OK` (success), `500 Internal Server Error` (failure)
+  - Response body: the number of moved proposals (from both tables, active and archived)
 
-
-### Testing
-
-`Jest` is set up for unit testing as demo1, but for demo2 we opted for a different library for e2e, still based on Jest.
-
-### Implemetation for Integration
-(OBSOLETE)
+- GET `/api/initialdate`
+  - Description: fetches the last date used from the virtual clock system
+  - Response: `200 OK` (success), `500 Internal Server Error` (failure)
+  - Response body: a string containing the system date
+  
 
 
-- setup process.env.NODE_ENV as 'test' in the integration test file
-- import the server, which will start listening on port 3001
-- the db file will create/open an in-memory db and populate it with the exported db in `thesis-management-project/code/server/db_TM.sql`
-- connection to the in-memory sqlite database before every test case (in the file) start execution
-- after all test cases the db is closed, the server is closed.
+## Testing
 
->*IMPORTANT*: keep the `db_TM.sql` updated as the `cleanDB/db_TM.db` is updated
+`Jest` is the library chosen and set up for unit testing since demo1. 
+
+From demo2 on, we opted for `Puppeteer`, a library based on Jest, to automate E2E tests.
 
 ### Commands
 
@@ -357,4 +356,4 @@ This commands are executed only on test files under `thesis-management-project/c
 
 - `npm test`: runs all test 
 - `npm test:unit`: runs only unit tests with coverage
-- `npm run test:integration`: obsolete, still present but integration test are no more mmeaningfull
+- `INSERT HERE COMMANDS FOR E2E TESTS`

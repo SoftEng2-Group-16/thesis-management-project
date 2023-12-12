@@ -10,11 +10,8 @@ const router = express.Router();
 /*use the middleware isloggedin to protect the route (hopefully) */
 
 /*session routes*/
-
 router.get('/sessions/current', auth.getCurrentSession);
-
 router.post('/sessions', auth.login);
-
 router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 
 
@@ -40,8 +37,8 @@ router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplication
 router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
 router.put('/teacher/proposal/:thesisid',auth.isLoggedIn, professor.updateThesisProposal);
 router.put('/teacher/applications/:thesisid', auth.isLoggedIn, professor.decideApplication);
-router.put('/teacher/archiveproposal', /*auth.isLoggedIn,*/ professor.archiveProposal);
-router.delete('/deleteproposal/:proposalid', auth.isLoggedIn, professor.deleteProposal);
+router.put('/teacher/archiveproposal', auth.isLoggedIn, professor.archiveProposal);
+router.delete('/teacher/deleteproposal/:proposalid', auth.isLoggedIn, professor.deleteProposal);
 
 
 module.exports = router;

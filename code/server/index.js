@@ -33,7 +33,6 @@ const bodyParser = require("body-parser"); //needed to read the token from saml
 
 //-------------------------------AUTH0 stuff for SAML2--------------------------------//
 
-
 passport.use(new SamlStrategy({
   entryPoint: 'https://group16-thesis-management-system.eu.auth0.com/samlp/7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
   path: '/login/callback', //motherfucker
@@ -41,10 +40,7 @@ passport.use(new SamlStrategy({
   cert: cert,
   acceptedClockSkewMs: -1 // avoid syncerror Error: SAML assertion not yet valid
 }, function (profile, done) {
-
-
-  return done(null, //take from the Saml token the parameters so that will be available in req.user ffs
-    {
+  return done(null, {//take from the Saml token the parameters so that will be available in req.user ffs
       id: profile['nameID'],
       email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
       displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
@@ -67,10 +63,8 @@ passport.serializeUser(function (user, cb) {
   cb(null, user);
 });
 
-passport.deserializeUser(function (user, cb) { // this user all the data found in the select user in the db, needs to be cleaned up
+passport.deserializeUser(function (user, cb) {
   return cb(null, user);
-  //! i do not now what happens now, how do i store session data? we should not call here a dao function, maybe in serialize?
-  //! solved, moved in the callback login
 });
 
 app.use(session({
@@ -85,40 +79,23 @@ app.use(session({
 
 app.use(passport.authenticate('session'));
 
-// auth routes, temp?
-
-// todo move these again in the router
-
 
 app.get('/login', (req, res, next) => {
-    passport.authenticate('saml', { failureRedirect: '/login', failureFlash: true })(req, res, next) 
+  passport.authenticate('saml', { failureRedirect: '/login', failureFlash: true })(req, res, next)
 });
 
-app.post('/login/callback',
-
+app.post(
+  '/login/callback',
   bodyParser.urlencoded({ extended: false }),
   passport.authenticate('saml', { failureRedirect: '/login', failureFlash: true }),
   async function (req, res, next) {
-
-    //! the req does not contain req.user and it's full of crap that does not fit the console.... i need a txtlog
-   
-    /* const logStream = fs.createWriteStream('request_log.txt', { flags: 'a' });
-      logStream.write('Request Object:\n' + JSON.stringify(req, null, 2) + '\n\n');
-      logStream.end(); */
-
-    //! solved in the setup strategy
-
-    // I need a new way to find the user in db, regexp?
-
     // Get the email
     const userEmail = req.user.email;
-
     // Check if email contains "studenti.polito"
     const isStudent = userEmail.includes("studenti.polito");
 
     try {
       let userData;
-
       // If email is for a student, fetch data from the student table
       if (isStudent) {
         const studentData = await dao.getStudentByEmail(userEmail);
@@ -200,10 +177,5 @@ const server = http.createServer(app);
 server.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
-
-// activate the server
-// app.listen(port, () => {
-//   console.log(`Server listening at http://localhost:${port}`);
-// });
 
 module.exports = { app, server };
