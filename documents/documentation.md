@@ -271,8 +271,6 @@ Students need to get thesis proposals filtered by their course, and professors n
       // ... more entries ...
     ]
 
-
-    
 - PUT `/api/teacher/applications/:id`
   - Description: update a row in the application table setting the status to accepted/rejected according to the received parameter. Also when an application is accepetd all the other applications of the same student and for the same thesis are canceled.
   - Request body: object containing the decision "accepted" or "rejected" and the id of the student sending the application
@@ -285,9 +283,16 @@ Students need to get thesis proposals filtered by their course, and professors n
   - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
   - Response body: the updated thesis proposal
 
-
-
-
+- DELETE `/api/deleteproposal/:proposalid`
+  - Description: Deletes a thesis proposal based on the provided `proposalid`. Requires teacher authentication, allowing only the supervisor of the proposal to delete it.
+  - Request Parameters: `proposalid` which is the id of the proposal to be deleted.
+  - Responses:
+    - `200 OK`: Proposal successfully deleted.
+    - `401 Unauthorized`: Requesting teacher is not the supervisor of the proposal.
+    - `404 Not Found`: Proposal with the given id doesn't exist.
+    - `422 Unprocessable Entity`: `proposalid` is not valid.
+    - `500 Internal Server Error`: Generic server error.
+  - Response Body: number of proposals deleted
 
 ### Testing
 

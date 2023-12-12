@@ -27,8 +27,10 @@ const ProposalForm = (props) => {
     const { handleErrors } = useContext(MessageContext);
     const navigate = useNavigate();
     const location = useLocation();
-    const proposal = location.state ? location.state.thesisDetails : null;
+    //retrieve the proposal object with the data of the proposal to edit/copy from the ThesisPage component
+    const {proposal, mode} = location.state ? location.state : {}; 
 
+    //state fields are pre filled with the data of the proposal to edit if edit mode
     const [title, setTitle] = useState((proposal && proposal.title) || '');
     const [cosupervisorsInt, setCosupervisorsInt] = useState((proposal && proposal.cosupervisors.filter(s => s.split(',').length === 3).map(str => ({ value: str, label: str }))) || []);
     const [cosupervisorsExt, setCosupervisorsExt] = useState((proposal && proposal.cosupervisors.filter(s => s.split(',').length === 2).map(str => ({ value: str, label: str }))) || []);
@@ -56,6 +58,7 @@ const ProposalForm = (props) => {
 
     const supervisor = `${props.user.id}, ${props.user.name} ${props.user.surname}`
 
+    //used to load the CDS for the AsyncSelect component
     const loadOptions = () => {
         return new Promise((resolve) => {
             if (!cdsList) {
@@ -206,8 +209,8 @@ const ProposalForm = (props) => {
                 cds: cds.map(obj => obj.value.split(' ')[0]), //should be just the code like LT-2
             };
             console.log(newProposal);
-            if (proposal) {
-                newProposal.id = proposal.id;
+            if (proposal && mode === 'edit') {
+                newProposal.id = proposal.id;//add the id of the proposal to update
                 editProposal(newProposal)
             } else {
                 insertProposal(newProposal);
@@ -433,7 +436,7 @@ const ProposalForm = (props) => {
 
 
                         <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
-                            {proposal ? "Edit" : "Submit"}
+                            {proposal && mode === 'edit' ? "Edit" : "Submit"}
                         </Button>
                         &nbsp;
                         <Button variant="danger" style={{ marginTop: '10px' }} onClick={handleGoBack}>

@@ -141,7 +141,6 @@ exports.rejectApplication = (thesisId, teacherId, studentId) => {
 };
 
 exports.getAllApplicationsByProf = (idProfessor) => {
-    console.log(idProfessor);
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM applications where teacherid=?'
         db.all(
@@ -152,6 +151,49 @@ exports.getAllApplicationsByProf = (idProfessor) => {
                     reject(err);
                 } else if (rows.length == 0) {
                     resolve({ status: 404, error: 'No Applications found for professor ' + idProfessor });
+                } else {
+                    const applications = rows.map(row => (
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                    ));
+                    resolve(applications);
+                }
+            }
+        );
+    });
+}
+exports.getApplicationsByThesisId = (thesisId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM applications WHERE thesisid=?'
+        db.all(
+            sql,
+            [thesisId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length == 0) {
+                    resolve({ error: `Prolem while retrieving applications for proposal ${thesisId}` });
+                } else {
+                    const applications = rows.map(row => (
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                    ));
+                    resolve(applications);
+                }
+            }
+        )
+    });
+}
+
+exports.getAllApplicationsByThesisId = (thesisId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM applications where thesisid=?'
+        db.all(
+            sql,
+            [thesisId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length == 0) {
+                    resolve({ error: 'No Application found for thesis proposal ' + thesisId });
                 } else {
                     const applications = rows.map(row => (
                         new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)

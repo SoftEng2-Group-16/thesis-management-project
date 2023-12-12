@@ -42,7 +42,6 @@ const insertNewProposal = async (req, res) => {
     let groups = [];
 
     for (c of cosupervisors) {
-        console.log(c);
         const splitted = c.split(" ");
         if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
             let surname = splitted[1];
@@ -135,7 +134,7 @@ const decideApplication = async (req, res) => {
         return res.status(422).json({ error: "studentId is missing in body" });
     }
     if (isNaN(thesisId) || !Number.isInteger(parseInt(thesisId))) {
-        return res.status(422).json({ error: "thesisId non valido" });
+        return res.status(422).json({ error: "not valid thesisId" });
     }
 
     if (decision === "accepted") {
@@ -201,6 +200,66 @@ const getOwnProposals = async (req, res) => {
     }
 }
 
+const archiveProposal = async (req,res)  => {
+    const proposalId = req.body.proposalId;
+    //for manual testing purposes ONLY
+    //const userId = req.body.userId;
+    //this is the right way: take identity from req.user
+    const userId = req.user.id;
+
+    try {
+        const proposal = await daoGeneral.getThesisProposalById(proposalId);
+        const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
+
+        if(proposal.error || applications.error){
+            return res.status(404).json(proposal);
+        }
+
+        if ( applications.filter( a => a.status === "accepted").length != 0 ) {
+            return res.status(422).json({error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived`});
+        }
+        
+        if(!proposal.supervisor.match(userId)) {
+            return res.status(401).json({"error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED`})
+        } else {
+            const changes = await daoTeacher.archiveProposal(new models.ThesisProposal(
+                proposal.id, //can be whatever, DB handles autoincrement id
+                proposal.title,
+                proposal.supervisor,
+                proposal.cosupervisors.join('-'),
+                proposal.keywords.join(','),
+                proposal.type,
+                proposal.groups.join('-'),
+                proposal.description,
+                proposal.requirements,
+                proposal.notes,
+                proposal.expiration,
+                proposal.level,
+                proposal.cds.join(',')
+            )) //STILL NEED TO MANAGE APPLICATIONS
+                .then( () => {
+                    for (a of applications) {
+                        console.log(a);
+                        if(a.status === "pending"){
+                            daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
+                        }
+                    }
+                })
+                .then( () => {
+                    const c = daoTeacher.deleteProposal(proposal.id);
+                    return c;
+                });
+            if (changes == 1) {
+                return res.status(200).json(changes);
+            } else {
+                return res.status(500).json({error: "Problem encountered while archiving proposal"});
+            }
+        }
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 
 const updateThesisProposal = async (req, res) => {
 
@@ -214,7 +273,7 @@ const updateThesisProposal = async (req, res) => {
     if (req.body.id !== Number(req.params.thesisid)) {
         return res.status(422).json({ error: 'URL and body id mismatch' });
     }
-
+    //same logic of the insert
     const cosupervisors = req.body.cosupervisors;
     const supervisor = req.body.supervisor;
     let groups = [];
@@ -226,13 +285,19 @@ const updateThesisProposal = async (req, res) => {
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await daoTeacher.getGroupForTeacherById(id);
-            if (!groups.includes(group)) {
+            if (group.error) {
+                return res.status(404).json(group);
+            }
+            else if (!groups.includes(group)) {
                 groups.push(group);
             }
         }
     }
     const group = await daoTeacher.getGroupForTeacherById(supervisor.split(",")[0]) //search group of supervisor: id, name surname
-    if (!groups.includes(group)) {
+    if (group.error) {
+        return res.status(404).json(group);
+    }
+    else if (!groups.includes(group)) {
         groups.push(group);
     }
     let proposal = new models.ThesisProposal(
@@ -254,16 +319,51 @@ const updateThesisProposal = async (req, res) => {
     try {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
-        if (acceptedThesis.length > 0 && acceptedThesis.includes(proposal.id)) {
-            res.status(400).json({ error: "already accepted thesis" })
+
+        if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
+            return res.status(400).json({error:"already accepted thesis"})
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
-            res.status(404).json(result);
+            return res.status(404).json(result);
         else
-            res.json(result);
+            return res.status(201).json(result);
     } catch (err) {
-        res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisId}: ${err}` });
+        return res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisid}: ${err}` });
+    }
+}
+const deleteProposal = async (req, res) => {
+    const teacherId = req.user.id;
+    const proposalId = req.params.proposalid;
+
+    if (!teacherId) {
+        return res.status(503).json({ error: "problem with the authentication" });
+    }
+
+    if (isNaN(proposalId) || !Number.isInteger(parseInt(proposalId))) {
+        return res.status(422).json({ error: "not valid proposalId" });
+    }
+    
+    try {
+        // check user is authorized
+        const thesis_proposal = await daoGeneral.getThesisProposalById(proposalId);
+
+        if (thesis_proposal.error) {
+            return res.status(404).json(thesis_proposal);
+        } else {
+            let id = thesis_proposal.supervisor.split(',');
+            if(id[0] !== teacherId){
+                return res.status(401).json("Unauthorized");
+            }
+            // delete all PENDING applications
+            await daoGeneral.cancellPendingApplicationsForAThesis(proposalId, teacherId);
+            // delete proposal
+            const changes = await daoTeacher.deleteProposal(proposalId);
+
+            return res.status(200).json(changes);
+        }
+    } catch (e) {
+        return res.status(500).json(e.message);
     }
 }
 
@@ -274,5 +374,7 @@ module.exports = {
     getAllApplicationsByProf,
     decideApplication,
     getOwnProposals,
+    deleteProposal,
+    archiveProposal,
     updateThesisProposal
 }

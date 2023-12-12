@@ -27,13 +27,16 @@ function ThesisPage(props) {
       professorAPI.getApplications()
         .then((applications) => {
           const acceptedApplications = applications.enhancedApplications.filter(item => item.thesisId === state.thesisDetails.thesisId)
+          //check if already exist an accepted application for this thesis 
           if (acceptedApplications.lenght > 0) {
-            setAccepted(true);
+            setAccepted(true); //used to enable/disable the edit button
           }
         })
         .catch(e => {
-          console.log(e);
-          handleErrors(e);
+          //no application found for the professor, not a problem in this case
+          if (err.error && err.status !== 404) {
+            handleErrors(e);
+          }
         });
     }
 
@@ -49,7 +52,7 @@ function ThesisPage(props) {
       })
       .catch(e => {
         console.log(e);
-       handleErrors(e);
+        handleErrors(e);
       });
   };
 
@@ -116,19 +119,31 @@ function ThesisPage(props) {
                 </Button>
               )}
 
+              {/*edit button */}
               {props.user.role === 'teacher' && (
                 <Link
                   className=" mt-3 ms-2 btn btn-outline-primary"
                   to={"/proposal"}
-                  state={{ thesisDetails: state.thesisDetails }}
+                  state={{ proposal: state.thesisDetails, mode: 'edit' }}
                   disabled={isAccepted}
                 >
                   Edit
                 </Link>
               )}
 
+              {/*copy button */}
+              {props.user.role === 'teacher' && (
+                <Link
+                  className=" mt-3 ms-2 btn btn-outline-success"
+                  to={"/proposal"}
+                  state={{ proposal: state.thesisDetails, mode: 'copy' }}
+                >
+                  Copy
+                </Link>
+              )}
+
               {/* Go back button */}
-              <Button variant="danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
+              <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
             </Card.Body>
