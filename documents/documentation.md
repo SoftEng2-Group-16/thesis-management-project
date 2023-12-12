@@ -327,6 +327,14 @@ Students need to get thesis proposals filtered by their course, and professors n
     - `500 Internal Server Error`: Generic server error.
   - Response Body: number of proposals deleted
 
+  - POST `api/notify`
+    - Request Parameters: `proposalid` which is the id of the proposal to be deleted.
+  - Responses:
+    - `200 OK`: Proposal successfully deleted.
+    - `500 Internal Server Error`: Generic server error.
+  - Response Body: json object `{success: boolean , message/error: string}`
+
+
 ### Testing
 
 `Jest` is set up for unit testing as demo1, but for demo2 we opted for a different library for e2e, still based on Jest.
