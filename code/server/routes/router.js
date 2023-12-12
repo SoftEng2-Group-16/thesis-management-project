@@ -21,6 +21,7 @@ router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 /* general routes*/
 router.post('/notify', general.sendEmail)
 router.put('/clockchanged', utils.rearrangeProposals)
+router.get('/initialdate', utils.getInitialDate);
 
 
 /*student routes*/
@@ -31,23 +32,16 @@ router.get('/thesis/student/', auth.isLoggedIn, student.getThesisProposals);
 router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForStudent);
 
 router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
-
-/* professor routes  */
-//router.get('/proposals/:degreeCode', student.getThesisProposals); 
-
 router.get('/thesis/teacher/', auth.isLoggedIn, professor.getOwnProposals);
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplicationsByProf);
 
 router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
-
 router.put('/teacher/proposal/:thesisid',auth.isLoggedIn, professor.updateThesisProposal);
 router.put('/teacher/applications/:thesisid', auth.isLoggedIn, professor.decideApplication);
 router.put('/teacher/archiveproposal', /*auth.isLoggedIn,*/ professor.archiveProposal);
-
 router.delete('/deleteproposal/:proposalid', auth.isLoggedIn, professor.deleteProposal);
-
 
 
 module.exports = router;

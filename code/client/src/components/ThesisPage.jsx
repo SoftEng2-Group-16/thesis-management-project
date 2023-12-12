@@ -33,7 +33,10 @@ function ThesisPage(props) {
           }
         })
         .catch(e => {
-          handleErrors(e);
+          //no application found for the professor, not a problem in this case
+          if (err.error && err.status !== 404) {
+            handleErrors(e);
+          }
         });
     }
 
