@@ -43,6 +43,19 @@ const logOut = async () => {
     return null;
 }
 
+const getInitialDate = async () => {
+  const response = await fetch(SERVER_URL + '/api/initialdate', {
+    credentials: 'include',
+  });
+  
+  const date = response.json();
+  if(response.ok){
+    return date;
+  } else {
+    throw date;
+  }
+}
+
 const rearrangeProposals = async (newDate) => {
   const data = {
     selectedTimestamp: newDate
@@ -66,5 +79,5 @@ const rearrangeProposals = async (newDate) => {
 }
 
 
-const API = { getUserInfo, logIn, logOut, rearrangeProposals };
+const API = { getUserInfo, logIn, logOut, rearrangeProposals, getInitialDate };
 export default API;

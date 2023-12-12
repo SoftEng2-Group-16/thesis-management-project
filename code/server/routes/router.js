@@ -24,7 +24,6 @@ router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
 // REMEMBER to update documentation
 router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForStudent);
 
-//router.get('/proposals/:degreeCode', student.getThesisProposals); 
 router.get('/cosupervisors', professor.getPossibleCosupervisors);
 router.get('/degrees', professor.getDegreesInfo);
 router.post('/newproposal', auth.isLoggedIn, professor.insertNewProposal);
@@ -37,6 +36,7 @@ router.put('/teacher/archiveproposal', /*auth.isLoggedIn,*/ professor.archivePro
 /*student routes*/
 
 
-router.put('/clockchanged', utils.rearrangeProposals)
+router.put('/clockchanged', utils.rearrangeProposals);
+router.get('/initialdate', utils.getInitialDate);
 
 module.exports = router;
