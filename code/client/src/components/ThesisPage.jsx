@@ -53,8 +53,9 @@ function ThesisPage(props) {
       });
   };
 
+  const handleArchiveClick = () => {
 
-
+  }
 
   const handleGoBackClick = () => {
     // Navigate back to /thesis
@@ -137,6 +138,13 @@ function ThesisPage(props) {
                 >
                   Copy
                 </Link>
+              )}
+
+              {/*archive button */}
+              {props.user.role === 'teacher' && (
+                <Button variant="outline-warning" className="mt-3 ms-2" onClick={handleArchiveClick}>
+                  Archive
+                </Button>
               )}
 
               {/* Go back button */}
