@@ -44,6 +44,7 @@ function ThesisProposals(props) {
   const animatedComponents = makeAnimated();
   const [NoProposals, setNoProposals] = useState(false);
   const [checkedButton, setCheckedButton] = useState(true);
+  const [archivedThesis, setArchivedThesis] = useState([]);
 
   useEffect(() => {
 
@@ -57,7 +58,7 @@ function ThesisProposals(props) {
         }
 
         setAllThesis(proposals);
-        setThesis(proposals)
+        setThesis(proposals);
 
         if (proposals.length === 0) {
           setNoProposals(true);
@@ -82,8 +83,23 @@ function ThesisProposals(props) {
       }
     };
 
+    const fetchArchivedThesisProposals = async() => {
+      try {
+        let archivedProposals = [];
+
+        if (props.user.role == "teacher") {
+          archivedProposals = await professorAPI.getOwnArchivedProposals(props.user.id);
+        }
+
+        setArchivedThesis(archivedProposals);
+      } catch (error){
+        console.error(error);
+      }
+    }
+
     if (props.loggedIn || props.update == true) {
       fetchThesis();
+      fetchArchivedThesisProposals();
       props.setUpdate(false);
     }
   }, [props.loggedIn, props.update]);
@@ -158,6 +174,16 @@ function ThesisProposals(props) {
     setCheckedButton(!checkedButton);
   }
 
+  function showActiveThesisProposals() {
+    setThesis([...Allthesis]);
+  } 
+
+  function showArchivedThesisProposals() {
+    setThesis([...archivedThesis]);
+    console.log("thesis", thesis);
+    console.log("archived thesis", archivedThesis);
+  }
+
   return (
     <>
       {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
@@ -217,15 +243,17 @@ function ThesisProposals(props) {
           <Row className="d-flex justify-content-center">
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
             <ToggleButtonGroup type="radio" name="options" defaultValue={1}>
-              <ToggleButton className={checkedButton? "active-toggle-button" : "not-active-toggle-button"} id="activeProposals" value={1} onClick={changeProposalsButtonState}>
+              <ToggleButton className={checkedButton? "active-toggle-button" : "not-active-toggle-button"} id="activeProposals" value={1} onClick={changeProposalsButtonState} onChange={showActiveThesisProposals}>
                 Active Proposals
               </ToggleButton>
-              <ToggleButton className={checkedButton? "not-active-toggle-button" : "active-toggle-button"} id="ArchivedProposals" value={2} onClick={changeProposalsButtonState}>
+              <ToggleButton className={checkedButton? "not-active-toggle-button" : "active-toggle-button"} id="ArchivedProposals" value={2} onClick={changeProposalsButtonState} onChange={showArchivedThesisProposals}>
                 Archived Proposals
               </ToggleButton>
             </ToggleButtonGroup>
             </Col>
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
+               {console.log("teste", thesis)}
+              {thesis != [] ? 
               <Table striped bordered hover responsive>
                 <thead className="align-middle">
                   <tr>
@@ -252,6 +280,10 @@ function ThesisProposals(props) {
                   ))}
                 </tbody>
               </Table>
+              : <Row>
+                  <h3>None thesis proposals to show yet.</h3>
+                </Row>
+                }
             </Col>
           </Row>
           </>

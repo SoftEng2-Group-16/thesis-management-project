@@ -14,6 +14,9 @@ router.delete('/sessions/current', auth.isLoggedIn, auth.logout);
 router.get('/thesis/student', auth.isLoggedIn, student.getThesisProposals);
 router.get('/thesis/teacher', auth.isLoggedIn, professor.getOwnProposals);
 router.get('/archive/thesis', auth.isLoggedIn, professor.getOwnArchivedProposals);
+router.post('/notify', general.sendEmail)
+router.put('/clockchanged', utils.rearrangeProposals)
+router.get('/initialdate', utils.getInitialDate);
 
 
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */

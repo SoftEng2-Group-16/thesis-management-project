@@ -108,9 +108,22 @@ const editProposal = async (proposal) => {
   }
 }
 
+const getOwnArchivedProposals = async() => {
+  const response = await fetch(SERVER_URL + '/api/archive/thesis', {
+    credentials: 'include',
+  });
+
+  const archivedProposals = await response.json();
+  if (response.ok) {
+    return archivedProposals;
+  } else {
+    throw archivedProposals;
+  }
+}
+
 
 const professorAPI = {
   getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
-  getApplications, getOwnThesisProposals, editProposal
+  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals
 }
 export default professorAPI;
