@@ -48,7 +48,7 @@
 # General Information about the project implementation
 
 ## AUTH v.1.0
-(obsolete)
+(obsolete see AUTH 2.0 that follows)
 
 The authentication it's realized with passport framework, email and password are stored in the database with encrypted passwords and randomly (but manually) generated salt for the time being, since there is no registration process yet.
 
@@ -182,6 +182,15 @@ Starting from demo3 the application implements a notification system by email. S
 - `thesismanagementteacher@gmail.com`: the address in which we receive the emails for any teacher.
 
 The email server is realized using a popular js library for express, `nodemailer` and uses SMTP protocol along side the "Password App" authentication configured in the system google account.
+
+The backend makes use of an internal method to build the email called `buildEmail`, this method **must** receive two mandatory parameters from the front end api:
+
+- `type`: the type of notification that needs to send, for example "application", used in the switch case to decide how to body of the email and to which address will be sent.
+- `subject`: the text to put in the subject of the email (usually easier to build in the front-end where all data are available)
+
+- additional parameters received related to the email will be stored in a **Rest Parameter** `(...data)`, these are used in the switch case to build the text, like *"hello {studentname}"* .
+
+**Notifications implemented:**
 
 - DEMO 3: a notification is sent to the student when a professor takes a decision about his application.
 
