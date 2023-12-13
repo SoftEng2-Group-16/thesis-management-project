@@ -174,6 +174,14 @@ function ThesisProposals(props) {
     setCheckedButton(!checkedButton);
   }
 
+  function showActiveThesisProposals() {
+    setThesis([...Allthesis]);
+  } 
+
+  function showArchivedThesisProposals() {
+    setThesis([...archivedThesis]);
+  }
+
   return (
     <>
       {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
