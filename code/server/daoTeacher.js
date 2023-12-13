@@ -208,7 +208,7 @@ exports.getApplicationsByThesisId = (thesisId) => {
                 if (err) {
                     reject(err);
                 } else if (rows.length == 0) {
-                    resolve({ error: `Prolem while retrieving applications for proposal ${thesisId}` });
+                    resolve([]);
                 } else {
                     const applications = rows.map(row => (
                         new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)

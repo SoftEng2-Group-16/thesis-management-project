@@ -280,7 +280,7 @@ function ThesisProposals(props) {
                 </tbody>
               </Table>
               : <Row>
-                  <h4>None thesis proposals to show</h4>
+                  <h4>No thesis proposals to show.</h4>
                 </Row>
                 }
             </Col>
@@ -290,7 +290,7 @@ function ThesisProposals(props) {
         props.loggedIn && thesis == []?
         <>
           <Row>
-              <h3>None thesis proposals to show yet.</h3>
+              <h3>No thesis proposals to show yet.</h3>
           </Row>
         </>
        : <div>You need to LOGIN!</div>}

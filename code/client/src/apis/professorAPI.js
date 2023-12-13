@@ -121,14 +121,14 @@ const getOwnArchivedProposals = async() => {
   }
 }
 
-const archiveProposal = async (proposalID) => {
+const archiveProposal = async (proposalId) => {
   const response = await fetch(SERVER_URL + `/api/teacher/archiveproposal`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify({proposalID}),
+    body: JSON.stringify({proposalId}),
   });
   const res = await response.json();
   if (response.ok) {

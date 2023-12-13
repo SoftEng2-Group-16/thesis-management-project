@@ -35,4 +35,6 @@ router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplication
 router.put('/teacher/archiveproposal', auth.isLoggedIn, professor.archiveProposal);
 /*student routes*/
 router.put('/clockchanged', utils.rearrangeProposals)
+
+
 module.exports = router;

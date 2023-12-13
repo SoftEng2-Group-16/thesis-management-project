@@ -219,11 +219,11 @@ const archiveProposal = async (req,res)  => {
         const proposal = await daoGeneral.getThesisProposalById(proposalId);
         const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
 
-        if(proposal.error || applications.error){
+        if(proposal.error){
             return res.status(404).json(proposal);
         }
-
-        if ( applications.filter( a => a.status === "accepted").length != 0 ) {
+        
+        if (applications.filter( a => a.status === "accepted").length != 0 ) {
             return res.status(422).json({error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived`});
         }
         
