@@ -82,6 +82,7 @@ const insertNewProposal = async (req, res) => {
 
     }
 }
+
 const getAllApplicationsByProf = async (req, res) => {
     try {
         const applications = await daoTeacher.getAllApplicationsByProf(req.user.id);
@@ -117,7 +118,6 @@ const getAllApplicationsByProf = async (req, res) => {
 }
 
 const decideApplication = async (req, res) => {
-
     const thesisId = req.params.thesisid;
     const decision = req.body.decision;
     const studentId = req.body.studentId;
@@ -184,9 +184,6 @@ const decideApplication = async (req, res) => {
 }
 
 const getOwnProposals = async (req, res) => {
-    // for testing purposes, at the moment the id of the teacher is taken from params
-    //const teacherId = req.params.teacherId;
-    // decomment this when calling it from FE
     const teacherId = req.user.id;
     try {
         const proposals = await daoTeacher.getOwnProposals(teacherId);
@@ -200,7 +197,21 @@ const getOwnProposals = async (req, res) => {
     }
 }
 
-const archiveProposal = async (req, res) => {
+const getOwnArchivedProposals = async (req, res) => {
+    const teacherId = req.user.id;
+    try {
+        const archivedProposals = await daoTeacher.getOwnArchivedProposals(teacherId);
+        if (archivedProposals.error) {
+            return res.status(404).json(archivedProposals);
+        } else {
+            return res.status(200).json(archivedProposals);
+        }
+    } catch (e) {
+        return res.status(500).json(e.message);
+    }
+}
+
+const archiveProposal = async (req,res)  => {
     const proposalId = req.body.proposalId;
     const userId = req.user.id;
 
@@ -259,9 +270,7 @@ const archiveProposal = async (req, res) => {
 
 
 const updateThesisProposal = async (req, res) => {
-
-
-
+    
     const teacherId = req.user.id;
     if (!teacherId) {
         return res.status(503).json({ error: "problem with the authentication" });
@@ -330,6 +339,7 @@ const updateThesisProposal = async (req, res) => {
         return res.status(503).json({ error: `Database error during the update of thesis ${req.params.thesisid}: ${err}` });
     }
 }
+
 const deleteProposal = async (req, res) => {
     const teacherId = req.user.id;
     const proposalId = req.params.proposalid;
@@ -372,6 +382,7 @@ module.exports = {
     getAllApplicationsByProf,
     decideApplication,
     getOwnProposals,
+    getOwnArchivedProposals,
     deleteProposal,
     archiveProposal,
     updateThesisProposal

@@ -14,6 +14,7 @@ function ThesisPage(props) {
   const { handleErrors } = useContext(MessageContext);
 
   const [isAccepted, setAccepted] = useState(false);
+  const [isArchived, setArchived] = useState(false);
 
   useEffect(() => {
     (state)
@@ -38,9 +39,20 @@ function ThesisPage(props) {
             handleErrors(e);
           }
         });
+      professorAPI.getOwnArchivedProposals().then((archivedProposals) => {
+        const wasArchived = archivedProposals.filter(item => item.id === state.thesisDetails.id)
+
+        if (wasArchived.length > 0)
+          setArchived(true); 
+      })
+      .catch(e => {
+        handleErrors(e);
+      })
     }
 
   }, [state]);
+
+  
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
@@ -56,8 +68,17 @@ function ThesisPage(props) {
       });
   };
 
-
-
+  const handleArchiveClick = () => {
+    professorAPI.archiveProposal(thesisDetails.id)
+      .then(() => {
+        props.setMessage({ msg: "Thesis Proposal succesfully archived!", type: 'success' });
+        navigate('/thesis');
+      })
+      .catch(e => {
+        console.log(e);
+        handleErrors(e);
+      });
+  }
 
   const handleGoBackClick = () => {
     // Navigate back to /thesis
@@ -140,6 +161,13 @@ function ThesisPage(props) {
                 >
                   Copy
                 </Link>
+              )}
+
+              {/*archive button */}
+              {props.user.role === 'teacher' && !isArchived && (
+                <Button variant="outline-warning" className="mt-3 ms-2" onClick={handleArchiveClick}>
+                  Archive
+                </Button>
               )}
 
               {/* Go back button */}

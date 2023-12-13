@@ -149,6 +149,26 @@
   border-top: 1px solid #dee2e6;
 }
 
+.active-toggle-button {
+  background-color: var(--orange) !important;
+  border-color: var(--orange) !important;
+}
+
+.active-toggle-button:hover {
+  background-color: var(--orange);
+  border-color: var(--orange);
+}
+
+.not-active-toggle-button {
+  background-color: #ffa570;
+  border-color: #ffa570;
+}
+
+.not-active-toggle-button:hover {
+  background-color: var(--orange) !important;
+  border-color: var(--orange) !important;
+}
+
 /* restyle */
 /* declare variables in root starting with --*/
 
