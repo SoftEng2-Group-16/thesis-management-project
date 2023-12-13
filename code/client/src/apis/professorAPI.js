@@ -121,9 +121,27 @@ const getOwnArchivedProposals = async() => {
   }
 }
 
+const archiveProposal = async (proposalID) => {
+  const response = await fetch(SERVER_URL + `/api/teacher/archiveproposal`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({proposalID}),
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
 
 const professorAPI = {
   getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
-  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals
+  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals, archiveProposal
 }
 export default professorAPI;

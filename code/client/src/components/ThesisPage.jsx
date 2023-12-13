@@ -57,7 +57,15 @@ function ThesisPage(props) {
   };
 
   const handleArchiveClick = () => {
-
+    professorAPI.archiveProposal(thesisDetails.id)
+      .then(() => {
+        props.setMessage({ msg: "Thesis Proposal succesfully archived!", type: 'success' });
+        navigate('/thesis');
+      })
+      .catch(e => {
+        console.log(e);
+        handleErrors(e);
+      });
   }
 
   const handleGoBackClick = () => {
