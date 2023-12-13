@@ -1,15 +1,17 @@
 name: Build and push images
 
 on: 
+  push:
+    branches:
+      - dev
   pull_request:
     branches:
       - dev
-      - build-action-attempt
     types:
       - closed
 jobs:
     docker:
-      if: github.event.pull_request.merged == true
+      #sif: github.event.pull_request.merged == true
       runs-on: ubuntu-latest
       steps:
         - name: Checkout
