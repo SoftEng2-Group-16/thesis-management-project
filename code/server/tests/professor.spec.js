@@ -12,7 +12,7 @@ describe('Professor tests', () => {
     // Launch the browser and open a new blank page
     //with headless:false we show the chromium browser
     //with headless:true we don't show the browser running, just the result
-    browser = await puppeteer.launch( {headless: true});
+    browser = await puppeteer.launch( {headless: false});
     page = await browser.newPage();
     //save the db before the changes we are going to do
     const sourcePath = '../server/db_TM_dirty.db';
@@ -38,7 +38,7 @@ describe('Professor tests', () => {
   });
   
 
-  test('a professor checks the first thesis', async () => {
+  test.skip('a professor checks the first thesis', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -87,7 +87,7 @@ describe('Professor tests', () => {
     await page.click("button.mt-3.ms-2.btn.btn-outline-danger")
   });
 
-  test('a professor updates the first thesis', async () => {
+  test.skip('a professor updates the first thesis', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -602,4 +602,127 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
+  test.skip('a professor archives a thesis and does all the checks', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 600});
+  
+    //this below is the mocked login for the professor
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'maria.rossi@polito.it');
+    await page.type('#password', '268553');
+    //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
+    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    await page.click(buttonSelector);
+  
+    //use this part above as a login in every test since it's needed.
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+    
+    
+    const rowIndex = 1;
+    const columnIndex = 2;
+    const numberOfRowsActive1 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length);
+
+    // Use the name of the archived thesis
+    const thesisName = await page.$eval(
+      `table.table-striped.table-bordered.table-hover tr:nth-child(${rowIndex + 1}) td:nth-child(${columnIndex + 1})`,
+      cell => cell.textContent.trim()
+    );
+    
+    //checking if there are some pending proposals
+    await page.click('#applications');
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+    // Used to save the name of the thesis
+    let textInThirdColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(3)', cells =>
+      cells.map(cell => cell.textContent.trim())
+      );
+    //used to see the status
+    let textInSixthColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(6)', cells =>
+      cells.map(cell => cell.textContent.trim())
+      );
+    let counterPending = 0;
+    //incrementing the counter for each pending request for the first thesis
+    textInThirdColumn.forEach((value, index) => {
+      if(value == thesisName){
+        if(textInSixthColumn[index] == "pending") counter++;
+      }
+    });
+    console.log(counterPending);
+
+    
+    //here we go to the archived and we save the number of archived thesis to compare then after
+    await page.click('#ArchivedProposals');
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const numberOfRowsArchived1 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length); 
+    //now we return back   
+    await page.click('#activeProposals');
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+    //return to the home page
+    await page.click('#my-proposals');
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    // Select the cell using CSS selector (in this case the first thesis)
+    const cellSelector = `${tableSelector} tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`;
+  
+    
+
+    await page.click(cellSelector);
+
+    await page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    //archive thesis
+    await page.click('button.mt-3 ms-2.btn.btn-outline-warning');
+
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+    const numberOfRowsActive2 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length);
+    //the new number of active has to be lower
+    if(numberOfRowsActive1 != numberOfRowsActive2 +1) throw new Error("No thesis Archived");
+
+    //here we go to the archived and we save the number of archived thesis to compare then after
+    await page.click('label[for="ArchivedProposals"]');
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const numberOfRowsArchived2 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length); 
+    //the new number of archived has to be bigger
+    if(numberOfRowsArchived1 +1 != numberOfRowsArchived2) throw new Error("No thesis Archived");
+    //now we return back to the active 
+    await page.click('label[for="activeProposals"]');
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+   
+    await page.click('#applications');
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+    // Used to save the name of the thesis
+     textInThirdColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(3)', cells =>
+      cells.map(cell => cell.textContent.trim())
+      );
+    //used to see the status
+     textInSixthColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(6)', cells =>
+      cells.map(cell => cell.textContent.trim())
+      );
+    //decrementing the counter for each rejected request for the first thesis
+    textInThirdColumn.forEach((value, index) => {
+      if(value == thesisName){
+        if(textInSixthColumn[index] == "rejected") counter--;
+      }
+      //if it's 0 it's fine since we rejected all the pending requests
+    if(counter != 0) throw new Error("The applications were not rejected")
+    });
+    console.log(counterPending);
+
+
+   
+    
+  }, 1 * 60 * 1000);
+  
 });

@@ -63,7 +63,7 @@ function NavHeader(props) {
           {props.loggedIn && props.user.role === 'student' && (
             <>
               <Nav.Item>
-                <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => { props.setMessage(''); navigate('/thesis'); }}>
+                <Nav.Link as={Link} to="/thesis" id="all-thesis" className="nav-link" eventKey="/thesis" onClick={() => { props.setMessage(''); navigate('/thesis'); }}>
                   All Thesis
                 </Nav.Link>
               </Nav.Item>
@@ -78,12 +78,12 @@ function NavHeader(props) {
           {props.loggedIn && props.user.role === 'teacher' && (
             <>
               <Nav.Item>
-                <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => { props.setMessage(''); navigate('/thesis'); }}>
+                <Nav.Link as={Link} to="/thesis" id="my-proposals" className="nav-link" eventKey="/thesis" onClick={() => { props.setMessage(''); navigate('/thesis'); }}>
                   My Proposals
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link as={Link} to="/proposal" className="nav-link" eventKey="/proposal" onClick={() => { props.setMessage(''); navigate('/proposal') }}>
+                <Nav.Link as={Link} to="/proposal" id="new-proposal" className="nav-link" eventKey="/proposal" onClick={() => { props.setMessage(''); navigate('/proposal') }}>
                   New Proposal
                 </Nav.Link>
               </Nav.Item>
