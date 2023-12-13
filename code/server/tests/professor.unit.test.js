@@ -717,3 +717,139 @@ describe("deleteProposal()", () => {
     expect(mockResponse.json).toHaveBeenCalledWith("Internal Server Error");
   });
 })
+
+describe("archiveProposal", () => {
+  let mockRequest;
+  let mockResponse;
+
+  beforeEach(() => {
+    mockRequest = {
+      body: {
+        proposalId: 3,
+      },
+      user: {
+        id: '268555',
+      },
+    };
+
+    mockResponse = {
+      status: jest.fn(() => mockResponse),
+      json: jest.fn(),
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const proposal = {
+    "id": 3,
+    "title": "Blockchain Technology and Cryptocurrencies",
+    "supervisor": "268555, Ferrari Giovanna",
+    "cosupervisors": [
+      "Maria Rossi, 268553, DAD",
+      "Luigi Bianchi, 268554, DAUIN"
+    ],
+    "keywords": [
+      "Blockchain",
+      " Cryptocurrency",
+      " Security"
+    ],
+    "type": "Company Thesis",
+    "groups": [
+      "AI",
+      "SO",
+      "SE"
+    ],
+    "description": "Explore the potential of blockchain technology and cryptocurrencies.",
+    "requirements": "Blockchain Development, Security, Financial Technology",
+    "notes": "This project focuses on the security and applications of blockchain and cryptocurrencies.",
+    "expiration": "31/12/2023",
+    "level": "master",
+    "cds": [
+      "LM-1",
+      "LM-2",
+      "LM-3"
+    ]
+  };
+
+  test("should successfully archive proposal", async () => {
+    const applications = [{ status: 'pending', thesisId: 3, teacherId: '268555', studentId: '200001' }];
+
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce(proposal);
+    daoTeacher.getApplicationsByThesisId.mockResolvedValueOnce(applications);
+    daoTeacher.archiveProposal.mockResolvedValueOnce(1); // Successfully archived proposal
+    daoTeacher.rejectApplication.mockResolvedValueOnce(); // Resolved reject application promise
+    daoTeacher.deleteProposal.mockResolvedValueOnce(1); // Successfully deleted proposal
+
+    await professorApi.archiveProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith(1);
+  });
+
+  test("should return 404 if proposal or applications not found", async () => {
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce({ error: 'Proposal not found' });
+    daoTeacher.getApplicationsByThesisId.mockResolvedValueOnce({ error: 'Applications not found' });
+
+    await professorApi.archiveProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(404);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Proposal not found' });
+  });
+
+  test("should return 422 if an application was accepted", async () => {
+    const proposal = { id: 3, supervisor: '268555' };
+    const applications = [{ status: 'accepted' }];
+
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce(proposal);
+    daoTeacher.getApplicationsByThesisId.mockResolvedValueOnce(applications);
+
+    await professorApi.archiveProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived`,
+    });
+  });
+
+  test("should return 401 if user not authorized to archive", async () => {
+    const proposal = { id: 3, supervisor: '268555' };
+    const applications = [{ status: 'pending' }];
+    mockRequest.user.id = '268553';
+
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce(proposal);
+    daoTeacher.getApplicationsByThesisId.mockResolvedValueOnce(applications);
+
+    await professorApi.archiveProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      "error": `User ${mockRequest.user.id} cannot archive proposal ${proposal.id}: NOT OWNED`
+    });
+  });
+
+  test("should return 500 if encountered some problems", async () => {
+    const applications = [{ status: 'pending', thesisId: 3, teacherId: '268555', studentId: '200001' }];
+
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce(proposal);
+    daoTeacher.getApplicationsByThesisId.mockResolvedValueOnce(applications);
+    daoTeacher.archiveProposal.mockResolvedValueOnce(1);
+    daoTeacher.rejectApplication.mockResolvedValueOnce();
+    daoTeacher.deleteProposal.mockResolvedValueOnce(2);
+
+    await professorApi.archiveProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: "Problem encountered while archiving proposal" });
+  });
+
+  test("should handle internal server error", async () => {
+    daoGeneral.getThesisProposalById.mockRejectedValue(new Error("Internal Server Error"));
+
+    await professorApi.archiveProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith("Internal Server Error");
+  });
+});
