@@ -168,8 +168,8 @@ function ThesisProposals(props) {
                   {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
                 </Form.Select>
                 <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
-                <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
-                <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
+                <Button id='search-button' variant="outline-success" onClick={() => filtering()}>Search</Button>
+                <Button id='reset-button' variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
               </Form>
             </Col>
           </Row>

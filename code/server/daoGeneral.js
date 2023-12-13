@@ -8,15 +8,9 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 
 
-exports.getThesisProposalById = (thesisId, status = 'none') => {
+exports.getThesisProposalById = (thesisId) => {
   return new Promise((resolve, reject) => {
-    let sql = '';
-    if (status == 'accepted' || status == 'canceled' || status == 'expired' || status == 'rejected') { //means the thesis is archived, look in the right table
-      sql = 'SELECT * from archived_thesis_proposals where id=?';
-    } else {
-      sql = 'SELECT * from thesis_proposals where id=? ';
-    }
-
+    const sql =  'SELECT * from thesis_proposals where id=? ';
     db.all(
       sql,
       [thesisId],
@@ -44,6 +38,41 @@ exports.getThesisProposalById = (thesisId, status = 'none') => {
             rows[0].cds.split(',')
           );
 
+          resolve(proposal);
+        }
+      });
+  });
+};
+
+exports.getProposalFromArchivedById = (thesisId) => {
+  return new Promise((resolve, reject) => {
+    const sql =  'SELECT * from archived_thesis_proposals where id=? ';
+    db.get(
+      sql,
+      [thesisId],
+      (err, row) => {
+        if (err) {
+          reject(err);
+        } else if (!row) {
+          resolve(
+            { error: `No archived thesis proposals found for id ${thesisId}` }
+          );
+        } else {
+          const proposal = new ThesisProposal(
+            row.id,
+            row.title,
+            row.supervisor,
+            row.cosupervisors.split('-'),
+            row.keywords.split(','),
+            row.type,
+            row.groups.split(','),
+            row.description,
+            row.requirements,
+            row.notes,
+            row.expiration,
+            row.level,
+            row.cds.split(',')
+          );
           resolve(proposal);
         }
       });

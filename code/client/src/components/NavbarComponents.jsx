@@ -31,9 +31,11 @@ function NavHeader(props) {
             if (props.loggedIn)
               setShowClock(!showClock);
           }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ffffff" viewBox="0 0 16 16">
-              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z" />
-            </svg>
+            <div className='clock-icon'>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ffffff" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z" />
+              </svg>
+            </div>
           </span>
           {props.loggedIn && showClock && (
             <Clock
@@ -57,36 +59,36 @@ function NavHeader(props) {
       {/* Rest of the Navbar below the brand */}
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav" className="lower-navbar w-100">
-      <Nav className="me-auto" variant="pills" defaultActiveKey="/">
+        <Nav className="me-auto" variant="pills" defaultActiveKey="/thesis">
           {props.loggedIn && props.user.role === 'student' && (
             <>
-            <Nav.Item >
-              <Nav.Link as={Link} to="/thesis" id='all-thesis' className="nav-link" eventKey="/thesis" onClick={() => props.setMessage('')}>
-                All Thesis
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/applications" id='applications' className='nav-link' eventKey="/applications" onClick={() => props.setMessage('')}>
-                Applications
-              </Nav.Link>
-            </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => { props.setMessage(''); navigate('/thesis'); }}>
+                  All Thesis
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} to="/applications" className='nav-link' eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications'); }}>
+                  Applications
+                </Nav.Link>
+              </Nav.Item>
             </>
           )}
 
           {props.loggedIn && props.user.role === 'teacher' && (
             <>
               <Nav.Item>
-                <Nav.Link as={Link} to="/" id='my-proposals' className="nav-link" eventKey="/" onClick={() => navigate('/')}>
+                <Nav.Link as={Link} to="/thesis" className="nav-link" eventKey="/thesis" onClick={() => { props.setMessage(''); navigate('/thesis'); }}>
                   My Proposals
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link as={Link} to="/proposal" id='new-proposal' className="nav-link" eventKey="/proposal" onClick={() => navigate('/proposal')}>
+                <Nav.Link as={Link} to="/proposal" className="nav-link" eventKey="/proposal" onClick={() => { props.setMessage(''); navigate('/proposal') }}>
                   New Proposal
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link as={Link} to="/applications" id='applications' className="nav-link"  eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications') }}>
+                <Nav.Link as={Link} to="/applications" id='applications' className="nav-link" eventKey="/applications" onClick={() => { props.setMessage(''); navigate('/applications') }}>
                   Applications
                 </Nav.Link>
               </Nav.Item>

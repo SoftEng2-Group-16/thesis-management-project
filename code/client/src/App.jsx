@@ -15,6 +15,7 @@ import ThesisApplications from './components/Applications.jsx';
 import ApplicationDetails from './components/ApplicationDetails.jsx';
 import dayjs from 'dayjs';
 
+
 function App() {
   const [loggedIn, setLoggedIn] = useState(null);
 
@@ -33,6 +34,20 @@ function App() {
     else msg = "Unknown Error";
     setMessage({ msg: msg, type: 'danger' });
   }
+
+  useEffect(() => {
+    const getInitialDate = async () => {
+      const initial = await API.getInitialDate();
+      //adjust month, because Date library is stupid and datepicker uses it
+      let [d,m,y] = initial.split('/');
+      m = (Number(m) - 1).toString();
+    
+      const date = new Date(y,m,d);
+      setCurrentDate(date);
+    }
+
+    getInitialDate();
+  }, []);
 
   //TODO the login method should not returns the row in the auth table but should query again against student or professor table to get all the info
   //! generalAPI exports a 'API' and not 'generalAPI' for the time being
@@ -60,6 +75,7 @@ function App() {
     } */
     setMessage('');
   }, []);
+
 
   const handleLogin = async (credentials) => {
     try {
