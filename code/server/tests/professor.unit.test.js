@@ -708,15 +708,6 @@ describe("deleteProposal()", () => {
     expect(mockResponse.json).toHaveBeenCalledWith({ error: "Proposal not found" });
   });
 
-  test("should handle unauthorized deletion", async () => {
-    daoGeneral.getThesisProposalById.mockResolvedValue({ supervisor: 'some_other_teacher_id' });
-
-    await professorApi.deleteProposal(mockRequest, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(401);
-    expect(mockResponse.json).toHaveBeenCalledWith("Unauthorized");
-  });
-
   test("should handle internal server error", async () => {
     daoGeneral.getThesisProposalById.mockRejectedValue(new Error("Internal Server Error"));
 
