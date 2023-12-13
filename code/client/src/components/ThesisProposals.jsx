@@ -174,16 +174,6 @@ function ThesisProposals(props) {
     setCheckedButton(!checkedButton);
   }
 
-  function showActiveThesisProposals() {
-    setThesis([...Allthesis]);
-  } 
-
-  function showArchivedThesisProposals() {
-    setThesis([...archivedThesis]);
-    console.log("thesis", thesis);
-    console.log("archived thesis", archivedThesis);
-  }
-
   return (
     <>
       {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && thesis != []?
