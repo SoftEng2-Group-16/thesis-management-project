@@ -113,7 +113,6 @@ const ProposalForm = (props) => {
         professorAPI.getDegreesInfo()
             .then((degreesInfo) => {
                 setCdsList(degreesInfo.map(str => ({ value: str, label: str })));
-                console.log(degreesInfo);
 
                 if (proposal && proposal.cds.length > 0) {
                     const transformedCDS = degreesInfo
@@ -133,7 +132,6 @@ const ProposalForm = (props) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(proposal);
         const cosupervisors = cosupervisorsExt ? cosupervisorsExt.concat(cosupervisorsInt) : cosupervisorsInt;
 
         const errors = {};
@@ -145,7 +143,6 @@ const ProposalForm = (props) => {
         if (!supervisor || supervisor.trim() === '') {
             errors.supervisor = 'Supervisor is required';
         }
-        console.log(keywords);
         if (!keywords || keywords.trim() === '') {
             errors.keywords = 'Keywords are required';
         } else {

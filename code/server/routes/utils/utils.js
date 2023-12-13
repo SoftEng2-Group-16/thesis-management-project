@@ -1,11 +1,9 @@
-const daoStudent = require('../../daoStudent');
 const daoTeacher = require('../../daoTeacher');
-const daoGeneral = require('../../daoGeneral');
 const daoUtils= require('../../daoUtils');
 const models = require('../../model');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat")
-
+const it = require('dayjs/locale/it')
 
 dayjs.extend(customParseFormat);
 
@@ -13,23 +11,14 @@ const rearrangeProposals = async (req,res) => {
     const selectedTimestamp = req.body.selectedTimestamp;
     try {
         let counterMovedProposals = 0;
-        let expiredProposals = await daoUtils.getExpiredProposals(selectedTimestamp);
-        let proposalsToRevive = await daoUtils.getProposalsToRevive(selectedTimestamp);
-        const acceptedProposalsIds = await daoUtils.getAcceptedProposalsIds()
-            .then(ids => {
-                if(ids.error){
-                    return [];
-                } else {
-                    return ids;
-                }
-            });
-        
+        const expiredProposals = await daoUtils.getExpiredProposals(selectedTimestamp);
+        const proposalsToRevive = await daoUtils.getProposalsToRevive(selectedTimestamp);
+        const acceptedProposalsIds = await daoUtils.getAcceptedApplicationsIds(); //either array of ids or empty
+ 
         if(expiredProposals.length > 0 && !expiredProposals.error) {
-            for (p of expiredProposals) { 
-                //archive expired proposals (insert into archived_thesis_proposals, delete from thesis proposals)
-                //also mark as expired all applications for expired proposals
+            for (const p of expiredProposals) {
                 await daoTeacher.archiveProposal(new models.ThesisProposal(
-                    p.id, //can be whatever, DB handles autoincrement id
+                    p.id,
                     p.title,
                     p.supervisor,
                     p.cosupervisors.join('-'),
@@ -44,27 +33,21 @@ const rearrangeProposals = async (req,res) => {
                     p.cds.join(',')
                 ))
                     .then(() => {
-                        daoTeacher.deleteProposal(p.id);
-                        daoUtils.updateApplicationsForExpiredProposals(p.id, p.supervisor.slice(0,6));
+                        daoUtils.updateApplicationsForExpiredProposals(p.id, p.supervisor.slice(0,6))
+                            .then(daoTeacher.deleteProposal(p.id));
                         counterMovedProposals++;
                     })
                     .catch( (e) => {
                         return res.status(500).json(e.message);
                     });
-    
             }
         }
         
         if(proposalsToRevive.length > 0 && !proposalsToRevive.error) {
-            for (p of proposalsToRevive) { 
-                //revive expired proposals (insert into thesis_proposals, delete from archived_thesis_proposals)
-                //put related applications statuses back to pending, but should also update proposal id since it's been
-                //inserted back as a new row in the table
-                //NOTE: revive a proposal only if there isn't already an accepted application for that proposal, otherwise
-                //ignore it
+            for (const p of proposalsToRevive) { 
                 if(!acceptedProposalsIds.includes(p.id)) {
                     await daoTeacher.saveNewProposal(new models.ThesisProposal(
-                        p.id, //can be whatever, DB handles autoincrement id
+                        p.id,
                         p.title,
                         p.supervisor,
                         p.cosupervisors.join('-'),
@@ -80,7 +63,7 @@ const rearrangeProposals = async (req,res) => {
                     ))
                         .then(() => {
                             daoUtils.reviveExpiredApplications(p.id)
-                                .then(daoUtils.deleteProposalFromArchived(p.id))
+                                .then(daoUtils.deleteProposalFromArchived(p.id));
                             counterMovedProposals++;
                         })
                         .catch ( (e) => {
@@ -90,8 +73,12 @@ const rearrangeProposals = async (req,res) => {
             }
         }
 
-        //clean up eventual applications that need to be put back as canceled
-        await daoUtils.cancelApplicationsAfterClockChange();
+        //update the date in the db
+        const updated = await daoUtils.updateVirtualClockDate(selectedTimestamp);
+        if(updated != 1){
+            console.log(updated);
+            return res.status(500).json({error: 'Problem while updating the date'});
+        }
         
         //if we get here, all went well
         return res.status(200).json(counterMovedProposals);
@@ -100,6 +87,16 @@ const rearrangeProposals = async (req,res) => {
     }
 }
 
+const getInitialDate = async (req,res) => {
+    try {
+        const date = await daoUtils.getVirtualClockDate();
+        return res.status(200).json(date);
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 module.exports = {
-    rearrangeProposals
+    rearrangeProposals,
+    getInitialDate
 }

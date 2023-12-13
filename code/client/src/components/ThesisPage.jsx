@@ -14,6 +14,7 @@ function ThesisPage(props) {
   const { handleErrors } = useContext(MessageContext);
 
   const [isAccepted, setAccepted] = useState(false);
+  const [isArchived, setArchived] = useState(false);
 
   useEffect(() => {
     (state)
@@ -33,11 +34,25 @@ function ThesisPage(props) {
           }
         })
         .catch(e => {
-          handleErrors(e);
+          //no application found for the professor, not a problem in this case
+          if (e.error && e.status !== 404) {
+            handleErrors(e);
+          }
         });
+      professorAPI.getOwnArchivedProposals().then((archivedProposals) => {
+        const wasArchived = archivedProposals.filter(item => item.id === state.thesisDetails.id)
+
+        if (wasArchived.length > 0)
+          setArchived(true); 
+      })
+      .catch(e => {
+        //handleErrors(e);
+      })
     }
 
   }, [state]);
+
+  
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
@@ -52,6 +67,18 @@ function ThesisPage(props) {
         handleErrors(e);
       });
   };
+
+  const handleArchiveClick = () => {
+    professorAPI.archiveProposal(thesisDetails.id)
+      .then(() => {
+        props.setMessage({ msg: "Thesis Proposal succesfully archived!", type: 'success' });
+        navigate('/thesis');
+      })
+      .catch(e => {
+        console.log(e);
+        handleErrors(e);
+      });
+  }
 
   const handleGoBackClick = () => {
     // Navigate back to /thesis
@@ -83,7 +110,7 @@ function ThesisPage(props) {
         <Col md={{ span: 8, offset: 2 }}>
           <Card className="thesis-card">
             <Card.Body>
-              <Card.Title className="border-bottom pb-2 mb-4">{thesisDetails.title}</Card.Title>
+              <Card.Title className="border-bottom pb-2 mb-4" id="card-title">{thesisDetails.title}</Card.Title>
 
               {/* Grouping related information */}
               <Row className="mb-4">
@@ -154,6 +181,12 @@ function ThesisPage(props) {
               {props.user.role === 'teacher' && (
                 <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleDeleteProposal}>
                   Delete Proposal
+                </Button>
+                )}
+              {/*archive button */}
+              {props.user.role === 'teacher' && !isArchived && (
+                <Button variant="outline-warning" className="mt-3 ms-2" onClick={handleArchiveClick}>
+                  Archive
                 </Button>
               )}
 
