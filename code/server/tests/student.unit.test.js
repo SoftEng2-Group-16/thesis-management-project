@@ -79,6 +79,17 @@ describe('tests for insertNewApplication', () => {
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(error.message);
   });
+  test('should handle an already accepted application for the student', async () => {
+    const acceptedThesis = [{ thesisid: 3 }, { thesisid: 3 }];
+    daoStudent.getMyThesisAccepted.mockResolvedValueOnce(acceptedThesis);
+
+    await insertNewApplication(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      error: "already exist an accepted application for this student"
+    });
+  });
 });
 
 describe('getApplicationsForStudent', () => {
@@ -149,6 +160,25 @@ describe('getApplicationsForStudent', () => {
 
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+  });
+  test('should handle an error retrieving teacher or thesis information', async () => {
+    const applications = [
+      { id: 1, teacherId: 'teacher456', thesisId: 'thesis789', studentId: 'student123' },
+      // Add more application objects as needed
+    ];
+
+    const teacherError = new Error('Error retrieving teacher information');
+    const thesisError = new Error('Error retrieving thesis information');
+
+    daoStudent.getApplicationsForStudent.mockResolvedValueOnce(applications);
+    daoTeacher.getTeacherById.mockRejectedValueOnce(teacherError);
+    daoGeneral.getThesisProposalById.mockRejectedValueOnce(thesisError);
+    daoStudent.getStudentById.mockResolvedValueOnce({ id: 'student123', name: 'Student Name' });
+
+    await getApplicationsForStudent(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith('Error retrieving teacher information');
   });
 });
 

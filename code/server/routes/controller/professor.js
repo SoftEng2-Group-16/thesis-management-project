@@ -219,16 +219,16 @@ const archiveProposal = async (req,res)  => {
         const proposal = await daoGeneral.getThesisProposalById(proposalId);
         const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
 
-        if(proposal.error){
+        if (proposal.error || applications.error) {
             return res.status(404).json(proposal);
         }
-        
-        if (applications.filter( a => a.status === "accepted").length != 0 ) {
-            return res.status(422).json({error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived`});
+
+        if (applications.filter(a => a.status === "accepted").length != 0) {
+            return res.status(422).json({ error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived` });
         }
-        
-        if(!proposal.supervisor.match(userId)) {
-            return res.status(401).json({"error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED`})
+
+        if (!proposal.supervisor.match(userId)) {
+            return res.status(401).json({ "error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED` })
         } else {
             const changes = await daoTeacher.archiveProposal(new models.ThesisProposal(
                 proposal.id, //can be whatever, DB handles autoincrement id
@@ -245,25 +245,25 @@ const archiveProposal = async (req,res)  => {
                 proposal.level,
                 proposal.cds.join(',')
             )) //STILL NEED TO MANAGE APPLICATIONS
-                .then( () => {
+                .then(async () => {
                     for (a of applications) {
                         console.log(a);
-                        if(a.status === "pending"){
-                            daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
+                        if (a.status === "pending") {
+                            await daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
                         }
                     }
                 })
-                .then( () => {
-                    const c = daoTeacher.deleteProposal(proposal.id);
+                .then(async () => {
+                    const c = await daoTeacher.deleteProposal(proposal.id);
                     return c;
                 });
             if (changes == 1) {
                 return res.status(200).json(changes);
             } else {
-                return res.status(500).json({error: "Problem encountered while archiving proposal"});
+                return res.status(500).json({ error: "Problem encountered while archiving proposal" });
             }
         }
-    } catch(e) {
+    } catch (e) {
         return res.status(500).json(e.message);
     }
 }
@@ -275,6 +275,7 @@ const updateThesisProposal = async (req, res) => {
     if (!teacherId) {
         return res.status(503).json({ error: "problem with the authentication" });
     }
+
 
     // Is the id in the body equal to the id in the url?
     if (req.body.id !== Number(req.params.thesisid)) {
@@ -326,9 +327,8 @@ const updateThesisProposal = async (req, res) => {
     try {
         //**check if there is an already accepted application for this proposal */
         const acceptedThesis = await daoTeacher.getThesisAccepted();
-
-        if(acceptedThesis.length>0 && acceptedThesis.includes(proposal.id)){
-            return res.status(400).json({error:"already accepted thesis"})
+        if (acceptedThesis.length > 0 && acceptedThesis.includes(proposal.id)) {
+            return res.status(400).json({ error: "already accepted thesis" })
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
@@ -351,7 +351,7 @@ const deleteProposal = async (req, res) => {
     if (isNaN(proposalId) || !Number.isInteger(parseInt(proposalId))) {
         return res.status(422).json({ error: "not valid proposalId" });
     }
-    
+
     try {
         // check user is authorized
         const thesis_proposal = await daoGeneral.getThesisProposalById(proposalId);
@@ -360,7 +360,7 @@ const deleteProposal = async (req, res) => {
             return res.status(404).json(thesis_proposal);
         } else {
             let id = thesis_proposal.supervisor.split(',');
-            if(id[0] !== teacherId){
+            if (id[0] !== teacherId) {
                 return res.status(401).json("Unauthorized");
             }
             // delete all PENDING applications

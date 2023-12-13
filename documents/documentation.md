@@ -1,30 +1,33 @@
 
 # Table of Contents
 
-1. [Changes](#changes)
-2. [Stories](#stories)
-3. [General Information about the project implementation](#general-information-about-the-project-implementation)
-   1. [AUTH v.1.0](#auth-v10)
-      
-   2. [AUTH v.2.0](#auth-v20)
-      1. [Strategy Description](#strategy-description)
-   3. [SESSIONS](#sessions)
-   4. [Database Structure](#database-structure)
-         1. [STUDENTS](#students)
-         2. [TEACHERS](#teachers)
-         3. [CAREERS](#careers)
-         4. [DEGREES](#degrees)
-         5. [THESIS_PROPOSALS](#thesis-proposals)
-   5. [Nofification System](#notification-system)
-4. [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
-   1. [Update get thesis proposals](#update-get-thesis-proposals)
-5. [React Client Application Routes](#react-client-application-routes)
-   1. [Main Component](#main-component)
-6. [API Server](#api-server)
-   1. [Template for API Description](#template-for-api-description)
-7. [Testing](#testing)
-8. [Implementation for Integration (OBSOLETE)](#implementation-for-integration-obsolete)
-   1. [Commands](#commands)
+- [Table of Contents](#table-of-contents)
+    - [Changes](#changes)
+    - [Stories](#stories)
+- [General Information about the project implementation](#general-information-about-the-project-implementation)
+  - [AUTH v.1.0](#auth-v10)
+  - [AUTH v.2.0](#auth-v20)
+    - [Description](#description)
+    - [SESSIONS](#sessions)
+  - [Database Structure](#database-structure)
+    - [Example rows (one for each table)](#example-rows-one-for-each-table)
+      - [STUDENTS](#students)
+      - [TEACHERS](#teachers)
+      - [CAREERS](#careers)
+      - [DEGREES](#degrees)
+      - [THESIS\_PROPOSALS](#thesis_proposals)
+    - [Notification System](#notification-system)
+  - [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
+  - [React Client Application Routes](#react-client-application-routes)
+  - [Main Component](#main-component)
+  - [API Server](#api-server)
+    - [API Description](#api-description)
+    - [Session APIs:](#session-apis)
+    - [Proposals APIs:](#proposals-apis)
+    - [Applications APIs:](#applications-apis)
+    - [General and utils APIs:](#general-and-utils-apis)
+  - [Testing](#testing)
+    - [Commands](#commands)
 
 
 ### Changes
@@ -356,4 +359,4 @@ This commands are executed only on test files under `thesis-management-project/c
 
 - `npm test`: runs all test 
 - `npm test:unit`: runs only unit tests with coverage
-- `INSERT HERE COMMANDS FOR E2E TESTS`
+- `npm test:spec`: runs the e2e tests with coverage. For e2e is suggested to run each test singularly with the command `npm test ` + the name of the .spec file. For now we have 3 spec files. One for the student were we try only student stories, one for the professoe were we do the same, and one called user, were we test stories that need some sort of interactions between users.
