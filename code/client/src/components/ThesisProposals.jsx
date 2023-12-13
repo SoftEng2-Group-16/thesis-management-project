@@ -252,8 +252,7 @@ function ThesisProposals(props) {
             </ToggleButtonGroup>
             </Col>
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
-               {console.log("teste", thesis)}
-              {thesis != [] ? 
+              {thesis.length > 0 ? 
               <Table striped bordered hover responsive>
                 <thead className="align-middle">
                   <tr>
@@ -281,7 +280,7 @@ function ThesisProposals(props) {
                 </tbody>
               </Table>
               : <Row>
-                  <h3>None thesis proposals to show yet.</h3>
+                  <h4>None thesis proposals to show</h4>
                 </Row>
                 }
             </Col>
