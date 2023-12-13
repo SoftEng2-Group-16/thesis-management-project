@@ -234,16 +234,16 @@ const archiveProposal = async (req, res) => {
                 proposal.level,
                 proposal.cds.join(',')
             )) //STILL NEED TO MANAGE APPLICATIONS
-                .then(() => {
+                .then(async () => {
                     for (a of applications) {
                         console.log(a);
                         if (a.status === "pending") {
-                            daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
+                            await daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
                         }
                     }
                 })
-                .then(() => {
-                    const c = daoTeacher.deleteProposal(proposal.id);
+                .then(async () => {
+                    const c = await daoTeacher.deleteProposal(proposal.id);
                     return c;
                 });
             if (changes == 1) {
