@@ -79,7 +79,24 @@ Implement an intelligent system leveraging machine learning algorithms to analyz
 
 ## NOTIFY application DECISION
 
-(wip)
+### TEACHER
+
+- Login:
+    - luigi.bianchi@polito.it
+    - 268554
+- Choose thesis
+- Accept it
+
+### SYSTEM
+
+- Show the notification sent to the student
+
+### STUDENT
+
+- Login
+    - luigi.ferrari@studenti.polito.it
+    - 200003
+- show application status ('accepted')
 
 ## DELETE proposal
 
@@ -152,4 +169,17 @@ date: 30/04/2024
 
 ## ARCHIVE proposal
 
-(wip)
+### TEACHER
+
+- Login:
+    - teacher that has a proposal with an application in 'pending' state
+- Choose that thesis
+- Archive
+
+### STUDENT
+
+- Login
+    - student that did the application on the proposal
+- show application status ('rejected')
+
+> **END**
