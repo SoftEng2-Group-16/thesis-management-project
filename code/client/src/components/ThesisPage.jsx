@@ -158,7 +158,7 @@ function ThesisPage(props) {
               )}
 
               {/*edit button */}
-              {props.user.role === 'teacher' && (
+              {props.user.role === 'teacher' && !isArchived && (
                 <Link
                   className=" mt-3 ms-2 btn btn-outline-primary"
                   to={"/proposal"}
