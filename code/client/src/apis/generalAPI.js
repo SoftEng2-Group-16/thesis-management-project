@@ -43,6 +43,19 @@ const logOut = async () => {
     return null;
 }
 
+const getInitialDate = async () => {
+  const response = await fetch(SERVER_URL + '/api/initialdate', {
+    credentials: 'include',
+  });
+  
+  const date = response.json();
+  if(response.ok){
+    return date;
+  } else {
+    throw date;
+  }
+}
+
 const rearrangeProposals = async (newDate) => {
   const data = {
     selectedTimestamp: newDate
@@ -65,20 +78,30 @@ const rearrangeProposals = async (newDate) => {
   }
 }
 
+const sendEmail = async (emailData) => {
+  try {
+    const response = await fetch(SERVER_URL + '/api/notify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(emailData),
+    });
 
-// general purpose apis 
-/*const getThesisProposals = async () => {
-  const response = await fetch(SERVER_URL + '/api/thesis', {
-    credentials: 'include',
-  });
-  const proposals = await response.json();
-  if (response.ok) {
-    return proposals
-  } else {
-    throw proposals;  // an object with the error coming from the server
+    const res = await response.json();
+
+    if (response.ok) {
+      console.log('Email sent successfully. Email text:', res.emailText);
+      return res;
+    } else {
+      throw res;
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
   }
 };
-*/
 
-const API = { getUserInfo, logIn, logOut, /*getThesisProposals,*/ rearrangeProposals };
+const API = { getUserInfo, logIn, logOut, rearrangeProposals, getInitialDate, sendEmail };
 export default API;

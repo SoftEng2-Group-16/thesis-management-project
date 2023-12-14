@@ -15,6 +15,7 @@ import ThesisApplications from './components/Applications.jsx';
 import ApplicationDetails from './components/ApplicationDetails.jsx';
 import dayjs from 'dayjs';
 
+
 function App() {
   const [loggedIn, setLoggedIn] = useState(null);
 
@@ -33,6 +34,20 @@ function App() {
     else msg = "Unknown Error";
     setMessage({ msg: msg, type: 'danger' });
   }
+
+  useEffect(() => {
+    const getInitialDate = async () => {
+      const initial = await API.getInitialDate();
+      //adjust month, because Date library is stupid and datepicker uses it
+      let [d,m,y] = initial.split('/');
+      m = (Number(m) - 1).toString();
+    
+      const date = new Date(y,m,d);
+      setCurrentDate(date);
+    }
+
+    getInitialDate();
+  }, []);
 
   //TODO the login method should not returns the row in the auth table but should query again against student or professor table to get all the info
   //! generalAPI exports a 'API' and not 'generalAPI' for the time being
@@ -60,6 +75,7 @@ function App() {
     } */
     setMessage('');
   }, []);
+
 
   const handleLogin = async (credentials) => {
     try {
@@ -107,24 +123,25 @@ function App() {
           <Route
             element={
               <>
-                <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} setMessage={setMessage} />
-                <Container fluid className="mt-3 text-center">
-                  {message && (
-                    <Row>
-                      <Alert variant={message.type} onClose={() => setMessage('')} dismissible>
-                        {message.msg}
-                      </Alert>
-                    </Row>
-                  )}
-                  <Outlet />
-                </Container>
-
+                <NavHeader loggedIn={loggedIn} user={user} handleLogout={handleLogout} onDateChange={handleDateChange} currentDate={currentDate} newDate={newDate} setNewDate={setNewDate} setCurrentDate={setCurrentDate} setMessage={setMessage}/>
+                <div className="mt-3 ms-4 me-4 mb-3 text-center">
+                  <Container fluid className="text-center">
+                    {message && (
+                      <Row>
+                        <Alert variant={message.type} onClose={() => setMessage('')} dismissible>
+                          {message.msg}
+                        </Alert>
+                      </Row>
+                    )}
+                    <Outlet/>
+                  </Container>
+                </div>
               </>
             }
           >
             <Route path="/" element={loggedIn === true ? (<Navigate to="/thesis" />) : (<LoginForm loggedIn={loggedIn} />)} />
             <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} setMessage={setMessage}/> : <ThesisProposals user={user} />} ></Route>
-            <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} /> : <LoginForm login={handleLogin} />}></Route>
+            <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} setMessage={setMessage} /> : <LoginForm login={handleLogin} />}></Route>
             <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors} setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
             <Route path="/application/:id" element={loggedIn ? <ApplicationDetails setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />

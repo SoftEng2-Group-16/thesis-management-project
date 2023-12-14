@@ -76,39 +76,48 @@ function StudentApplications({ applications, user }) {
 
     return (
 
-        <div style={{ marginTop: '10px' }}>
-
-            <Row style={{ marginTop: '20px' }}>
-                <Col style={{ marginBottom: '15px' }}><h2> Thesis applications </h2></Col>
-                <Col xs={12}>
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>Teacher</th>
-                                <th>Thesis</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="align-middle">
-                            {applications.map((appl, index) => (
-                                // choose a better key...
-                                <tr key={index} style={{ fontWeight: 'bold' }}>
-                                    <td>{appl.teacherInfo.surname + ' ' + appl.teacherInfo.name}<br /><small>{appl.teacherInfo.email}</small> </td>
-                                    <td>
-                                        <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
-                                            {appl.thesisInfo.title}
-                                        </Link>
-                                    </td>
-                                    <td>{appl.thesisInfo.type}</td>
-                                    <td>{appl.timestamp.split(' ')[0]}</td>
-                                    <td>{appl.status}</td>
+        <div className="mt-4">
+            <Row className="mt-5">
+                <Row className="d-flex justify-content-center mb-4">
+                    <Col lg={9} xs={12} md={12} sm={12} className="text-start">
+                        <h2> Thesis applications </h2>
+                    </Col>
+                </Row>
+                <Row className="d-flex justify-content-center">
+                    <Col lg={9} xs={12} md={12} sm={12}>
+                        <Table striped bordered hover responsive>
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Thesis</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </Col>
+                            </thead>
+                            <tbody className="align-middle">
+                                {applications.map((appl, index) => (
+                                    // choose a better key...
+                                    <tr key={index} style={{ fontWeight: 'bold' }}>
+                                        <td>{appl.teacherInfo.surname + ' ' + appl.teacherInfo.name}<br /><small>{appl.teacherInfo.email}</small> </td>
+                                        <td>{appl.thesisInfo.title? ( 
+                                            <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
+                                            {appl.thesisInfo.title}
+                                            </Link>
+                                            ) : (
+                                                <span className="d-inline-block">The thesis proposal has been deleted</span>
+                                            )
+                                        }   
+                                        </td>
+                                        <td>{appl.thesisInfo.type? appl.thesisInfo.type : ' - ' }</td>
+                                        <td>{appl.timestamp.split(' ')[0]}</td>
+                                        <td>{appl.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
             </Row>
 
         </div>
@@ -122,41 +131,50 @@ function ProfessorApplications({ applications, user }) {
 
     return (
 
-        <div style={{ marginTop: '10px' }}>
-
-            <Row style={{ marginTop: '20px' }}>
-                <Col style={{ marginBottom: '15px' }}><h2> Thesis applications </h2></Col>
-                <Col xs={12}>
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>StudentID</th>
-                                <th>Student</th>
-                                <th>Thesis</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="align-middle">
-                            {applications.map((appl, index) => (
-                                // choose a better key...
-                                <tr key={index} style={{ fontWeight: 'bold' }}>
-                                    <td>{appl.studentId}</td>
-                                    <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br /><small>{appl.studentInfo.email}</small> </td>
-                                    <td>
-                                        <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
-                                            {appl.thesisInfo.title}
-                                        </Link>
-                                    </td>
-                                    <td>{appl.thesisInfo.type}</td>
-                                    <td>{appl.timestamp.split(' ')[0]}</td>
-                                    <td>{appl.status}</td>
+        <div className="mt-4">
+            <Row className="mt-5">
+                <Row className="d-flex justify-content-center mb-4">
+                    <Col lg={9} xs={12} md={12} sm={12} className="text-start">
+                        <h2> Thesis applications </h2>
+                    </Col>
+                </Row>
+                <Row className="d-flex justify-content-center">
+                    <Col lg={9} xs={12} md={12} sm={12}>
+                        <Table striped bordered hover responsive>
+                            <thead className="align-middle">
+                                <tr>
+                                    <th>StudentID</th>
+                                    <th>Student</th>
+                                    <th>Thesis</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </Col>
+                            </thead>
+                            <tbody className="align-middle">
+                                {applications.map((appl, index) => (
+                                    // choose a better key...
+                                    <tr key={index} style={{ fontWeight: 'bold' }}>
+                                        <td>{appl.studentId}</td>
+                                        <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br /><small>{appl.studentInfo.email}</small> </td>
+                                        <td>{appl.thesisInfo.title? (
+                                            <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
+                                                {appl.thesisInfo.title}
+                                            </Link>
+                                            ) : (
+                                                <span className="d-inline-block">The thesis proposal has been deleted</span>
+                                            )
+                                        }
+                                        </td>
+                                        <td>{appl.thesisInfo.type? appl.thesisInfo.type : ' - '}</td>
+                                        <td>{appl.timestamp.split(' ')[0]}</td>
+                                        <td>{appl.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
             </Row>
 
         </div>

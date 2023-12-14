@@ -13,6 +13,8 @@ import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 
 function removeDuplicates(array) {
   return array.filter((value, index, self) => self.findIndex(v => v.value === value.value) === index);
@@ -41,6 +43,9 @@ function ThesisProposals(props) {
   const [version, setVersion] = useState(0);
   const animatedComponents = makeAnimated();
   const [NoProposals, setNoProposals] = useState(false);
+  const [activePorposalsButton, setActiveProposalsButton] = useState(true);
+  const [archivedPorposalsButton, setArchivedProposalsButton] = useState(false);
+  const [archivedThesis, setArchivedThesis] = useState([]);
 
   useEffect(() => {
 
@@ -52,24 +57,26 @@ function ThesisProposals(props) {
         } else {
           proposals = await professorAPI.getOwnThesisProposals(props.user.id);
         }
+        
         setAllThesis(proposals);
-        setThesis(proposals)
-
+        setThesis(proposals);
         if (proposals.length === 0) {
           setNoProposals(true);
+        } else {
+  
+          const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
+          setTitle(uniqueByTitle);
+          //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
+          setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
+          setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
+          setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
+          setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
+          setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
+          setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
+          setFilter("title")
+          setOptions(uniqueByTitle);
         }
-
-        const uniqueByTitle = removeDuplicates(proposals.map(item => ({ value: item.title, label: item.title })));
-        setTitle(uniqueByTitle);
-        //here we set all the options suggestions that we have divided by filter type. With map we don't put twice the same element
-        setSupervisor(removeDuplicates(proposals.map(item => ({ value: item.supervisor, label: item.supervisor }))));
-        setKeywords(removeDuplicates(proposals.flatMap(item => item.keywords.map(keyword => ({ value: keyword, label: keyword })))));
-        setGroups(removeDuplicates(proposals.flatMap(item => item.groups.map(group => ({ value: group, label: group })))));
-        setType(removeDuplicates(proposals.map(item => ({ value: item.type, label: item.type }))));
-        setLevel(removeDuplicates(proposals.map(item => ({ value: item.level, label: item.level }))));
-        setCds(removeDuplicates(proposals.flatMap(item => item.cds.map(cds => ({ value: cds, label: cds })))));
-        setFilter("title")
-        setOptions(uniqueByTitle);
+      
       } catch (error) {
         console.error(error);
         // Handle error
@@ -77,8 +84,23 @@ function ThesisProposals(props) {
       }
     };
 
+    const fetchArchivedThesisProposals = async() => {
+      try {
+        let archivedProposals = [];
+
+        if (props.user.role == "teacher") {
+          archivedProposals = await professorAPI.getOwnArchivedProposals(props.user.id);
+        }
+
+        setArchivedThesis(archivedProposals);
+      } catch (error){
+        console.error(error);
+      }
+    }
+
     if (props.loggedIn || props.update == true) {
       fetchThesis();
+      fetchArchivedThesisProposals();
       props.setUpdate(false);
     }
   }, [props.loggedIn, props.update]);
@@ -149,29 +171,55 @@ function ThesisProposals(props) {
 
   }
 
+  function changeActiveProposalsButtonState() {
+    if (!activePorposalsButton && archivedPorposalsButton) {
+      setActiveProposalsButton(true);
+      setArchivedProposalsButton(false);
+    }
+  }
+
+  function changeArchivedProposalsButtonState() {
+    if (activePorposalsButton && !archivedPorposalsButton) {
+      setActiveProposalsButton(false);
+      setArchivedProposalsButton(true);
+    }
+  }
+
+  function showActiveThesisProposals() {
+    setThesis([...Allthesis]);
+  } 
+
+  function showArchivedThesisProposals() {
+    setThesis([...archivedThesis]);
+  }
+
   return (
     <>
-      {props.loggedIn && !NoProposals ? (
-        <div style={{ marginTop: '10px' }} >
-          <Form className="d-flex">
-            <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
-              <option value="title">Title</option>
-              <option value="supervisor">Supervisor</option>
-              <option value="keywords">Keywords</option>
-              <option value="type">Type</option>
-              <option value="groups">Groups</option>
-              <option value="level">Level</option>
-              {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
-            </Form.Select>
-            <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
-            <Button variant="outline-success" onClick={() => filtering()}>Search</Button>
-            <Button variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
-          </Form>
+      {props.loggedIn && props.user.role != undefined && props.user.role == 'student' && !NoProposals?
+        <>
+          <Row className="d-flex justify-content-center mt-5" >
+            <Col lg={9} xs={12} md={12} sm={12}>
+              <Form className="d-flex">
+                <Form.Select aria-label="Default select example" className="selector" onChange={(event) => { changeParameter(event.target.value) }}>
+                  <option value="title">Title</option>
+                  <option value="supervisor">Supervisor</option>
+                  <option value="keywords">Keywords</option>
+                  <option value="type">Type</option>
+                  <option value="groups">Groups</option>
+                  <option value="level">Level</option>
+                  {props.user && props.user.role === "teacher" && <option value="cds">Course of study</option>}
+                </Form.Select>
+                <Select options={options} key={version} className="parameters" closeMenuOnSelect={true} components={animatedComponents} isMulti onChange={(event) => changeSelection(event)} />
+                <Button id='search-button' variant="outline-success" onClick={() => filtering()}>Search</Button>
+                <Button id='reset-button' variant="outline-secondary" onClick={() => handleReset()}>Reset</Button>
+              </Form>
+            </Col>
+          </Row>
 
-          <Row style={{ marginTop: '20px' }}>
-            <Col xs={12}>
-              <Table striped bordered hover>
-                <thead>
+          <Row className="d-flex justify-content-center mt-4">
+            <Col lg={9} xs={12} md={12} sm={12}>
+              <Table striped bordered hover responsive>
+                <thead className="align-middle">
                   <tr>
                     <th>Type</th>
                     <th>Title</th>
@@ -180,7 +228,7 @@ function ThesisProposals(props) {
                     <th>Expiration Date</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="align-middle">
                   {thesis.map((singleThesis) => (
                     <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
                       <td>{singleThesis.type}</td>
@@ -198,26 +246,64 @@ function ThesisProposals(props) {
               </Table>
             </Col>
           </Row>
-        </div>
-      ) : props.loggedIn && NoProposals ? (
-            <NoThesisProposalsFound />
-      ) : (
-        <div>You need to LOGIN!</div>
-      )}
+        </>
+       : props.user.role == 'teacher'? 
+       <>
+          <Row className="d-flex justify-content-center">
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
+            <ToggleButtonGroup type="radio" name="options" defaultValue={1}>
+              <ToggleButton className={activePorposalsButton? "active-toggle-button" : "not-active-toggle-button"} id="activeProposals" onClick={changeActiveProposalsButtonState} onChange={showActiveThesisProposals}>
+                Active Proposals
+              </ToggleButton>
+              <ToggleButton className={archivedPorposalsButton? "active-toggle-button" : "not-active-toggle-button"} id="ArchivedProposals" onClick={changeArchivedProposalsButtonState} onChange={showArchivedThesisProposals}>
+                Archived Proposals
+              </ToggleButton>
+            </ToggleButtonGroup>
+            </Col>
+            <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
+              {thesis.length > 0 ? 
+              <Table striped bordered hover responsive>
+                <thead className="align-middle">
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Groups</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody className="align-middle">
+                  { thesis.map((singleThesis) => (
+                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                      <td>{singleThesis.type}</td>
+                      <td>
+                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                          {singleThesis.title}
+                        </Link>
+                      </td>
+                      <td>{singleThesis.groups.join(', ')}</td>
+                      <td>{singleThesis.supervisor}</td>
+                      <td>{singleThesis.expiration}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              : <Row>
+                  <h4>No thesis proposals to show.</h4>
+                </Row>
+                }
+            </Col>
+          </Row>
+          </>
+       :
+        props.loggedIn && NoProposals?
+        <>
+          <Row className='mt-4'>
+              <h3>None thesis proposals to show yet</h3>
+          </Row>
+        </>
+       : <div>You need to LOGIN!</div>}
     </>
-  );
-}
-
-function NoThesisProposalsFound() {
-
-  return (
-      <Card className="thesis-card">
-          <Card.Title>
-              No active proposals to show!
-          </Card.Title>
-          <Card.Body>
-          </Card.Body>
-      </Card>
   );
 }
 

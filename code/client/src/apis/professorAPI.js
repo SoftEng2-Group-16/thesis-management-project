@@ -89,5 +89,77 @@ const getOwnThesisProposals = async () => {
   }
 }
 
-const professorAPI = { getPossibleCosupervisors, getDegreesInfo,setDecision, insertProposal, getApplications, getOwnThesisProposals }
+
+const editProposal = async (proposal) => {
+  const response = await fetch(SERVER_URL + `/api/teacher/proposal/${proposal.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(proposal),
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
+const deleteProposal = async (proposalID) => {
+
+  const response = await fetch(SERVER_URL + `/api/deleteproposal/${proposalID}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
+const getOwnArchivedProposals = async() => {
+  const response = await fetch(SERVER_URL + '/api/archive/thesis', {
+    credentials: 'include',
+  });
+
+  const archivedProposals = await response.json();
+  if (response.ok) {
+    return archivedProposals;
+  } else {
+    throw archivedProposals;
+  }
+}
+
+const archiveProposal = async (proposalId) => {
+  const response = await fetch(SERVER_URL + `/api/teacher/archiveproposal`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({proposalId}),
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
+
+const professorAPI = {
+  getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
+  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals, archiveProposal, deleteProposal
+}
 export default professorAPI;
