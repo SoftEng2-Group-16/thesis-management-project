@@ -43,7 +43,8 @@ function ThesisProposals(props) {
   const [version, setVersion] = useState(0);
   const animatedComponents = makeAnimated();
   const [NoProposals, setNoProposals] = useState(false);
-  const [checkedButton, setCheckedButton] = useState(true);
+  const [activePorposalsButton, setActiveProposalsButton] = useState(true);
+  const [archivedPorposalsButton, setArchivedProposalsButton] = useState(false);
   const [archivedThesis, setArchivedThesis] = useState([]);
 
   useEffect(() => {
@@ -170,8 +171,18 @@ function ThesisProposals(props) {
 
   }
 
-  function changeProposalsButtonState() {
-    setCheckedButton(!checkedButton);
+  function changeActiveProposalsButtonState() {
+    if (!activePorposalsButton && archivedPorposalsButton) {
+      setActiveProposalsButton(true);
+      setArchivedProposalsButton(false);
+    }
+  }
+
+  function changeArchivedProposalsButtonState() {
+    if (activePorposalsButton && !archivedPorposalsButton) {
+      setActiveProposalsButton(false);
+      setArchivedProposalsButton(true);
+    }
   }
 
   function showActiveThesisProposals() {
@@ -241,10 +252,10 @@ function ThesisProposals(props) {
           <Row className="d-flex justify-content-center">
             <Col lg={9} xs={12} md={12} sm={12} className="mt-4">
             <ToggleButtonGroup type="radio" name="options" defaultValue={1}>
-              <ToggleButton className={checkedButton? "active-toggle-button" : "not-active-toggle-button"} id="activeProposals" value={1} onClick={changeProposalsButtonState} onChange={showActiveThesisProposals}>
+              <ToggleButton className={activePorposalsButton? "active-toggle-button" : "not-active-toggle-button"} id="activeProposals" onClick={changeActiveProposalsButtonState} onChange={showActiveThesisProposals}>
                 Active Proposals
               </ToggleButton>
-              <ToggleButton className={checkedButton? "not-active-toggle-button" : "active-toggle-button"} id="ArchivedProposals" value={2} onClick={changeProposalsButtonState} onChange={showArchivedThesisProposals}>
+              <ToggleButton className={archivedPorposalsButton? "active-toggle-button" : "not-active-toggle-button"} id="ArchivedProposals" onClick={changeArchivedProposalsButtonState} onChange={showArchivedThesisProposals}>
                 Archived Proposals
               </ToggleButton>
             </ToggleButtonGroup>
