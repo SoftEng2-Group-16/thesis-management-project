@@ -126,9 +126,40 @@ const deleteProposal = async (proposalID) => {
   }
 }
 
+const getOwnArchivedProposals = async() => {
+  const response = await fetch(SERVER_URL + '/api/archive/thesis', {
+    credentials: 'include',
+  });
+
+  const archivedProposals = await response.json();
+  if (response.ok) {
+    return archivedProposals;
+  } else {
+    throw archivedProposals;
+  }
+}
+
+const archiveProposal = async (proposalId) => {
+  const response = await fetch(SERVER_URL + `/api/teacher/archiveproposal`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({proposalId}),
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  }
+  else {
+    throw res;
+  }
+}
+
 
 const professorAPI = {
   getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
-  getApplications, getOwnThesisProposals, editProposal, deleteProposal
+  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals, archiveProposal, deleteProposal
 }
 export default professorAPI;

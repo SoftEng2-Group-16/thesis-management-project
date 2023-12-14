@@ -26,8 +26,7 @@ exports.getExpiredProposals = (selectedTimestamp) => {
                             if (pts.isBefore(ts))
                                 return r;
                         })
-                        .map((row) => (
-                            {
+                        .map((row) => ({
                                 id: row.id,
                                 title: row.title,
                                 supervisor: row.supervisor,
@@ -69,8 +68,7 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
                             if (pts.isSameOrAfter(ts))
                                 return r;
                         })
-                        .map((row) => (
-                            {
+                        .map((row) => ({
                                 id: row.id,
                                 title: row.title,
                                 supervisor: row.supervisor,
@@ -93,7 +91,7 @@ exports.getProposalsToRevive = (selectedTimestamp) => {
     });
 }
 
-exports.getAcceptedProposalsIds = () => {
+exports.getAcceptedApplicationsIds = () => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT thesisid FROM applications WHERE status=?';
         db.all(
@@ -102,8 +100,8 @@ exports.getAcceptedProposalsIds = () => {
             (err, rows) => {
                 if (err) {
                     reject(err);
-                } else if (!rows || rows.length == 0) {
-                    resolve({ error: "No accepted applications, can revive all proposals" });
+                } else if (rows.length == 0) {
+                    resolve([]); //no accepted applications found
                 } else {
                     const ids = rows.map(row => row.thesisid);
                     resolve(ids);
@@ -135,29 +133,12 @@ exports.updateApplicationsForExpiredProposals = (thesisId, teacherId) => {
     });
 };
 
-exports.cancelApplicationsAfterClockChange = () => { //used to put back as canceled applications that have been revived wrongly
-    return new Promise((resolve, reject) => {
-        const sql = 'UPDATE applications SET status=? WHERE status=? AND studentid IN  ( SELECT studentid FROM applications WHERE status=? )'
-        db.run(
-            sql,
-            ["canceled", "pending", "accepted"],
-            function (err) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(this.changes);
-                }
-            }
-        )
-    });
-}
-
 exports.reviveExpiredApplications = (thesisId) => {
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE applications SET status=? WHERE thesisid=? AND (status=? OR status=?)'
+        const sql = 'UPDATE applications SET status=? WHERE thesisid=? AND status=?'
         db.run(
             sql,
-            ["pending", thesisId, "expired", "canceled"],
+            ["pending", thesisId, "expired"],
             function (err) {
                 if (err) {
                     reject(err);
@@ -185,4 +166,39 @@ exports.deleteProposalFromArchived = (proposalId) => {
             }
         )
     });
+}
+
+exports.getVirtualClockDate = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT date FROM vc_date WHERE id=?';
+        db.all(
+            sql,
+            [0],
+            (err,rows) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    resolve(rows[0].date);
+                }
+            }
+        );
+    });
+}
+
+exports.updateVirtualClockDate = (date) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE vc_date SET date=? WHERE id=?'
+        db.run(
+            sql,
+            [date,0],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    //this.cancelApplicationsAfterClockChange();
+                    resolve(this.changes);
+                }
+            }
+        )
+    })
 }
