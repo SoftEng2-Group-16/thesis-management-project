@@ -100,12 +100,16 @@ function StudentApplications({ applications, user }) {
                                     // choose a better key...
                                     <tr key={index} style={{ fontWeight: 'bold' }}>
                                         <td>{appl.teacherInfo.surname + ' ' + appl.teacherInfo.name}<br /><small>{appl.teacherInfo.email}</small> </td>
-                                        <td>
+                                        <td>{appl.thesisInfo.title? ( 
                                             <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
-                                                {appl.thesisInfo.title}
+                                            {appl.thesisInfo.title}
                                             </Link>
+                                            ) : (
+                                                <span className="d-inline-block">The thesis proposal has been deleted</span>
+                                            )
+                                        }   
                                         </td>
-                                        <td>{appl.thesisInfo.type}</td>
+                                        <td>{appl.thesisInfo.type? appl.thesisInfo.type : ' - ' }</td>
                                         <td>{appl.timestamp.split(' ')[0]}</td>
                                         <td>{appl.status}</td>
                                     </tr>
@@ -153,12 +157,16 @@ function ProfessorApplications({ applications, user }) {
                                     <tr key={index} style={{ fontWeight: 'bold' }}>
                                         <td>{appl.studentId}</td>
                                         <td>{appl.studentInfo.surname + ' ' + appl.studentInfo.name}<br /><small>{appl.studentInfo.email}</small> </td>
-                                        <td>
+                                        <td>{appl.thesisInfo.title? (
                                             <Link to={`/application/${index}`} state={{ applicationDetails: appl, user: user }}>
                                                 {appl.thesisInfo.title}
                                             </Link>
+                                            ) : (
+                                                <span className="d-inline-block">The thesis proposal has been deleted</span>
+                                            )
+                                        }
                                         </td>
-                                        <td>{appl.thesisInfo.type}</td>
+                                        <td>{appl.thesisInfo.type? appl.thesisInfo.type : ' - '}</td>
                                         <td>{appl.timestamp.split(' ')[0]}</td>
                                         <td>{appl.status}</td>
                                     </tr>

@@ -35,7 +35,7 @@ function ThesisPage(props) {
         })
         .catch(e => {
           //no application found for the professor, not a problem in this case
-          if (err.error && err.status !== 404) {
+          if (e.error && e.status !== 404) {
             handleErrors(e);
           }
         });
@@ -46,7 +46,7 @@ function ThesisPage(props) {
           setArchived(true); 
       })
       .catch(e => {
-        handleErrors(e);
+        //handleErrors(e);
       })
     }
 
@@ -85,6 +85,23 @@ function ThesisPage(props) {
     props.setMessage('');
     navigate('/thesis');
   };
+
+  const isSupervisor = () => {
+    // only supervisor can delete a proposal
+    let supervisor = thesisDetails.supervisor.split(",");
+    return supervisor[0] == props.user.id.toString();
+  }
+
+  const handleDeleteProposal = () => {
+
+    if (isSupervisor){
+      professorAPI.deleteProposal(thesisDetails.id)
+          .then(() => { navigate('/thesis')})
+          .catch(err => { handleErrors(err); })
+    } else {
+        props.setMessage({ msg: "Only the supervisor can delete a thesis proposal." });
+    }
+  }
 
   if (!state || !state.thesisDetails || !thesisDetails) {
     return <div>Data Unavailable</div>;
@@ -163,6 +180,12 @@ function ThesisPage(props) {
                 </Link>
               )}
 
+              {/* Delete button (visible only for the supervisor) */}
+              {props.user.role === 'teacher' && !isArchived && isSupervisor && (
+                <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleDeleteProposal}>
+                  Delete Proposal
+                </Button>
+                )}
               {/*archive button */}
               {props.user.role === 'teacher' && !isArchived && (
                 <Button variant="outline-warning" className="mt-3 ms-2" onClick={handleArchiveClick}>
@@ -171,7 +194,7 @@ function ThesisPage(props) {
               )}
 
               {/* Go back button */}
-              <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
+              <Button variant="outline-secondary" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
             </Card.Body>
