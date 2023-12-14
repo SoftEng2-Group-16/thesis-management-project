@@ -86,12 +86,15 @@ function ThesisPage(props) {
     navigate('/thesis');
   };
 
-  const handleDeleteProposal = () => {
-
+  const isSupervisor = () => {
     // only supervisor can delete a proposal
     let supervisor = thesisDetails.supervisor.split(",");
+    return supervisor[0] == props.user.id.toString();
+  }
 
-    if (supervisor[0] == props.user.id.toString()){
+  const handleDeleteProposal = () => {
+
+    if (isSupervisor){
       professorAPI.deleteProposal(thesisDetails.id)
           .then(() => { navigate('/thesis')})
           .catch(err => { handleErrors(err); })
@@ -178,7 +181,7 @@ function ThesisPage(props) {
               )}
 
               {/* Delete button (visible only for the supervisor) */}
-              {props.user.role === 'teacher' && (
+              {props.user.role === 'teacher' && !isArchived && isSupervisor && (
                 <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleDeleteProposal}>
                   Delete Proposal
                 </Button>
