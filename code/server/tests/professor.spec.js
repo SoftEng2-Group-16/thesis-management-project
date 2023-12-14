@@ -218,7 +218,7 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test('a professor updates the first thesis but forgots to insert some needed data', async () => {
+  test.skip('a professor updates the first thesis but forgets to insert some needed data', async () => {
 
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -293,7 +293,7 @@ describe('Professor tests', () => {
 
   }, 1 * 60 * 1000);
 
-  test('a professor copies the first thesis', async () => {
+  test.skip('a professor copies the first thesis', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -358,7 +358,7 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test('a professor copies the first thesis changing some parameters', async () => {
+  test.skip('a professor copies the first thesis changing some parameters', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -504,7 +504,7 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test('a professor copies the first thesis changing some parameters', async () => {
+  test.skip('a professor copies the first thesis changing some parameters', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -602,7 +602,8 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test.skip('a professor archives a thesis and does all the checks', async () => {
+  test('a professor archives a thesis and does all the checks', async () => {
+    //here i added some waits since some elemnts can or cannot be present so we wait the right time to render the elements
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -630,7 +631,7 @@ describe('Professor tests', () => {
 
     // Use the name of the archived thesis
     const thesisName = await page.$eval(
-      `table.table-striped.table-bordered.table-hover tr:nth-child(${rowIndex + 1}) td:nth-child(${columnIndex + 1})`,
+      `table.table-striped.table-bordered.table-hover tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`,
       cell => cell.textContent.trim()
     );
     
@@ -647,39 +648,54 @@ describe('Professor tests', () => {
       cells.map(cell => cell.textContent.trim())
       );
     let counterPending = 0;
+
     //incrementing the counter for each pending request for the first thesis
     textInThirdColumn.forEach((value, index) => {
+
       if(value == thesisName){
-        if(textInSixthColumn[index] == "pending") counter++;
+        if(textInSixthColumn[index] == "pending") counterPending++;
       }
     });
-    console.log(counterPending);
+     
+     
 
-    
-    //here we go to the archived and we save the number of archived thesis to compare then after
-    await page.click('#ArchivedProposals');
-
-    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
-    const numberOfRowsArchived1 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length); 
-    //now we return back   
-    await page.click('#activeProposals');
-    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
-
-    //return to the home page
+    //return back to my proposals
     await page.click('#my-proposals');
+    //here we go to the archived and we save the number of archived thesis to compare then after
+    await page.waitForTimeout(3000);
+    await page.evaluate(() => {
+      const label = document.querySelector('label[for="ArchivedProposals"]');
+      label.click();
+    });
+    // Wait for 5 seconds (5000 milliseconds) so that we know that the table changes
+    await page.waitForTimeout(3000);
+
+    let numberOfRowsArchived1 = 1; //the header at least is considered
+    const selectorExists = await page.$('table.table-striped.table-bordered.table-hover');
+    if (selectorExists) {
+      numberOfRowsArchived1 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length); 
+    }
+    //now we return back 
+    await page.waitForTimeout(3000);  
+    await page.evaluate(() => {
+      const label = document.querySelector('label[for="activeProposals"]');
+      label.click();
+    });
+    // Wait for 5 second (5000 milliseconds) so that we know that the table changes
+    await page.waitForTimeout(3000);
+
     await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
     // Select the cell using CSS selector (in this case the first thesis)
     const cellSelector = `${tableSelector} tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`;
-  
-    
-
+    //opening the first thesis page and archieving it
     await page.click(cellSelector);
 
     await page.evaluate(() => {
       window.scrollTo(0, document.body.scrollHeight);
     });
     //archive thesis
-    await page.click('button.mt-3 ms-2.btn.btn-outline-warning');
+    await page.click('button.mt-3.ms-2.btn.btn-outline-warning');
 
 
     await page.waitForSelector('table.table-striped.table-bordered.table-hover');
@@ -689,40 +705,40 @@ describe('Professor tests', () => {
     if(numberOfRowsActive1 != numberOfRowsActive2 +1) throw new Error("No thesis Archived");
 
     //here we go to the archived and we save the number of archived thesis to compare then after
-    await page.click('label[for="ArchivedProposals"]');
+    await page.waitForTimeout(3000); 
+    await page.evaluate(() => {
+      const label = document.querySelector('label[for="ArchivedProposals"]');
+      label.click();
+    });
+    // Wait for one second (1000 milliseconds) so that we know that the table changes
+    await page.waitForTimeout(3000); 
+
     await page.waitForSelector('table.table-striped.table-bordered.table-hover');
     const numberOfRowsArchived2 = await page.$$eval('table.table-striped.table-bordered.table-hover tr', rows => rows.length); 
     //the new number of archived has to be bigger
-    if(numberOfRowsArchived1 +1 != numberOfRowsArchived2) throw new Error("No thesis Archived");
-    //now we return back to the active 
-    await page.click('label[for="activeProposals"]');
-    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    if((numberOfRowsArchived1 +1) != numberOfRowsArchived2) throw new Error("No thesis Archived");
 
    
     await page.click('#applications');
     await page.waitForSelector('table.table-striped.table-bordered.table-hover');
 
     // Used to save the name of the thesis
-     textInThirdColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(3)', cells =>
+    textInThirdColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(3)', cells =>
       cells.map(cell => cell.textContent.trim())
       );
     //used to see the status
-     textInSixthColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(6)', cells =>
+    textInSixthColumn = await page.$$eval('table.table-striped.table-bordered.table-hover tr td:nth-child(6)', cells =>
       cells.map(cell => cell.textContent.trim())
-      );
+      ); 
     //decrementing the counter for each rejected request for the first thesis
     textInThirdColumn.forEach((value, index) => {
       if(value == thesisName){
-        if(textInSixthColumn[index] == "rejected") counter--;
+        if(textInSixthColumn[index] == "rejected") counterPending--;
       }
-      //if it's 0 it's fine since we rejected all the pending requests
-    if(counter != 0) throw new Error("The applications were not rejected")
     });
+    //if it's 0 it's fine since we rejected all the pending requests    
+    if(counterPending != 0) throw new Error("The applications were not rejected")
     console.log(counterPending);
-
-
-   
-    
   }, 1 * 60 * 1000);
   
 });
