@@ -41,9 +41,9 @@ const insertNewProposal = async (req, res) => {
     const supervisor = req.body.supervisor;
     let groups = [];
 
-    for (c of cosupervisors) {
+    for (const c of cosupervisors) {
         const splitted = c.split(" ");
-        if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
+        if (splitted.length === 4) { //internal cosupervisor, find group and save it for proposal insertion
             let surname = splitted[1];
             let id = splitted[2];
             surname = surname.replace(',', '');
@@ -145,7 +145,7 @@ const decideApplication = async (req, res) => {
             //archive the thesis proposal so other students cannot apply to it
             const proposal = await daoGeneral.getThesisProposalById(thesisId)
                 .then(p => {
-                    const p2 = new models.ThesisProposal(
+                    return new models.ThesisProposal(
                         p.id, //can be whatever, DB handles autoincrement id
                         p.title,
                         p.supervisor,
@@ -160,7 +160,6 @@ const decideApplication = async (req, res) => {
                         p.level,
                         p.cds.join(',')
                     );
-                    return p2;
                 });
             await daoTeacher.archiveProposal(proposal)
             await daoTeacher.deleteProposal(proposal.id);
@@ -223,7 +222,7 @@ const archiveProposal = async (req,res)  => {
             return res.status(404).json(proposal);
         }
 
-        if (applications.filter(a => a.status === "accepted").length != 0) {
+        if (applications.filter(a => a.status === "accepted").length !== 0) {
             return res.status(422).json({ error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived` });
         }
 
@@ -246,7 +245,7 @@ const archiveProposal = async (req,res)  => {
                 proposal.cds.join(',')
             )) //STILL NEED TO MANAGE APPLICATIONS
                 .then(async () => {
-                    for (a of applications) {
+                    for (const a of applications) {
                         console.log(a);
                         if (a.status === "pending") {
                             await daoTeacher.rejectApplication(a.thesisId, a.teacherId, a.studentId);
@@ -254,8 +253,7 @@ const archiveProposal = async (req,res)  => {
                     }
                 })
                 .then(async () => {
-                    const c = await daoTeacher.deleteProposal(proposal.id);
-                    return c;
+                    return await daoTeacher.deleteProposal(proposal.id);
                 });
             if (changes == 1) {
                 return res.status(200).json(changes);
@@ -286,10 +284,11 @@ const updateThesisProposal = async (req, res) => {
     const supervisor = req.body.supervisor;
     let groups = [];
 
-    for (c of cosupervisors) {
+    for (const c of cosupervisors) {
         const splitted = c.split(" ");
         if (splitted.length == 4) { //internal cosupervisor, find group and save it for proposal insertion
-            let [name, surname, id, departmentCode] = [...splitted];
+            let surname = splitted[1];
+            let id = splitted[2];
             surname = surname.replace(',', '');
             id = id.replace(',', '');
             const group = await daoTeacher.getGroupForTeacherById(id);
