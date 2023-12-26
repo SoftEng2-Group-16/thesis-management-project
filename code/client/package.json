@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.2",
     "bootstrap": "^5.2.3",
     "dayjs": "^1.11.7",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.3",
+    "react-confirm": "^0.3.0-7",
     "react-datepicker": "^4.21.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.3.1",

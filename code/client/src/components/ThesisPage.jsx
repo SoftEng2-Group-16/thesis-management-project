@@ -5,6 +5,7 @@ import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
 import professorAPI from '../apis/professorAPI';
 import MessageContext from '../messageCtx';
+import ResponsiveDialog from './ConfirmationDialog';
 
 function ThesisPage(props) {
   const navigate = useNavigate();
@@ -15,6 +16,28 @@ function ThesisPage(props) {
 
   const [isAccepted, setAccepted] = useState(false);
   const [isArchived, setArchived] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({  //state used to configure dynamically the dialog
+    title: '', //title displayed in the dialog
+    message: '', //message displayed in the dialog
+    handleAction: null, //acrion called when the dialog is confirmed
+    actionText: '', //text displayed in the dialog button
+  });
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const openDialog = (title, message, handleAction, actionText) => { //function to open and configure the dialog
+    setDialogConfig({
+      title,
+      message,
+      handleAction,
+      actionText,
+    });
+    setDialogOpen(true);
+  };
 
   useEffect(() => {
     (state)
@@ -43,16 +66,16 @@ function ThesisPage(props) {
         const wasArchived = archivedProposals.filter(item => item.id === state.thesisDetails.id)
 
         if (wasArchived.length > 0)
-          setArchived(true); 
+          setArchived(true);
       })
-      .catch(e => {
-        //handleErrors(e);
-      })
+        .catch(e => {
+          //handleErrors(e);
+        })
     }
 
   }, [state]);
 
-  
+
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
@@ -94,12 +117,15 @@ function ThesisPage(props) {
 
   const handleDeleteProposal = () => {
 
-    if (isSupervisor){
+    if (isSupervisor) {
       professorAPI.deleteProposal(thesisDetails.id)
-          .then(() => { navigate('/thesis')})
-          .catch(err => { handleErrors(err); })
+        .then(() => {
+          props.setMessage({ msg: "Thesis Proposal succesfully deleted!", type: 'success' });
+          navigate('/thesis')
+        })
+        .catch(err => { handleErrors(err); })
     } else {
-        props.setMessage({ msg: "Only the supervisor can delete a thesis proposal." });
+      props.setMessage({ msg: "Only the supervisor can delete a thesis proposal." });
     }
   }
 
@@ -109,6 +135,7 @@ function ThesisPage(props) {
 
   return (
     <Container className="mt-5">
+
       <Row>
         <Col md={{ span: 8, offset: 2 }}>
           <Card className="thesis-card">
@@ -157,7 +184,7 @@ function ThesisPage(props) {
                 </Button>
               )}
 
-              {/*edit button */}
+              {/*edit button (visible only to teacher*/}
               {props.user.role === 'teacher' && !isArchived && (
                 <Link
                   className=" mt-3 ms-2 btn btn-outline-primary"
@@ -182,13 +209,13 @@ function ThesisPage(props) {
 
               {/* Delete button (visible only for the supervisor) */}
               {props.user.role === 'teacher' && !isArchived && isSupervisor && (
-                <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleDeleteProposal}>
+                <Button id="button-delete-proposal" variant="outline-danger" className="mt-3 ms-2" onClick={() => openDialog('Confirm Delete', 'Are you sure you want to delete this proposal? This action cannot be undone.', handleDeleteProposal, 'Delete')}>
                   Delete Proposal
                 </Button>
-                )}
+              )}
               {/*archive button */}
               {props.user.role === 'teacher' && !isArchived && (
-                <Button variant="outline-warning" className="mt-3 ms-2" onClick={handleArchiveClick}>
+                <Button id="button-archive-proposal" variant="outline-warning" className="mt-3 ms-2" onClick={() => openDialog('Confirm Archive', 'Are you sure you want to archive this proposal?', handleArchiveClick, 'Archive')}>
                   Archive
                 </Button>
               )}
@@ -197,11 +224,22 @@ function ThesisPage(props) {
               <Button variant="outline-secondary" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
+
+              {/*Dialog shown for confirmation */}
+              <ResponsiveDialog
+                open={dialogOpen}
+                handleClose={handleCloseDialog}
+                title={dialogConfig.title}
+                message={dialogConfig.message}
+                handleAction={dialogConfig.handleAction}
+                actionText={dialogConfig.actionText}
+              />
+
             </Card.Body>
           </Card>
         </Col>
       </Row>
-    </Container>
+    </Container >
   );
 }
 
