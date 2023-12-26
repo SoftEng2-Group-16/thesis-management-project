@@ -68,5 +68,18 @@ const uploadFile = async (data) => {
   }
 }
 
-const studentAPI = { insertApplication, getThesisProposals, getApplications,uploadFile };
+const getExams = async () => {
+  const response = await fetch(SERVER_URL + `/api/exams`, {
+    credentials: 'include',
+  });
+  const res = await response.json();
+  if (response.ok) {
+    return res; // list of exams of the student
+  }
+  else {
+    throw res;
+  }
+}
+
+const studentAPI = { insertApplication, getThesisProposals, getApplications,uploadFile,getExams };
 export default studentAPI;

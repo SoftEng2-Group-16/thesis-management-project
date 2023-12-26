@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, CardBody, Table } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
 import professorAPI from '../apis/professorAPI';
 import MessageContext from '../messageCtx';
-import FileUploader from './FileUploader';
+import ApplicationData from './ApplicationDataCV';
 
 function ThesisPage(props) {
   const navigate = useNavigate();
@@ -16,6 +16,8 @@ function ThesisPage(props) {
 
   const [isAccepted, setAccepted] = useState(false);
   const [isArchived, setArchived] = useState(false);
+
+  const [showApplicationData, setShowData] = useState(false);
 
   useEffect(() => {
     (state)
@@ -56,7 +58,7 @@ function ThesisPage(props) {
 
 
   const handleApplyClick = () => {
-    // Add logic to handle the "Apply" button click (e.g., send an application)
+    // Add logic to handle the "Apply" button click (e.g., send an application
     const teacherId = thesisDetails.supervisor.split(",")[0];
     studentAPI.insertApplication(studentId, thesisDetails.id, teacherId)
       .then(() => {
@@ -138,6 +140,10 @@ function ThesisPage(props) {
                 </Col>
               </Row>
 
+              <Row>
+                <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
+              </Row>
+
               {/* Description in a separate card */}
               <Card>
                 <Card.Title className="border-bottom pb-2 mb-4">Description:</Card.Title>
@@ -146,14 +152,19 @@ function ThesisPage(props) {
                 </Card.Body>
               </Card>
 
-              <Row>
-                <Card.Text className="mt-2"><strong>Keywords:</strong> {thesisDetails.keywords.join(', ')}</Card.Text>
-              </Row>
+
+              <Button id="button-show-exams" className="mt-3" variant="secondary" onClick={() => setShowData(!showApplicationData)}>
+                {showApplicationData ? 'Hide details' : 'Show exam details'}
+              </Button>
+              {/*data to send with the application just for student */}
+              {props.user.role === 'student' && showApplicationData && (
+                <ApplicationData setShowData={setShowData} handleErrors={handleErrors} />
+              )}
 
 
               {/* Apply button (visible only for students) */}
               {props.user.role === 'student' && (
-                <Button variant="success" className="mt-3" onClick={handleApplyClick}>
+                <Button variant="success" className="mt-3 ms-2" onClick={handleApplyClick}>
                   Apply
                 </Button>
               )}
@@ -200,15 +211,11 @@ function ThesisPage(props) {
               </Button>
             </Card.Body>
           </Card>
-          {/*form to upload the cv, jsut for students */}
-          {props.user.role === 'student' && (
-            <FileUploader />
-          )}
-
         </Col>
       </Row>
     </Container>
   );
 }
+
 
 export default ThesisPage;
