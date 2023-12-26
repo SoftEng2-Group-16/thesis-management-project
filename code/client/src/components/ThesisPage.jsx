@@ -175,6 +175,7 @@ function ThesisPage(props) {
                       handleErrors({ error: "you cannot edit this proposal since there are pending/accepted applications for it" })
                     }
                   }}
+                  state={{ proposal: state.thesisDetails, mode: 'edit' }}
                 >
                   Edit
                 </Link>
