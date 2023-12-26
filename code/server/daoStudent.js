@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher, Exam } = require('./model');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -139,3 +139,27 @@ exports.getMyThesisAccepted = (studentId) => {
         );
     });
 }
+
+
+exports.getExamsByStudentId = (studentId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * from careers where student_id=? ';
+        db.all(
+            sql,
+            [studentId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length === 0) {
+                    resolve(
+                        { error: `No exams found for student id ${studentId}` }
+                    );
+                } else {
+                    const exams = rows.map(row => (
+                        new Exam(row.student_id, row.course_code, row.course_title, row.cfu, row.grade, row.date_registered)
+                    ));
+                    resolve(exams);
+                }
+            });
+    });
+};

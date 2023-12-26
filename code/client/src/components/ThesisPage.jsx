@@ -5,6 +5,7 @@ import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
 import professorAPI from '../apis/professorAPI';
 import MessageContext from '../messageCtx';
+import FileUploader from './FileUploader';
 
 function ThesisPage(props) {
   const navigate = useNavigate();
@@ -43,16 +44,16 @@ function ThesisPage(props) {
         const wasArchived = archivedProposals.filter(item => item.id === state.thesisDetails.id)
 
         if (wasArchived.length > 0)
-          setArchived(true); 
+          setArchived(true);
       })
-      .catch(e => {
-        //handleErrors(e);
-      })
+        .catch(e => {
+          //handleErrors(e);
+        })
     }
 
   }, [state]);
 
-  
+
 
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application)
@@ -94,12 +95,12 @@ function ThesisPage(props) {
 
   const handleDeleteProposal = () => {
 
-    if (isSupervisor){
+    if (isSupervisor) {
       professorAPI.deleteProposal(thesisDetails.id)
-          .then(() => { navigate('/thesis')})
-          .catch(err => { handleErrors(err); })
+        .then(() => { navigate('/thesis') })
+        .catch(err => { handleErrors(err); })
     } else {
-        props.setMessage({ msg: "Only the supervisor can delete a thesis proposal." });
+      props.setMessage({ msg: "Only the supervisor can delete a thesis proposal." });
     }
   }
 
@@ -185,7 +186,7 @@ function ThesisPage(props) {
                 <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleDeleteProposal}>
                   Delete Proposal
                 </Button>
-                )}
+              )}
               {/*archive button */}
               {props.user.role === 'teacher' && !isArchived && (
                 <Button variant="outline-warning" className="mt-3 ms-2" onClick={handleArchiveClick}>
@@ -199,6 +200,11 @@ function ThesisPage(props) {
               </Button>
             </Card.Body>
           </Card>
+          {/*form to upload the cv, jsut for students */}
+          {props.user.role === 'student' && (
+            <FileUploader />
+          )}
+
         </Col>
       </Row>
     </Container>

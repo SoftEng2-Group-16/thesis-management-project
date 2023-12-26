@@ -18,7 +18,8 @@ router.post('/notify', general.sendEmail)
 router.put('/clockchanged', utils.rearrangeProposals)
 router.get('/initialdate', utils.getInitialDate);
 
-
+router.post('/upload',auth.isLoggedIn,student.uploadFile);
+router.get('/exams/:id',student.getAllExams)
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
 // remove the :studentId param when api is protected, it will be taken from req.user

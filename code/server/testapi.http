@@ -153,3 +153,7 @@ content-type: application/json
 ###
 # test delete proposal
 DELETE http://localhost:3001/api/deleteproposal/3
+
+# test teacher gets own archived proposals
+###
+GET http://localhost:3001/api/exams/200001
