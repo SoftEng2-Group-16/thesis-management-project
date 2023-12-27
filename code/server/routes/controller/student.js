@@ -18,13 +18,14 @@ const insertNewApplication = async (req, res) => {
         if (acceptedThesis && acceptedThesis.length > 0) {
             return res.status(400).json({ error: "already exist an accepted application for this student" });
         }
-        const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId);
+
+        const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId, null);//pass a idCV null for compatibility 
         return res.status(201).json(changes);
     } catch (e) {
         if (e.message.includes("SQLITE_CONSTRAINT")) {
             e.message = "Application already submitted, wait for professor response";
         }
-        return res.status(500).json(e.message);
+        return res.status(500).json({ error: e.message });
     }
 }
 
@@ -46,7 +47,7 @@ const getApplicationsForStudent = async (req, res) => {
                 const teacherInfo = await daoTeacher.getTeacherById(appl.teacherId);
                 const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId)
                     .then(t => {
-                        if(t.error || t === undefined)
+                        if (t.error || t === undefined)
                             return daoGeneral.getProposalFromArchivedById(appl.thesisId)
                         else
                             return t;
@@ -93,7 +94,7 @@ const getAllExams = async (req, res) => {
     //const studentId= req.params.id
     const studentId = req.user.id
 
-    if(!studentId){
+    if (!studentId) {
         return res.status(403).json({ error: "problem with login" });
     }
 
@@ -115,23 +116,42 @@ const uploadFile = async (req, res) => {
     const teacherId = req.body.teacherId;
     const timestamp = dayjs().format("DD/MM/YYYY HH:mm:ss");
     const status = 'pending';
-
-    if (req.user.id !== studentId) {
+    const exams = req.body.exams;
+    if (!req.body.exams || !req.body.studentId || !req.body.proposalId || !req.body.teacherId) {
+        return res.status(400).json({ error: 'missing data ' });
+    }
+    if (req.user.id !== parseInt(studentId,10)){
         return res.status(422).json({ error: "the student who is sending the application is not the logged in one" });
     }
+
+    //if file is not defined is not a problem will not be added to the table
+    //thanks to Multipart we have the file saved in req.file
+    const file = req.file;
+    const fileName = file ? file.originalname : null;
+    const fileContent = file ? file.buffer : null;
+
     try {
+        //do the check to see if i can send the application
         const acceptedThesis = await daoStudent.getMyThesisAccepted(studentId);
         if (acceptedThesis && acceptedThesis.length > 0) {
             return res.status(400).json({ error: "already exist an accepted application for this student" });
         }
-        const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId);
-        return res.status(201).json(changes);
-    } catch (e) {
-        if (e.message.includes("SQLITE_CONSTRAINT")) {
-            e.message = "Application already submitted, wait for professor response";
+        //check if the student already sent an application for the thesis
+        const myApplications = await daoStudent.getApplicationsForStudent(studentId);
+        if (myApplications.length > 0 && myApplications.some(appl => appl.thesisId == proposalId)) {
+            return res.status(400).json({ error: "Application already submitted, wait for professor response" });
         }
-        return res.status(500).json(e.message);
+        console.log("whyyyyy");
+        //if everything is ok uplaod the cv in the table
+        const idCV = await daoStudent.insertApplicationData(fileName, fileContent, exams);//retruns the new id created
+        //then store the application with the cv id
+        const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId, idCV);
+        return res.status(200).json(changes);
+
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
     }
+
 }
 
 module.exports = {

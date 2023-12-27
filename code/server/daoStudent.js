@@ -7,12 +7,12 @@ const { Applications, Application, Student, ThesisProposal, Teacher, Exam } = re
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 
-exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teacherId) => {
+exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teacherId,idCV) => {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid) VALUES (?,?,?,?,?)';
+        const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid,cv_id) VALUES (?,?,?,?,?,?)';
         db.run(
             sql,
-            [thesisId, studentId, timestamp, status, teacherId],
+            [thesisId, studentId, timestamp, status, teacherId,idCV],
             function (err) {
                 if (err) {
                     reject(err);
@@ -140,7 +140,6 @@ exports.getMyThesisAccepted = (studentId) => {
     });
 }
 
-
 exports.getExamsByStudentId = (studentId) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * from careers where student_id=? ';
@@ -163,3 +162,21 @@ exports.getExamsByStudentId = (studentId) => {
             });
     });
 };
+
+
+exports.insertApplicationData = (fileName,fileContent,exams) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO cv_application (list_exams, file_name, file_content) VALUES (?,?,?)';
+        db.run(
+            sql,
+            [exams,fileName,fileContent],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            }
+        );
+    });
+}

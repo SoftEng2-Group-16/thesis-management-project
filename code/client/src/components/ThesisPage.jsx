@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, CardBody, Table } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, CardBody, Table, Dropdown, DropdownButton } from 'react-bootstrap';
 import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
 import professorAPI from '../apis/professorAPI';
@@ -18,6 +18,8 @@ function ThesisPage(props) {
   const [isArchived, setArchived] = useState(false);
 
   const [showApplicationData, setShowData] = useState(false);
+
+  const [applicationCV, setApplicationCV] = useState(undefined);
 
   useEffect(() => {
     (state)
@@ -70,6 +72,41 @@ function ThesisPage(props) {
         handleErrors(e);
       });
   };
+
+  const handleApplyWithCV = () => {
+
+    const teacherId = parseInt(thesisDetails.supervisor.split(",")[0]);
+    //send cv data to server
+
+    //format the object to send it to the server
+    //the form data will contain the exams and all the application field as a json in body
+    //and the cv file in the req.file
+    const formData = new FormData();
+    if (!applicationCV) {
+      //application cv is loaded the first time the student click to see the exam details
+      handleErrors({ error: "first look at your exams then you can send the CV" })
+      return;
+    }
+    formData.append('file', applicationCV.filePDF);
+    formData.append('exams', JSON.stringify(applicationCV.exams));
+    //upload the cv data and insert the application
+    formData.append('proposalId', JSON.stringify(thesisDetails.id));
+    formData.append('studentId', JSON.stringify(studentId));
+    formData.append('teacherId', JSON.stringify(teacherId));
+    
+
+    studentAPI.uploadFile(formData)
+      .then(() => {
+        props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
+        navigate('/thesis');
+      })
+      .catch(e => {
+        handleErrors(e);
+      });
+
+
+  };
+
 
   const handleArchiveClick = () => {
     professorAPI.archiveProposal(thesisDetails.id)
@@ -152,21 +189,22 @@ function ThesisPage(props) {
                 </Card.Body>
               </Card>
 
-
-              <Button id="button-show-exams" className="mt-3" variant="secondary" onClick={() => setShowData(!showApplicationData)}>
-                {showApplicationData ? 'Hide details' : 'Show exam details'}
-              </Button>
-              {/*data to send with the application just for student */}
-              {props.user.role === 'student' && showApplicationData && (
-                <ApplicationData setShowData={setShowData} handleErrors={handleErrors} />
-              )}
-
+              <Row>
+                <Button id="button-show-exams" className="mt-3" variant="secondary" onClick={() => setShowData(!showApplicationData)}>
+                  {showApplicationData ? 'Hide details' : 'Show exam details'}
+                </Button>
+                {/*data to send with the application just for student */}
+                {props.user.role === 'student' && showApplicationData && (
+                  <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} />
+                )}
+              </Row>
 
               {/* Apply button (visible only for students) */}
               {props.user.role === 'student' && (
-                <Button variant="success" className="mt-3 ms-2" onClick={handleApplyClick}>
-                  Apply
-                </Button>
+                <DropdownButton id="dropdown-item-button" title="Send Application" variant='success' className='mt-3 ms-2'>
+                  <Dropdown.Item id='button-apply' as="button" primary='success' onClick={handleApplyClick}>Apply</Dropdown.Item>
+                  <Dropdown.Item id='button-apply-cv' as="button" variant='success' onClick={handleApplyWithCV}>Apply + CV</Dropdown.Item>
+                </DropdownButton>
               )}
 
               {/*edit button */}
@@ -206,7 +244,7 @@ function ThesisPage(props) {
               )}
 
               {/* Go back button */}
-              <Button variant="outline-secondary" className="mt-3 ms-2" onClick={handleGoBackClick}>
+              <Button variant="outline-danger" className="mt-3 ms-2" onClick={handleGoBackClick}>
                 Go Back
               </Button>
             </Card.Body>

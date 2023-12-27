@@ -50,18 +50,14 @@ const getApplications = async () => {
 }
 
 
-const uploadFile = async (data) => {
-  const response = await fetch(SERVER_URL + '/api/upload', {
+const uploadFile = async (formData) => {
+  const response = await fetch(SERVER_URL + '/api/uploadCV', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     credentials: 'include',
-    body: JSON.stringify(data),
+    body: formData,
   });
   const res = await response.json();
   if (response.ok) {
-    console.log('File uploaded successfully:', data);
     return res;
   } else {
     throw res;
@@ -81,5 +77,5 @@ const getExams = async () => {
   }
 }
 
-const studentAPI = { insertApplication, getThesisProposals, getApplications,uploadFile,getExams };
+const studentAPI = { insertApplication, getThesisProposals, getApplications, uploadFile, getExams };
 export default studentAPI;

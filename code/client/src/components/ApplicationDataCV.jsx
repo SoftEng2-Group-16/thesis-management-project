@@ -8,9 +8,10 @@ import MessageContext from '../messageCtx';
 
 
 
-function ApplicationData({ setShowData, handleErrors }) {
+function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
 
     const [examList, setExamList] = useState();
+    const [selectedFile, setSelectedFile] = useState(null);
 
     useEffect(() => {
         studentAPI.getExams()
@@ -26,6 +27,14 @@ function ApplicationData({ setShowData, handleErrors }) {
     }, []);
 
 
+    useEffect(() => {
+        //check if exam list is not null, only the exam list is mandatory when sending cv, in this case update the object for the cv
+        if (examList ) {
+            setApplicationCV(
+                { exams: examList, filePDF: selectedFile }
+            )
+        }
+    }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
 
     return (
@@ -59,7 +68,7 @@ function ApplicationData({ setShowData, handleErrors }) {
                     <h2>no exam passed</h2>
                 }
 
-                <FileUploader />
+                <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
 
 
             </Card.Body>
@@ -70,52 +79,55 @@ function ApplicationData({ setShowData, handleErrors }) {
 }
 
 
-function FileUploader() {
-    const [selectedFile, setSelectedFile] = useState(null);
+function FileUploader({ setSelectedFile, selectedFile, setApplicationCV }) {
     const { handleErrors } = useContext(MessageContext);
+    const [showTick, setShowTick] = useState(false);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
+        console.log(file);
         setSelectedFile(file);
 
         // Verifica che il file sia di tipo PDF
         if (file && file.type !== 'application/pdf') {
             setSelectedFile(null);
             handleErrors({ error: "Inserisci un file PDF valido." });
+
         }
-
-
-
+        setShowTick(false);
     };
 
     const handleUpload = () => {
-       
 
         if (selectedFile) {
-            //create the object formatted the right way to be sent in the POST
-            const formData = new FormData();
-            formData.append('file', selectedFile);
-
-            studentAPI.uploadFile(formData)
-                .then(() => { })
-                .catch(err => { handleErrors(err); });
+            setSelectedFile(selectedFile);
+            /*  studentAPI.uploadFile(formData)
+                 .then(() => { })
+                 .catch(err => { handleErrors(err); });
+         }
+         else {
+             handleErrors({ error: "Seleziona un file prima di effettuare l'upload." });
+         } */
+            setShowTick(true);
+        } else {
+            handleErrors({ error: "Inserisci un file PDF valido." });
+            setShowTick(false);
         }
-        else {
-            handleErrors({ error: "Seleziona un file prima di effettuare l'upload." });
-        }
-
     };
 
     return (
         <Container>
             <Form>
                 <Form.Label>Upload any additional file</Form.Label>
+
                 <Form.Group controlId="formFile" className="mb-3">
                     <Form.Control type="file" onChange={handleFileChange} />
                 </Form.Group>
+
                 <Button variant="primary" className='mb-3' onClick={handleUpload} >
                     Upload
                 </Button>
+                {showTick && <span color='green'>✔</span>}
             </Form>
         </Container>
     );
