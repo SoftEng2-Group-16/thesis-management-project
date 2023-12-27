@@ -110,7 +110,7 @@ const getAllExams = async (req, res) => {
     }
 }
 
-const uploadFile = async (req, res) => {
+const insertApplicationWithCV = async (req, res) => {
     const studentId = req.body.studentId;
     const proposalId = req.body.proposalId;
     const teacherId = req.body.teacherId;
@@ -158,6 +158,6 @@ module.exports = {
     insertNewApplication,
     getApplicationsForStudent,
     getThesisProposals,
-    uploadFile,
+    insertApplicationWithCV,
     getAllExams
 };

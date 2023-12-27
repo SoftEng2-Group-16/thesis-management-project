@@ -49,8 +49,8 @@ const getApplications = async () => {
   }
 }
 
-
-const uploadFile = async (formData) => {
+//the header content is put automatically 
+const insertApplicationWithCV = async (formData) => {
   const response = await fetch(SERVER_URL + '/api/uploadCV', {
     method: 'POST',
     credentials: 'include',
@@ -77,5 +77,5 @@ const getExams = async () => {
   }
 }
 
-const studentAPI = { insertApplication, getThesisProposals, getApplications, uploadFile, getExams };
+const studentAPI = { insertApplication, getThesisProposals, getApplications, insertApplicationWithCV, getExams };
 export default studentAPI;

@@ -68,7 +68,6 @@ function ThesisPage(props) {
         navigate('/thesis');
       })
       .catch(e => {
-        console.log(e);
         handleErrors(e);
       });
   };
@@ -95,7 +94,7 @@ function ThesisPage(props) {
     formData.append('teacherId', JSON.stringify(teacherId));
     
 
-    studentAPI.uploadFile(formData)
+    studentAPI.insertApplicationWithCV(formData)
       .then(() => {
         props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
         navigate('/thesis');

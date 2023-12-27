@@ -85,7 +85,6 @@ function FileUploader({ setSelectedFile, selectedFile, setApplicationCV }) {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        console.log(file);
         setSelectedFile(file);
 
         // Verifica che il file sia di tipo PDF
@@ -98,16 +97,7 @@ function FileUploader({ setSelectedFile, selectedFile, setApplicationCV }) {
     };
 
     const handleUpload = () => {
-
         if (selectedFile) {
-            setSelectedFile(selectedFile);
-            /*  studentAPI.uploadFile(formData)
-                 .then(() => { })
-                 .catch(err => { handleErrors(err); });
-         }
-         else {
-             handleErrors({ error: "Seleziona un file prima di effettuare l'upload." });
-         } */
             setShowTick(true);
         } else {
             handleErrors({ error: "Inserisci un file PDF valido." });
