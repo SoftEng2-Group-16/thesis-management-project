@@ -52,7 +52,6 @@ const getApplicationsForStudent = async (req, res) => {
                         else
                             return t;
                     });
-                console.log(thesisInfo);
                 const studentInfo = await daoStudent.getStudentById(appl.studentId); //Why? Should be in the session cookie
 
                 enhancedApplications.push({
@@ -141,7 +140,6 @@ const insertApplicationWithCV = async (req, res) => {
         if (myApplications.length > 0 && myApplications.some(appl => appl.thesisId == proposalId)) {
             return res.status(400).json({ error: "Application already submitted, wait for professor response" });
         }
-        console.log("whyyyyy");
         //if everything is ok uplaod the cv in the table
         const idCV = await daoStudent.insertApplicationData(fileName, fileContent, exams);//retruns the new id created
         //then store the application with the cv id
