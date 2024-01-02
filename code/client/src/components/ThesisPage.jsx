@@ -100,15 +100,15 @@ function ThesisPage(props) {
       .then(() => {
         const emailData = {
           subject: `New Application Received`,
-          type: 'application-sent', 
+          type: 'application-sent',
           studentId: studentId,
           thesisTitle: thesisDetails.title,
           teacherName: teacherName,
-          studentName : studentName
+          studentName: studentName
         };
-    
+
         generalAPI.sendEmail(emailData);
-  
+
       })
       .then(() => {
         props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
@@ -124,7 +124,7 @@ function ThesisPage(props) {
     const teacherId = parseInt(thesisDetails.supervisor.split(",")[0]);
     const teacherName = thesisDetails.supervisor.split(",")[1];
     const studentName = props.user.name + " " + props.user.surname;
-    
+
     //send cv data to server
 
     //format the object to send it to the server
@@ -142,26 +142,26 @@ function ThesisPage(props) {
     formData.append('proposalId', JSON.stringify(thesisDetails.id));
     formData.append('studentId', JSON.stringify(studentId));
     formData.append('teacherId', JSON.stringify(teacherId));
-    
+
 
     studentAPI.insertApplicationWithCV(formData)
-    .then(() => {
-      const emailData = {
-        subject: `New Application Received`,
-        type: 'application-sent', 
-        studentId: studentId,
-        thesisTitle: thesisDetails.title,
-        teacherName: teacherName,
-        studentName : studentName
-      };
-  
-      generalAPI.sendEmail(emailData);
+      .then(() => {
+        const emailData = {
+          subject: `New Application Received`,
+          type: 'application-sent',
+          studentId: studentId,
+          thesisTitle: thesisDetails.title,
+          teacherName: teacherName,
+          studentName: studentName
+        };
 
-    })
-    .then(() => {
-      props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
-      navigate('/thesis');
-    })
+        generalAPI.sendEmail(emailData);
+
+      })
+      .then(() => {
+        props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
+        navigate('/thesis');
+      })
       .catch(e => {
         handleErrors(e);
       });
@@ -255,10 +255,13 @@ function ThesisPage(props) {
                 </Card.Body>
               </Card>
 
+              {/*Only student can see his exams here, the professor will see them in the application */}
               <Row>
-                <Button id="button-show-exams" className="mt-3" variant="secondary" onClick={() => setShowData(!showApplicationData)}>
-                  {showApplicationData ? 'Hide details' : 'Show exam details'}
-                </Button>
+                {props.user.role === 'student' && (
+                  <Button id="button-show-exams" className="mt-3" variant="secondary" onClick={() => setShowData(!showApplicationData)}>
+                    {showApplicationData ? 'Hide details' : 'Show exam details'}
+                  </Button>
+                )}
                 {/*data to send with the application just for student */}
                 {props.user.role === 'student' && showApplicationData && (
                   <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} />
