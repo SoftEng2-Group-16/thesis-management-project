@@ -14,8 +14,10 @@ const port = 3001;
 const morgan = require('morgan');
 const cors = require('cors');
 const dao = require('./daoUsers.js');
+const multer = require('multer');
 
 const { check, validationResult, } = require('express-validator'); // validation middleware
+
 
 // TODO Passport-related imports + new idp import module
 
@@ -41,12 +43,12 @@ passport.use(new SamlStrategy({
   acceptedClockSkewMs: -1 // avoid syncerror Error: SAML assertion not yet valid
 }, function (profile, done) {
   return done(null, {//take from the Saml token the parameters so that will be available in req.user ffs
-      id: profile['nameID'],
-      email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
-      displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
-      name: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
-      lastName: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
-    });
+    id: profile['nameID'],
+    email: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+    displayName: profile['http://schemas.microsoft.com/identity/claims/displayname'],
+    name: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
+    lastName: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
+  });
 }));
 
 // set up middlewares
@@ -167,6 +169,12 @@ app.get('/logout', (req, res) => {
 const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
   return `${location}[${param}]: ${msg}`;
 };
+
+/**Multer stuff */
+// Increase payload size limit (adjust the limit as needed)
+app.use(bodyParser.json({ limit: '200mb' }));
+app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
+
 
 
 /* ROUTERS */
