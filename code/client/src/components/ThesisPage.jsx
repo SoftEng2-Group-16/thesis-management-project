@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Button, CardBody, Table, Dropdown, DropdownB
 import '../App.css'; // Import the custom CSS file
 import studentAPI from '../apis/studentAPI';
 import professorAPI from '../apis/professorAPI';
+import generalAPI from '../apis/generalAPI';
 import MessageContext from '../messageCtx';
 import ApplicationData from './ApplicationDataCV';
 import ResponsiveDialog from './ConfirmationDialog';
@@ -92,7 +93,23 @@ function ThesisPage(props) {
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application
     const teacherId = thesisDetails.supervisor.split(",")[0];
+    const teacherName = thesisDetails.supervisor.split(",")[1];
+    const studentName = props.user.name + " " + props.user.surname;
     studentAPI.insertApplication(studentId, thesisDetails.id, teacherId)
+
+      .then(() => {
+        const emailData = {
+          subject: `New Application Received`,
+          type: 'application-sent', 
+          studentId: studentId,
+          thesisTitle: thesisDetails.title,
+          teacherName: teacherName,
+          studentName : studentName
+        };
+    
+        generalAPI.sendEmail(emailData);
+  
+      })
       .then(() => {
         props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
         navigate('/thesis');
@@ -105,6 +122,9 @@ function ThesisPage(props) {
   const handleApplyWithCV = () => {
 
     const teacherId = parseInt(thesisDetails.supervisor.split(",")[0]);
+    const teacherName = thesisDetails.supervisor.split(",")[1];
+    const studentName = props.user.name + " " + props.user.surname;
+    
     //send cv data to server
 
     //format the object to send it to the server
@@ -125,10 +145,23 @@ function ThesisPage(props) {
     
 
     studentAPI.insertApplicationWithCV(formData)
-      .then(() => {
-        props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
-        navigate('/thesis');
-      })
+    .then(() => {
+      const emailData = {
+        subject: `New Application Received`,
+        type: 'application-sent', 
+        studentId: studentId,
+        thesisTitle: thesisDetails.title,
+        teacherName: teacherName,
+        studentName : studentName
+      };
+  
+      generalAPI.sendEmail(emailData);
+
+    })
+    .then(() => {
+      props.setMessage({ msg: "Application submitted succesfully!", type: 'success' });
+      navigate('/thesis');
+    })
       .catch(e => {
         handleErrors(e);
       });
