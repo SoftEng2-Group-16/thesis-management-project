@@ -9,9 +9,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
-
-
 /* 
 
  @emails:
@@ -23,24 +20,6 @@ const transporter = nodemailer.createTransport({
  professor: thesismanagementteacher@gmail.com
 
 
-NOW:
-As a Student
-I want to be notified when a decision on my application on a thesis proposal is taken
- 
-As a Professor
-  I want to be notified when a new application is sent 
-  So that I can evaluate it
-
-THEN:
-
-
- 
-As a Professor
-  I want to be notified when a new thesis request is made by a student with me as supervisor
-  So that I can accept or reject it
-
-
- TODO A switch case to build the emails will serve well in this case
 */
 
 // general.js
@@ -90,4 +69,4 @@ const sendEmail = async (req, res) => {
   }
 };
 
-module.exports = { sendEmail };
+module.exports = { sendEmail, buildEmail };

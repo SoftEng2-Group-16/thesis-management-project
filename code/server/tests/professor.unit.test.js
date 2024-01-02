@@ -6,6 +6,7 @@ const daoGeneral = require("../daoGeneral.js");
 const professorApi = require("../routes/controller/professor.js")
 
 
+
 jest.mock('../daoTeacher'); // Mock the daoTeacher module
 jest.mock('../daoStudent'); // Mock the daoTeacher module
 jest.mock('../daoGeneral'); // Mock the daoTeacher module

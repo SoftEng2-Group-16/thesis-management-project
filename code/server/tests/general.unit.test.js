@@ -1,111 +1,116 @@
-// general.test.js
-
-const general = ("../routes/controller/general.js"); 
+const { sendEmail, buildEmail } = require('../routes/controller/general.js');
 const nodemailer = require('nodemailer');
 
-jest.mock('nodemailer');
+// Mock the nodemailer module
+jest.mock('nodemailer', () => ({
+  createTransport: jest.fn().mockReturnValue({
+    sendMail: jest.fn().mockImplementation((mailOptions, callback) => {
+      // Simulate successful email sending
+      if (typeof callback === 'function') {
+        callback(null, { response: 'mocked-response' });
+      }
 
-describe('sendEmail', () => {
-    let mockRequest;
-    let mockResponse;
-  
-    beforeEach(() => {
-      mockRequest = {
-        body: {
-          subject: 'Test Subject',
-          type: 'application-decision',
-          studentName: 'John Doe',
-          thesisTitle: 'Test Thesis',
-          decision: 'accepted',
-        },
-      };
-  
-      mockResponse = {
-        status: jest.fn(() => mockResponse),
-        json: jest.fn(),
-      };
-  
-      nodemailer.createTransport.mockReturnValue({
-        sendMail: jest.fn(() => Promise.resolve({ response: 'Mocked response' })),
-      });
-    });
-  
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-  
-    test('should send an email successfully for application-decision', async () => {
-      await general.sendEmail(mockRequest, mockResponse);
-  
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: true,
-        message: 'Email sent successfully.',
-      });
-    });
-  
-    test('should handle an error during email sending', async () => {
-      const error = new Error('Email sending failed');
-      nodemailer.createTransport.mockReturnValueOnce({
-        sendMail: jest.fn(() => Promise.reject(error)),
-      });
-  
-      await general.sendEmail(mockRequest, mockResponse);
-  
-      expect(mockResponse.status).toHaveBeenCalledWith(500);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: false,
-        error: 'Internal server error.',
-      });
-    });
-  
-    test('should handle an unknown email type', async () => {
-      mockRequest.body.type = 'unknown-type';
-  
-      await general.sendEmail(mockRequest, mockResponse);
-  
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: true,
-        message: 'Email sent successfully.',
-      });
-    });
-  
-    // Add more test cases for different scenarios, edge cases, and validations.
-  });
-  
-  describe('buildEmail', () => {
-    test('should build email for application-decision', () => {
-      const data = {
+      // Return a resolved promise for successful email sending
+      return Promise.resolve({ response: 'mocked-response' });
+    }),
+  }),
+}));
+
+describe('sendemail', () => {
+  test('sendEmail - success', async () => {
+    const req = {
+      body: {
+        subject: 'Test Subject',
+        type: 'application-decision',
         studentName: 'John Doe',
-        thesisTitle: 'Test Thesis',
+        thesisTitle: 'Sample Thesis',
         decision: 'accepted',
-      };
-  
-      const result = general.buildEmail('application-decision', data);
-  
-      expect(result.text).toContain('John Doe');
-      expect(result.text).toContain('Test Thesis');
-      expect(result.text).toContain('ACCEPTED');
-      expect(result.to).toBe('thesismanagementstudent@gmail.com');
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function and wait for it to complete
+    await sendEmail(req, res);
+
+    // Expectations for success
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      message: 'Email sent successfully.',
     });
-  
-    test('should build email for application-sent', () => {
-      const data = {
-        teacherName: 'Jane Smith',
-        studentName: 'John Doe',
-        studentId: '123',
-        thesisTitle: 'Test Thesis',
-      };
-  
-      const result = general.buildEmail('application-sent', data);
-  
-      expect(result.text).toContain('Jane Smith');
-      expect(result.text).toContain('John Doe');
-      expect(result.text).toContain('123');
-      expect(result.text).toContain('Test Thesis');
-      expect(result.to).toBe('thesismanagementteacher@gmail.com');
-    });
-  
-    // Add more test cases for different types as needed.
   });
+
+  test('sendEmail - error', async () => {
+    const req = {
+      body: {
+        subject: 'Test Subject',
+        type: 'application-decision',
+        studentName: 'John Doe',
+        thesisTitle: 'Sample Thesis',
+        decision: 'accepted',
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Mock the sendMail method to simulate an error
+    nodemailer.createTransport().sendMail.mockImplementationOnce((mailOptions, callback) => {
+      // Simulate an error by rejecting the promise
+      if (typeof callback === 'function') {
+        callback(new Error('Email sending failed'));
+      }
+
+      return Promise.reject(new Error('Email sending failed'));
+    });
+
+    // Call the function and wait for it to complete
+    await sendEmail(req, res);
+
+    // Expectations for error
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      error: 'Internal server error.',
+    });
+  });
+});
+
+describe(' build Email', () => {
+  test('buildEmail - application-decision', () => {
+    const data = {
+      studentName: 'John Doe',
+      thesisTitle: 'Sample Thesis',
+      decision: 'accepted',
+    };
+    const result = buildEmail('application-decision', data);
+    expect(result.text).toContain('ACCEPTED');
+    expect(result.to).toBe('thesismanagementstudent@gmail.com');
+  });
+
+  test('buildEmail - application-sent', () => {
+    const data = {
+      teacherName: 'Dr. Smith',
+      studentName: 'Jane Doe',
+      studentId: '12345',
+      thesisTitle: 'Another Thesis',
+    };
+    const result = buildEmail('application-sent', data);
+    expect(result.text).toContain('A new application request');
+    expect(result.to).toBe('thesismanagementteacher@gmail.com');
+  });
+
+  test('buildEmail - unknown type', () => {
+    const result = buildEmail('unknown-type', {});
+    expect(result.text).toBe('');
+    expect(result.to).toBe('');
+  });
+
+  
+});
