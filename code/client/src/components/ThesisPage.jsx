@@ -58,7 +58,7 @@ function ThesisPage(props) {
   const handleApplyClick = () => {
     // Add logic to handle the "Apply" button click (e.g., send an application + send email to professor)
     const teacherId = thesisDetails.supervisor.split(",")[0];
-    const teacherName =  thesisDetails.supervisor.split(",")[2] + " "+thesisDetails.supervisor.split(",")[1];
+    const teacherName = thesisDetails.supervisor.split(",")[1];
     const studentName = props.user.name + " " + props.user.surname;
     studentAPI.insertApplication(studentId, thesisDetails.id, teacherId)
 
@@ -72,7 +72,7 @@ function ThesisPage(props) {
           studentName : studentName
         };
     
-      APIgeneral.sendEmail(emailData);
+        generalAPI.sendEmail(emailData);
   
       })
       .then(() => {
