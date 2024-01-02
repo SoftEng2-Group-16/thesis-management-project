@@ -324,10 +324,10 @@ const updateThesisProposal = async (req, res) => {
     );
 
     try {
-        //**check if there is an already accepted application for this proposal */
-        const acceptedThesis = await daoTeacher.getThesisAccepted();
-        if (acceptedThesis.length > 0 && acceptedThesis.includes(proposal.id)) {
-            return res.status(400).json({ error: "already accepted thesis" })
+        //**check if there is an already accepted or pending application for this proposal */
+        const allApplications = await daoTeacher.getAllApplicationsByThesisId();
+        if (allApplications.length > 0 && allApplications.some(appl=>appl.status==="pending" || appl.status==="accepted")) {
+            return res.status(405).json({ error: "already accepted/pending application for the thesis" })
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)

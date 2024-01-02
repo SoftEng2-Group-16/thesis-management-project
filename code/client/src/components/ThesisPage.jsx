@@ -15,7 +15,7 @@ function ThesisPage(props) {
   const studentId = props.user.id;
   const { handleErrors } = useContext(MessageContext);
 
-  const [isAccepted, setAccepted] = useState(false);
+  const [isEditable, setIsEditable] = useState(true);
   const [isArchived, setArchived] = useState(false);
 
   const [showApplicationData, setShowData] = useState(false);
@@ -55,10 +55,17 @@ function ThesisPage(props) {
     if (props.user.role === "teacher") {
       professorAPI.getApplications()
         .then((applications) => {
-          const acceptedApplications = applications.enhancedApplications.filter(item => item.thesisId === state.thesisDetails.thesisId)
-          //check if already exist an accepted application for this thesis 
-          if (acceptedApplications.lenght > 0) {
-            setAccepted(true); //used to enable/disable the edit button
+          //i am getting all the applications of this teacher
+          //now keep only applications for the specific thesis with state is "accepted" or "pending"
+          const acceptedApplications = applications.enhancedApplications.filter(
+            item => {
+              return item.thesisId === state.thesisDetails.id &&
+                (item.status === 'accepted' || item.status === 'pending')
+            }
+          );
+          //check if already exist an accepted application or pending ones for this thesis 
+          if (acceptedApplications.length > 0) {
+            setIsEditable(false); //used to enable/disable the edit button
           }
         })
         .catch(e => {
@@ -235,11 +242,16 @@ function ThesisPage(props) {
 
               {/*edit button (visible only to teacher*/}
               {props.user.role === 'teacher' && !isArchived && (
-                <Link
-                  className=" mt-3 ms-2 btn btn-outline-primary"
-                  to={"/proposal"}
+                <Link id="button-edit-proposal"
+                  className={`mt-3 ms-2 btn btn-outline-primary`}
+                  to={isEditable ? "/proposal" : null}
+                  onClick={(e) => {
+                    if (!isEditable) {
+                      e.preventDefault();
+                      handleErrors({ error: "you cannot edit this proposal since there are pending/accepted applications for it" })
+                    }
+                  }}
                   state={{ proposal: state.thesisDetails, mode: 'edit' }}
-                  disabled={isAccepted}
                 >
                   Edit
                 </Link>
