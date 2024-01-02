@@ -61,8 +61,6 @@ const buildEmail = (type, data) => {
         return { text, to };
       }
 
-
-    return { text, to };
     // Add more cases for other types as needed
     default:
       return { text: '', to: '' }; // Default case if the type is not recognized
