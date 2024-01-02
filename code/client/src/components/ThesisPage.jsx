@@ -68,7 +68,7 @@ function ThesisPage(props) {
           type: 'application-sent', 
           studentId: studentId,
           thesisTitle: thesisDetails.title,
-          professorName: teacherName,
+          teacherName: teacherName,
           studentName : studentName
         };
     

@@ -55,8 +55,8 @@ const buildEmail = (type, data) => {
       }
     
       case 'application-sent': {
-        let { professorName, studentName, studentId, thesisTitle } = data;
-        let text = `Dear ${professorName},\n\nA new application for you thesis "${thesisTitle}" has been submitted by ${studentName} (${studentId}).\n\nBest regards,\nThe Thesis Management Team`;
+        let { teacherName, studentName, studentId, thesisTitle } = data;
+        let text = `Dear ${teacherName},\n\nA new application request for you thesis "${thesisTitle}" has been submitted by ${studentName} (${studentId}).\n\nBest regards,\nThe Thesis Management Team`;
         let to = "thesismanagementteacher@gmail.com"
         return { text, to };
       }
