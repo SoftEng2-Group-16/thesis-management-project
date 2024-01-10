@@ -20,6 +20,9 @@ function ThesisProposals(props) {
   const [activeProposalsButton, setActiveProposalsButton] = useState(true);
   const [archivedProposalsButton, setArchivedProposalsButton] = useState(false);
   const [archivedThesis, setArchivedThesis] = useState([]);
+  const [noMatchingThesisMessage, setNoMatchingThesisMessage] = useState('');
+
+  
 
   
 
@@ -73,6 +76,8 @@ function ThesisProposals(props) {
     changeParameter("all"); // Set the filter back to "all"
     setSelections([]);
     setFilter("all")
+    setNoMatchingThesisMessage('');
+
   }
 
   function changeParameter(parameter) {
@@ -118,7 +123,15 @@ function ThesisProposals(props) {
           }
         });
       });
+
+            // If no matching thesis found, set a message
+      if (filteredThesis.length === 0) {
+        setNoMatchingThesisMessage('No matching thesis found matching the desired criteria.');
+      } else {
+        setNoMatchingThesisMessage('');
+      }
     }
+    
   
     setThesis(filteredThesis);
   }
@@ -189,35 +202,43 @@ function ThesisProposals(props) {
               </Form>
             </Col>
           </Row>
-
+  
           <Row className="d-flex justify-content-center mt-4">
             <Col lg={9} xs={12} md={12} sm={12}>
-              <Table striped bordered hover responsive>
-                <thead className="align-middle">
-                  <tr>
-                    <th>Type</th>
-                    <th>Title</th>
-                    <th>Groups</th>
-                    <th>Supervisor</th>
-                    <th>Expiration Date</th>
-                  </tr>
-                </thead>
-                <tbody className="align-middle">
-                  {thesis.map((singleThesis) => (
-                    <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
-                      <td>{singleThesis.type}</td>
-                      <td>
-                        <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
-                          {singleThesis.title}
-                        </Link>
-                      </td>
-                      <td>{singleThesis.groups.join(', ')}</td>
-                      <td>{singleThesis.supervisor}</td>
-                      <td>{singleThesis.expiration}</td>
+              {/* Display "No matching thesis found" message */}
+              {noMatchingThesisMessage && (
+                <p style={{ color: 'red', textAlign: 'center' }}>{noMatchingThesisMessage}</p>
+              )}
+  
+              {/* Conditionally render the table only if there are proposals to show */}
+              {thesis.length > 0 && (
+                <Table striped bordered hover responsive>
+                  <thead className="align-middle">
+                    <tr>
+                      <th>Type</th>
+                      <th>Title</th>
+                      <th>Groups</th>
+                      <th>Supervisor</th>
+                      <th>Expiration Date</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody className="align-middle">
+                    {thesis.map((singleThesis) => (
+                      <tr key={singleThesis.id} style={{ fontWeight: 'bold' }}>
+                        <td>{singleThesis.type}</td>
+                        <td>
+                          <Link to={`/thesis/${singleThesis.id}`} state={{ thesisDetails: singleThesis }}>
+                            {singleThesis.title}
+                          </Link>
+                        </td>
+                        <td>{singleThesis.groups.join(', ')}</td>
+                        <td>{singleThesis.supervisor}</td>
+                        <td>{singleThesis.expiration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
             </Col>
           </Row>
         </>
@@ -290,7 +311,9 @@ function ThesisProposals(props) {
       )}
     </>
   );
-}
+  
+  }
+  
 
 function getSuggestions(filter, allThesis) {
   switch (filter) {
