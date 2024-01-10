@@ -106,10 +106,17 @@ function ThesisProposals(props) {
         return false;
       });
     } else if (filter === 'all') {
-      // For "all" filter, search across all fields
+      // For "all" filter, search across all fields, including arrays
       filteredThesis = filteredThesis.filter((item) => {
         const itemValues = Object.values(item);
-        return selections.some((selection) => itemValues.includes(selection));
+        return selections.every((selection) => {
+          if (Array.isArray(selection)) {
+            // Handle array fields (e.g., groups, keywords)
+            return selection.some((value) => itemValues.flat().includes(value));
+          } else {
+            return itemValues.flat().includes(selection);
+          }
+        });
       });
     }
   
