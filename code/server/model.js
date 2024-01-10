@@ -16,14 +16,22 @@ function ThesisProposal(id, title, supervisor, cosupervisors, keywords, type, gr
     this.cds = cds;
 }
 
-function Application(thesisId, studentId, timestamp, status, teacherId) {
+function Application(thesisId, studentId, timestamp, status, teacherId, cvId) {
     this.studentId = studentId;
     this.thesisId = thesisId;
     this.timestamp = timestamp;
     this.status = status;
     this.teacherId = teacherId;
-
+    this.cvId = cvId;
 }
+
+function CVData(CVId, listOfExams, fileName, fileContent) {
+    this.cvId = CVId;
+    this.listOfExams = listOfExams;
+    this.fileName = fileName;
+    this.fileContent = fileContent;
+}
+
 function Student(id, surname, name, gender, nationality, email, degreeCode, enrollmentYear) {
     this.id = id;
     this.surname = surname;
@@ -54,4 +62,4 @@ function Exam(studentId, courseCode, courseTitle, cfu, grade, date) {
 
 
 
-module.exports = { ThesisProposal, Application, Student, Teacher,Exam };
+module.exports = { ThesisProposal, Application, Student, Teacher,Exam, CVData };

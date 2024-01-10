@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher, CVData } = require('./model');
 const { getThesisProposalById } = require('./daoGeneral');
 
 dayjs.extend(customParseFormat);
@@ -414,6 +414,28 @@ exports.getThesisAccepted = () => {
                     
                     const thesisIds = rows.map((row) =>`${row.thesisid}` );
                     resolve(thesisIds);
+                }
+            }
+        );
+    });
+}
+
+exports.getCVDataByCVId = (cv_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM cv_application where cv_id = ?';
+        db.all(
+            sql,
+            [cv_id],
+            function (err, rows) {
+                if (err) {
+                    reject(err);
+                } else if (rows.length === 0) {
+                    resolve(
+                        { error: `No cv data found for CV id ${cv_id}` }
+                    );
+                } else {
+                    const cvData = new CVData(rows[0].cv_id, rows[0].list_exams, rows[0].file_name, rows[0].file_content);
+                    resolve(cvData);
                 }
             }
         );

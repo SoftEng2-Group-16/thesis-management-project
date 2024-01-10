@@ -2,6 +2,7 @@ const daoStudent = require('../../daoStudent');
 const daoTeacher = require('../../daoTeacher');
 const daoGeneral = require('../../daoGeneral');
 const models = require('../../model');
+const { CustomValidation } = require('express-validator/src/context-items');
 
 const getPossibleCosupervisors = async (req, res) => {
     try {
@@ -374,6 +375,29 @@ const deleteProposal = async (req, res) => {
     }
 }
 
+const getCVData = async (req, res) => {
+    const cvId = req.params.id;
+    try {
+        const cvData = await daoTeacher.getCVDataByCVId(cvId);
+        if (cvData.error) {
+            return res.status(404).json(cvData);
+        } else {
+            const filename = cvData.fileName;
+            const fileContent = cvData.fileContent;
+
+            res.writeHead(200, {
+                'Content-Type': 'application/pdf',
+                'Content-disposition': 'attachment;filename=' + filename,
+                'Content-Length': fileContent.length
+            });
+            res.end(Buffer.from(fileContent, 'binary'));
+            return res;
+        }
+    } catch (e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 module.exports = {
     getPossibleCosupervisors,
     insertNewProposal,
@@ -384,5 +408,6 @@ module.exports = {
     getOwnArchivedProposals,
     deleteProposal,
     archiveProposal,
-    updateThesisProposal
+    updateThesisProposal,
+    getCVData
 }
