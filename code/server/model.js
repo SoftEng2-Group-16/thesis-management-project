@@ -25,13 +25,6 @@ function Application(thesisId, studentId, timestamp, status, teacherId, cvId) {
     this.cvId = cvId;
 }
 
-function CVData(CVId, listOfExams, fileName, fileContent) {
-    this.cvId = CVId;
-    this.listOfExams = listOfExams;
-    this.fileName = fileName;
-    this.fileContent = fileContent;
-}
-
 function Student(id, surname, name, gender, nationality, email, degreeCode, enrollmentYear) {
     this.id = id;
     this.surname = surname;
@@ -62,4 +55,4 @@ function Exam(studentId, courseCode, courseTitle, cfu, grade, date) {
 
 
 
-module.exports = { ThesisProposal, Application, Student, Teacher,Exam, CVData };
+module.exports = { ThesisProposal, Application, Student, Teacher,Exam };

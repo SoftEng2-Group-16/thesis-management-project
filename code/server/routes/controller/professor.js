@@ -375,15 +375,15 @@ const deleteProposal = async (req, res) => {
     }
 }
 
-const getCVData = async (req, res) => {
+const getCVFile = async (req, res) => {
     const cvId = req.params.id;
     try {
-        const cvData = await daoTeacher.getCVDataByCVId(cvId);
+        const cvData = await daoTeacher.getCVFileByCVId(cvId);
         if (cvData.error) {
             return res.status(404).json(cvData);
         } else {
-            const filename = cvData.fileName;
-            const fileContent = cvData.fileContent;
+            const filename = cvData.file_name;
+            const fileContent = cvData.file_content;
 
             res.writeHead(200, {
                 'Content-Type': 'application/pdf',
@@ -409,5 +409,5 @@ module.exports = {
     deleteProposal,
     archiveProposal,
     updateThesisProposal,
-    getCVData
+    getCVFile
 }
