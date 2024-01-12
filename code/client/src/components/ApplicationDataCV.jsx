@@ -71,7 +71,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                 { userRole === 'student' && (
                     <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
                 )}
-                { userRole === 'professor' && (
+                { userRole === 'teacher' && (
                     <Button>download</Button>
                 )}
 

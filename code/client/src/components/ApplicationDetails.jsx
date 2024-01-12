@@ -18,7 +18,7 @@ function ApplicationDetails(props) {
   const [applicationCV, setApplicationCV] = useState(undefined);
   
   useEffect(() => {
-    console.log("props ", props);
+ 
     props.setMessage('');
     if (!state || !state.applicationDetails) {
       console.error('Application details are not available.');
