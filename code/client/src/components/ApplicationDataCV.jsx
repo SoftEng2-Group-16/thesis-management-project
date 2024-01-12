@@ -8,13 +8,13 @@ import MessageContext from '../messageCtx';
 
 
 
-function ApplicationData({ setShowData, handleErrors, setApplicationCV, user }) {
+function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole, studentId }) {
 
     const [examList, setExamList] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
 
     useEffect(() => {
-        studentAPI.getExams()
+        studentAPI.getExams(studentId)
             .then((exams) => {
                 setExamList(exams)
             })
@@ -68,10 +68,10 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, user }) 
                     <h2>no exam passed</h2>
                 }
 
-                { user.role === 'student' && (
+                { userRole === 'student' && (
                     <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
                 )}
-                { user.role === 'professor' && (
+                { userRole === 'professor' && (
                     <Button>download</Button>
                 )}
 

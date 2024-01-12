@@ -264,7 +264,7 @@ function ThesisPage(props) {
                 )}
                 {/*data to send with the application just for student */}
                 {props.user.role === 'student' && showApplicationData && (
-                  <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} user={props.user}/>
+                  <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} userRole={props.user.role} studentId={props.user.id} />
                 )}
               </Row>
 

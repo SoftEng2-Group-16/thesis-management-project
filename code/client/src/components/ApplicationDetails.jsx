@@ -15,7 +15,7 @@ function ApplicationDetails(props) {
   const [applInfo, setApplInfo] = useState();
   const [statusStyle, setStatusStyle] = useState();
   const [CVInfoDisplayed, setCVInfoDisplayed] = useState(false);
-
+  const [applicationCV, setApplicationCV] = useState(undefined);
   
   useEffect(() => {
     console.log("props ", props);
@@ -110,7 +110,7 @@ function ApplicationDetails(props) {
                     </div>
                   </div>
                   {CVInfoDisplayed && (
-                    <ApplicationData user={props.user}></ApplicationData>
+                    <ApplicationData userRole={props.user.role} studentId={applInfo.studentId} setApplicationCV={setApplicationCV}></ApplicationData>
                   )}
                 </Card.Body>
                 {/* <div className="GrAddCircle"></div>
