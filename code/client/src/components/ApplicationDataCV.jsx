@@ -8,7 +8,7 @@ import MessageContext from '../messageCtx';
 
 
 
-function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
+function ApplicationData({ setShowData, handleErrors, setApplicationCV, user }) {
 
     const [examList, setExamList] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
@@ -68,8 +68,12 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
                     <h2>no exam passed</h2>
                 }
 
-                <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
-
+                { user.role === 'student' && (
+                    <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
+                )}
+                { user.role === 'professor' && (
+                    <Button>download</Button>
+                )}
 
             </Card.Body>
         </Card>
