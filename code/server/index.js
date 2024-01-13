@@ -35,7 +35,7 @@ const bodyParser = require("body-parser"); //needed to read the token from saml
 
 passport.use(new SamlStrategy({
   entryPoint: 'https://group16-thesis-management-system.eu.auth0.com/samlp/7gZcQP3Nmz2ymU1iqYBKd1HwZRmb1D09',
-  path: '/login/callback', //motherfucker
+  path: '/login/callback',
   issuer: 'passport-saml',
   cert: cert,
   acceptedClockSkewMs: -1 // avoid syncerror Error: SAML assertion not yet valid
