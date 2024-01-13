@@ -189,7 +189,7 @@ exports.getAllApplicationsByProf = (idProfessor) => {
                     resolve({ status: 404, error: 'No Applications found for professor ' + idProfessor });
                 } else {
                     const applications = rows.map(row => (
-                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid, row.cv_id)
                     ));
                     resolve(applications);
                 }

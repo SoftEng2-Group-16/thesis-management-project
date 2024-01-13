@@ -8,7 +8,7 @@ import MessageContext from '../messageCtx';
 
 
 
-function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole, studentId }) {
+function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole, studentId, applicationInfo }) {
 
     const [examList, setExamList] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
@@ -36,6 +36,10 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
         }
     }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
+
+    const downloadCVFile = async () => {
+        await professorAPI.getCvFile(applicationInfo.cvId);
+    }
 
     return (
         <Card className='mt-3'>
@@ -72,7 +76,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                     <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
                 )}
                 { userRole === 'teacher' && (
-                    <Button>download</Button>
+                    <Button onClick={downloadCVFile}>Download student's CV file</Button>
                 )}
 
             </Card.Body>

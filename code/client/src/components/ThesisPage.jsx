@@ -145,6 +145,9 @@ function ThesisPage(props) {
 
 
     studentAPI.insertApplicationWithCV(formData)
+      .then((res) => {
+        setApplicationCV({cvId: res})
+      })
       .then(() => {
         const emailData = {
           subject: `New Application Received`,

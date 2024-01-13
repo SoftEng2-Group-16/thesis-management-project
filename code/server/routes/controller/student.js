@@ -143,6 +143,7 @@ const insertApplicationWithCV = async (req, res) => {
         const idCV = await daoStudent.insertApplicationData(fileName, fileContent, exams);//retruns the new id created
         //then store the application with the cv id
         const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId, idCV);
+        
         return res.status(200).json(changes);
 
     } catch (e) {

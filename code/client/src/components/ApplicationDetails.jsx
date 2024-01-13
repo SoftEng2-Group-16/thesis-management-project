@@ -18,7 +18,6 @@ function ApplicationDetails(props) {
   const [applicationCV, setApplicationCV] = useState(undefined);
   
   useEffect(() => {
- 
     props.setMessage('');
     if (!state || !state.applicationDetails) {
       console.error('Application details are not available.');
@@ -74,6 +73,8 @@ function ApplicationDetails(props) {
     return <div>Data Unavailable</div>;
   }
 
+
+
   return (
     <Container className="mt-5">
       <Row >
@@ -103,14 +104,16 @@ function ApplicationDetails(props) {
                   <Card.Text><strong>Email:</strong> {applInfo.studentInfo.email}</Card.Text>
                   <Card.Text><strong>Degree Code:</strong> {applInfo.studentInfo.degreeCode}</Card.Text>
                   <Card.Text><strong>Enrollment year:</strong> {applInfo.studentInfo.enrollmentYear}</Card.Text>
+                  {props.user.role ==='teacher' && 
                   <div className="mt-2 d-flex" onClick={() => setCVInfoDisplayed(!CVInfoDisplayed)}>
                     <GrAddCircle className="mt-1"/>
                     <div className="ms-1">
                       {CVInfoDisplayed ? "Hide student's CV information" : "Show student's CV information"}
                     </div>
                   </div>
+                  }
                   {CVInfoDisplayed && (
-                    <ApplicationData userRole={props.user.role} studentId={applInfo.studentId} setApplicationCV={setApplicationCV}></ApplicationData>
+                    <ApplicationData userRole={props.user.role} studentId={applInfo.studentId} setApplicationCV={setApplicationCV} applicationInfo={applInfo}></ApplicationData>
                   )}
                 </Card.Body>
                 {/* <div className="GrAddCircle"></div>
