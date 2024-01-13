@@ -163,7 +163,7 @@ const getCvFile = async (CVId) => {
     credentials: 'include',
   });
 
-  const CvFile = await response.json();
+  const CvFile = await response;
   if (response.ok) {
     return CvFile;
   } else {

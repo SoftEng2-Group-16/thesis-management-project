@@ -12,6 +12,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
 
     const [examList, setExamList] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
+    const [url, setUrl] = useState(null);
 
     useEffect(() => {
         studentAPI.getExams(studentId)
@@ -19,6 +20,16 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                 setExamList(exams)
             })
             .catch(e => {
+                // Handle errors
+                if (e.error && e.status !== 404) {
+                    handleErrors(e);
+                }
+            });
+        professorAPI.getCvFile(applicationInfo.cvId)
+        .then((res) => {
+            setUrl(res.url);
+        })
+        .catch(e => {
                 // Handle errors
                 if (e.error && e.status !== 404) {
                     handleErrors(e);
@@ -36,9 +47,13 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
         }
     }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
+    // useEffect(() => {
+    //   console.log("url", url);
+    //   const res = professorAPI.getCvFile(applicationInfo.cvId);
+    // }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
     const downloadCVFile = async () => {
-        await professorAPI.getCvFile(applicationInfo.cvId);
+        console.log("url", url);
     }
 
     return (
@@ -76,7 +91,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                     <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
                 )}
                 { userRole === 'teacher' && (
-                    <Button onClick={downloadCVFile}>Download student's CV file</Button>
+                    <Button href={url} target="_blank" onClick={downloadCVFile}>Download student's CV file</Button>
                 )}
 
             </Card.Body>
