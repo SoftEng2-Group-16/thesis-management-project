@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, CardText } from 'react-bootstrap';
-import { GrAddCircle } from "react-icons/gr";
+import { GrAddCircle, GrSubtractCircle } from "react-icons/gr";
 import API from '../apis/professorAPI';
 import APIgeneral from '../apis/generalAPI.js'
 import MessageContext from "../messageCtx.jsx"
@@ -106,10 +106,22 @@ function ApplicationDetails(props) {
                   <Card.Text><strong>Enrollment year:</strong> {applInfo.studentInfo.enrollmentYear}</Card.Text>
                   {props.user.role ==='teacher' && 
                   <div className="mt-2 d-flex" onClick={() => setCVInfoDisplayed(!CVInfoDisplayed)}>
-                    <GrAddCircle className="mt-1"/>
-                    <div className="ms-1">
-                      {CVInfoDisplayed ? "Hide student's CV information" : "Show student's CV information"}
-                    </div>
+
+                      {CVInfoDisplayed ? (
+                        <>
+                          <GrSubtractCircle className="mt-1"/>
+                          <div className="ms-1">
+                            Hide student's CV information
+                          </div> 
+                        </>
+                        ) : (
+                        <>
+                          <GrAddCircle  className="mt-1"/>
+                          <div className="ms-1">
+                            Show student's CV information
+                          </div> 
+                        </>
+                      )}
                   </div>
                   }
                   {CVInfoDisplayed && (
