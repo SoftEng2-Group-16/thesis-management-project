@@ -14,6 +14,7 @@ import ThesisPage from './components/ThesisPage.jsx';
 import ThesisApplications from './components/Applications.jsx';
 import ApplicationDetails from './components/ApplicationDetails.jsx';
 import dayjs from 'dayjs';
+import StartRequest from './components/StartRequest.jsx';
 
 
 function App() {
@@ -145,7 +146,7 @@ function App() {
             <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors} setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
             <Route path="/application/:id" element={loggedIn ? <ApplicationDetails setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
-
+            <Route path="/thesisRequest" element={loggedIn ? <StartRequest loggedIn={loggedIn} setMessage={setMessage} /> : <LoginForm login={handleLogin} />} />
             <Route path="*" element={<NotFoundLayout />} />
             <Route path="/login" element={loggedIn ? <Navigate replace to="/thesis" /> : <LoginForm login={handleLogin} />} />
           </Route>
