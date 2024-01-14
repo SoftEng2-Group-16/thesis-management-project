@@ -7,6 +7,7 @@ const it = require('dayjs/locale/it')
 
 dayjs.extend(customParseFormat);
 
+
 const rearrangeProposals = async (req,res) => {
     const selectedTimestamp = req.body.selectedTimestamp;
     try {
@@ -96,7 +97,16 @@ const getInitialDate = async (req,res) => {
     }
 }
 
+
+/* 
+    Cron job function: in a real world scenario, this would be called every day at midnight to move expired proposals to the archive,
+    using the real date as a timestamp to perform the check of expiration.
+    In our case, since we have the virtual clock saved in the DB (so it's frozen to a specific date), we use the saved initial date
+    as if it was the real date, and perform the cron job every 5 minutes.
+    NEED TO BE CHANGED in real world usage!
+*/
+
 module.exports = {
     rearrangeProposals,
-    getInitialDate
+    getInitialDate,
 }
