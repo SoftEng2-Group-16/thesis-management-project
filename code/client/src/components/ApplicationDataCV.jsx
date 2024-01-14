@@ -25,16 +25,18 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                     handleErrors(e);
                 }
             });
-        professorAPI.getCvFile(applicationInfo.cvId)
-        .then((res) => {
-            setUrl(res.url);
-        })
-        .catch(e => {
+        if (applicationInfo != undefined) {
+            professorAPI.getCvFile(applicationInfo.cvId)
+            .then((res) => {
+                setUrl(res.url);
+            })
+            .catch(e => {
                 // Handle errors
                 if (e.error && e.status !== 404) {
                     handleErrors(e);
                 }
             });
+        }
     }, []);
 
 
