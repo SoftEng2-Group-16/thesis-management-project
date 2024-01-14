@@ -334,11 +334,11 @@ None yet...
   - Response: `200 OK` (success), `404 Not Found` (no proposal found), `500 Internal Server Error` (generic server error), `401 Unauthorized` (if a professor tries to delete a proposal not owned, should not happen from the client), `422 Unprocessable Content` (happens when trying to archive a proposal which already has an accepted application, should not happen from the client)
   - Response body: the number of archived proposals (should always be 1)
 
-<!-- - GET `/api/cv/:id/download`
+- GET `/api/cv/:id/download`
   - Description: downloads the cv file present on the cv_application table
   - Request param: the id of the cv application
   - Response: `200 OK` (success), `404 Not Found` (no cv application found), `500 Internal Server Error` (generic server error)
-  - Response body:  -->
+  - Response body: the url to download the file
 
 ### General and utils APIs:
 - POST `/api/notify`
