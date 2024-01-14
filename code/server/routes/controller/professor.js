@@ -399,20 +399,6 @@ const getCVFile = async (req, res) => {
     }
 }
 
-const getCVInfo = async (req, res) => {
-    const cvId = req.params.id;
-    try {
-        const cvData = await daoTeacher.getCVDataByCVId(cvId);
-        if (cvData.error) {
-            return res.status(404).json(cvData);
-        } else {
-            return res.status(200).json(cvData);
-        }
-    } catch (e) {
-        return res.status(500).json(e.message);
-    }
-}
-
 module.exports = {
     getPossibleCosupervisors,
     insertNewProposal,
@@ -424,6 +410,5 @@ module.exports = {
     deleteProposal,
     archiveProposal,
     updateThesisProposal,
-    getCVFile,
-    getCVInfo
+    getCVFile
 }

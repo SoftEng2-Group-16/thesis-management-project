@@ -22,7 +22,6 @@ router.get('/initialdate', utils.getInitialDate);
 
 router.post('/uploadCV', multer.upload.single('file'),auth.isLoggedIn, student.insertApplicationWithCV);
 router.get('/cv/:id/download',professor.getCVFile); 
-router.get('/cv/:id/info',professor.getCVInfo); 
 router.get('/student/:id/exams',auth.isLoggedIn,student.getAllExams);
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
