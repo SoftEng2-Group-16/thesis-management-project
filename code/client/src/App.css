@@ -133,6 +133,11 @@
   width: 100%;
 }
 
+/* Application */
+.cv-details-button:hover {
+  text-decoration: underline;
+}
+
 
 /* ThesisPage.css */
 .thesis-card {

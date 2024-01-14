@@ -105,7 +105,7 @@ function ApplicationDetails(props) {
                   <Card.Text><strong>Degree Code:</strong> {applInfo.studentInfo.degreeCode}</Card.Text>
                   <Card.Text><strong>Enrollment year:</strong> {applInfo.studentInfo.enrollmentYear}</Card.Text>
                   {props.user.role ==='teacher' && 
-                  <div className="mt-2 d-flex" onClick={() => setCVInfoDisplayed(!CVInfoDisplayed)}>
+                  <div className="mt-5 d-flex cv-details-button" onClick={() => setCVInfoDisplayed(!CVInfoDisplayed)}>
 
                       {CVInfoDisplayed ? (
                         <>
