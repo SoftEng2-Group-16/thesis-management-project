@@ -152,10 +152,34 @@ const insertApplicationWithCV = async (req, res) => {
 
 }
 
+const insertNewStartRequest = async (req,res) => {
+    const thesisTitle = req.body.thesisTitle;
+    const supervisor = req.body.supervisor;
+    const cosupervisors = req.body.cosupervisors;
+    const thesisDescription = req.body.thesisDescription;
+    const timestamp = dayjs().format("DD/MM/YYYY HH:mm:ss");
+    const status = 'created';
+    const studentId = req.user.id;
+
+    if (!thesisTitle || !supervisor || !cosupervisors || !thesisDescription) {
+        return res.status(422).json({error: "Missing data in request body!"});
+    }
+    
+    try {
+        const requestId = await daoStudent.insertStartRequest(thesisTitle, supervisor, cosupervisors.join('-'), thesisDescription, status, timestamp, studentId);
+        return res.status(201).json(requestId);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+
+    }
+
+}
+
 module.exports = {
     insertNewApplication,
     getApplicationsForStudent,
     getThesisProposals,
     insertApplicationWithCV,
-    getAllExams
+    getAllExams,
+    insertNewStartRequest
 };

@@ -25,6 +25,7 @@ router.get('/cv/:id/download', auth.isLoggedIn, professor.getCVFile);
 router.get('/student/:id/exams',auth.isLoggedIn,student.getAllExams);
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
+router.post('/newstartrequest', /*auth.isLoggedIn,*/student.insertNewStartRequest);
 // remove the :studentId param when api is protected, it will be taken from req.user
 // REMEMBER to update documentation
 router.get('/student/applications', auth.isLoggedIn, student.getApplicationsForStudent);
@@ -40,6 +41,5 @@ router.get('/teacher/applications', auth.isLoggedIn, professor.getAllApplication
 router.put('/teacher/archiveproposal', auth.isLoggedIn, professor.archiveProposal);
 /*student routes*/
 router.put('/clockchanged', utils.rearrangeProposals)
-
 
 module.exports = router;
