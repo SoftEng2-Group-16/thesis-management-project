@@ -181,3 +181,20 @@ exports.insertApplicationData = (fileName,fileContent,exams) => {
         );
     });
 }
+
+exports.insertStartRequest = (thesisTitle, supervisor, cosupervisors, thesisDescription, status, timestamp, studentId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO thesis_start_request (timestamp,status,thesis_title,supervisor,cosupervisors,thesis_description, studentid) VALUES (?,?,?,?,?,?,?)';
+        db.run(
+            sql,
+            [timestamp, status, thesisTitle, supervisor, cosupervisors, thesisDescription, studentId],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            }
+        );
+    });
+}
