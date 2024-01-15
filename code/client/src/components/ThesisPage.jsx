@@ -145,6 +145,9 @@ function ThesisPage(props) {
 
 
     studentAPI.insertApplicationWithCV(formData)
+      .then((res) => {
+        setApplicationCV({cvId: res})
+      })
       .then(() => {
         const emailData = {
           subject: `New Application Received`,
@@ -264,7 +267,7 @@ function ThesisPage(props) {
                 )}
                 {/*data to send with the application just for student */}
                 {props.user.role === 'student' && showApplicationData && (
-                  <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} />
+                  <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} userRole={props.user.role} studentId={props.user.id} />
                 )}
               </Row>
 

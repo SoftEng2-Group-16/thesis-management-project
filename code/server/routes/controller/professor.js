@@ -2,6 +2,7 @@ const daoStudent = require('../../daoStudent');
 const daoTeacher = require('../../daoTeacher');
 const daoGeneral = require('../../daoGeneral');
 const models = require('../../model');
+const { CustomValidation } = require('express-validator/src/context-items');
 
 const getPossibleCosupervisors = async (req, res) => {
     try {
@@ -93,6 +94,7 @@ const getAllApplicationsByProf = async (req, res) => {
             const enhancedApplications = [];
             //add the 2 fields with details to the object
             for (const appl of applications) {
+                console.log("appl ", appl);
                 const studentInfo = await daoStudent.getStudentById(appl.studentId);
                 const thesisInfo = await daoGeneral.getThesisProposalById(appl.thesisId)
                     .then(t => {
@@ -374,6 +376,29 @@ const deleteProposal = async (req, res) => {
     }
 }
 
+const getCVFile = async (req, res) => {
+    const cvId = req.params.id;
+    try {
+        const cvData = await daoTeacher.getCVFileByCVId(cvId);
+        if (cvData.error) {
+            return res.status(404).json(cvData);
+        } else {
+            const filename = cvData.file_name;
+            const fileContent = cvData.file_content;
+
+            res.writeHead(200, {
+                'Content-Type': 'application/pdf',
+                'Content-disposition': 'attachment;filename=' + filename,
+                'Content-Length': fileContent.length
+            });
+            res.end(Buffer.from(fileContent, 'binary'));
+            return res;
+        }
+    } catch (e) {
+        return res.status(500).json(e.message);
+    }
+}
+
 module.exports = {
     getPossibleCosupervisors,
     insertNewProposal,
@@ -384,5 +409,6 @@ module.exports = {
     getOwnArchivedProposals,
     deleteProposal,
     archiveProposal,
-    updateThesisProposal
+    updateThesisProposal,
+    getCVFile
 }

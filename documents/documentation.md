@@ -163,6 +163,16 @@ LM-1 | Computer Engineering
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
 
+##### APPLICATIONS
+
+| thesisid | studentid | timestamp | status | teacherid | cv_id 
+|---  |--- | ---- | --- | ---- | --- 
+| 0 | 200001 | 13/01/2024 11:10:12 | pending | 268555 |	1
+
+#### CV_APPLICATION
+| cv_id | list_exams | file_name | file_content |
+| ---  | --- | --- | --- |
+| 1 |	[{"studentId":200001,"courseCode":"01ABCDE","courseTitle":"Computer Science","cfu":10,"grade":"20","date":"02-03-2020"},{"studentId":200001,"courseCode":"02PQRST","courseTitle":"Physics","cfu":6,"grade":"30L","date":"20-10-2018"},{"studentId":200001,"courseCode":"02UVWXY","courseTitle":"Geometry","cfu":10,"grade":"28","date":"18-07-2022"}]|	PDIS.pdf |	BLOB |
 
 *If you need a tool to explore the DB, you can try 'DB Browser for SQLITE' for Windows Desktop*
 
@@ -323,6 +333,12 @@ None yet...
   - Request body: object containing the id of the proposal to archive; it also uses the id of the currently logged teacher (retrieved from the session cookie).
   - Response: `200 OK` (success), `404 Not Found` (no proposal found), `500 Internal Server Error` (generic server error), `401 Unauthorized` (if a professor tries to delete a proposal not owned, should not happen from the client), `422 Unprocessable Content` (happens when trying to archive a proposal which already has an accepted application, should not happen from the client)
   - Response body: the number of archived proposals (should always be 1)
+
+- GET `/api/cv/:id/download`
+  - Description: downloads the cv file present on the cv_application table
+  - Request param: the id of the cv application
+  - Response: `200 OK` (success), `404 Not Found` (no cv application found), `500 Internal Server Error` (generic server error)
+  - Response body: the url to download the file
 
 ### General and utils APIs:
 - POST `/api/notify`

@@ -141,6 +141,7 @@ exports.getMyThesisAccepted = (studentId) => {
 }
 
 exports.getExamsByStudentId = (studentId) => {
+
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * from careers where student_id=? ';
         db.all(

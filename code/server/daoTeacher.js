@@ -2,7 +2,7 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher} = require('./model');
 const { getThesisProposalById } = require('./daoGeneral');
 
 dayjs.extend(customParseFormat);
@@ -189,7 +189,7 @@ exports.getAllApplicationsByProf = (idProfessor) => {
                     resolve({ status: 404, error: 'No Applications found for professor ' + idProfessor });
                 } else {
                     const applications = rows.map(row => (
-                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid)
+                        new Application(row.thesisid, row.studentid, row.timestamp, row.status, row.teacherid, row.cv_id)
                     ));
                     resolve(applications);
                 }
@@ -414,6 +414,27 @@ exports.getThesisAccepted = () => {
                     
                     const thesisIds = rows.map((row) =>`${row.thesisid}` );
                     resolve(thesisIds);
+                }
+            }
+        );
+    });
+}
+
+exports.getCVFileByCVId = (cv_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT file_name, file_content FROM cv_application where cv_id = ?';
+        db.all(
+            sql,
+            [cv_id],
+            function (err, rows) {
+                if (err) {
+                    reject(err);
+                } else if (rows.length === 0) {
+                    resolve(
+                        { error: `No cv data found for CV id ${cv_id}` }
+                    );
+                } else {
+                    resolve(rows[0]);
                 }
             }
         );

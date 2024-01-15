@@ -21,7 +21,8 @@ router.put('/clockchanged', utils.rearrangeProposals)
 router.get('/initialdate', utils.getInitialDate);
 
 router.post('/uploadCV', multer.upload.single('file'),auth.isLoggedIn, student.insertApplicationWithCV);
-router.get('/exams',auth.isLoggedIn,student.getAllExams)
+router.get('/cv/:id/download',professor.getCVFile); 
+router.get('/student/:id/exams',auth.isLoggedIn,student.getAllExams);
 /*other routes down there, use the middleware isloggedin to protect the route (hopefully) */
 router.post('/newapplication', auth.isLoggedIn, student.insertNewApplication);
 // remove the :studentId param when api is protected, it will be taken from req.user

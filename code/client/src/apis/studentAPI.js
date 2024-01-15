@@ -64,8 +64,8 @@ const insertApplicationWithCV = async (formData) => {
   }
 }
 
-const getExams = async () => {
-  const response = await fetch(SERVER_URL + `/api/exams`, {
+const getExams = async (studentId) => {
+  const response = await fetch(SERVER_URL + `/api/student/${studentId}/exams`, {
     credentials: 'include',
   });
   const res = await response.json();
