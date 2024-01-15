@@ -69,12 +69,11 @@ const StartRequest = (props) => {
             );
         } else {
             const thesisRequest = {
-                title: title,
-                description: description,
+                thesisTitle: title,
+                thesisDescription: description,
                 supervisor: supervisor.value,
                 cosupervisors: cosupervisorsInt.map(obj => obj.value),
             };
-            console.log(thesisRequest);
             // insert the start thesis request
             insertStartRequest(thesisRequest);
             setTitle('');
@@ -89,10 +88,9 @@ const StartRequest = (props) => {
     }
 
     const insertStartRequest = (request) => {
-        // studentAPI.insertStartRequest(request)
-        //     .then(() => { })
-        //     .catch(err => { handleErrors(err); })
-        console.log("insert start request api call");
+        studentAPI.insertStartRequest(request)
+            .then(() => {})
+            .catch(err => { setSuccessMessage(''); handleErrors(err); })
     }
 
     return (
