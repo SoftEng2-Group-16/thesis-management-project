@@ -144,7 +144,7 @@ function App() {
             <Route path="/thesis" element={loggedIn ? <ThesisProposals loggedIn={loggedIn} user={user} update={update} setUpdate={setUpdate} setMessage={setMessage}/> : <ThesisProposals user={user} />} ></Route>
             <Route path="/proposal" element={loggedIn ? <ProposalForm loggedIn={loggedIn} user={user} setMessage={setMessage} /> : <LoginForm login={handleLogin} />}></Route>
             <Route path="/applications" element={loggedIn ? <ThesisApplications loggedIn={loggedIn} user={user} handleErrors={handleErrors} setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
-            <Route path="/application/:id" element={loggedIn ? <ApplicationDetails setMessage={setMessage}/> : <LoginForm login={handleLogin} />} />
+            <Route path="/application/:id" element={loggedIn ? <ApplicationDetails setMessage={setMessage} user={user} handleErrors={handleErrors}/> : <LoginForm login={handleLogin} />} />
             <Route path="/thesis/:id" element={loggedIn ? <ThesisPage user={user} setMessage={setMessage}/> : <ThesisPage />} />
             <Route path="/thesisRequest" element={loggedIn ? <StartRequest loggedIn={loggedIn} setMessage={setMessage} /> : <LoginForm login={handleLogin} />} />
             <Route path="*" element={<NotFoundLayout />} />

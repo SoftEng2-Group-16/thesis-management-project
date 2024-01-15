@@ -8,13 +8,14 @@ import MessageContext from '../messageCtx';
 
 
 
-function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
+function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole, studentId, applicationInfo }) {
 
     const [examList, setExamList] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
+    const [url, setUrl] = useState(null);
 
     useEffect(() => {
-        studentAPI.getExams()
+        studentAPI.getExams(studentId)
             .then((exams) => {
                 setExamList(exams)
             })
@@ -24,6 +25,18 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
                     handleErrors(e);
                 }
             });
+        if (applicationInfo != undefined) {
+            professorAPI.getCvFile(applicationInfo.cvId)
+            .then((res) => {
+                setUrl(res.url);
+            })
+            .catch(e => {
+                // Handle errors
+                if (e.error && e.status !== 404) {
+                    handleErrors(e);
+                }
+            });
+        }
     }, []);
 
 
@@ -36,6 +49,9 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
         }
     }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
+    const downloadCVFile = async () => {
+        console.log("url", url);
+    }
 
     return (
         <Card className='mt-3'>
@@ -68,8 +84,12 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV }) {
                     <h2>no exam passed</h2>
                 }
 
-                <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
-
+                { userRole === 'student' && (
+                    <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
+                )}
+                { userRole === 'teacher' && url != undefined && (
+                    <Button href={url} target="_blank" onClick={downloadCVFile}>Download student's CV file</Button>
+                )}
 
             </Card.Body>
         </Card>

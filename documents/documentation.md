@@ -138,6 +138,44 @@ professor: {
 ## Database Structure
 ### Example rows (one for each table)
 
+##### APPLICATIONS
+
+| thesisid | studentid | timestamp | status | teacherid | cv_id 
+|---  |--- | ---- | --- | ---- | --- 
+| 0 | 200001 | 13/01/2024 11:10:12 | pending | 268555 |	1
+
+#### ARCHIVED_THESIS_PROPOSALS
+*Note: it has the same structure of the table thesis_proposals, it's used to store archived proposals*
+| id  | title  | supervisor | cosupervisors | keywords | type | groups | description | requirements | notes | expiration | level | cds
+|---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
+0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
+
+#### AUTH 
+*Note: obsolete, was used for authentication when SAML2.0 wasn't implemented*
+| id | email| role | password | salt |
+|--- |---   |---   |---       |---   |
+| 200001 | mario.rossi@studenti.polito.it |student | 78a9b43f33c457b3f12446c7cc4ab6150498ad85c832ec81321ade572350aedfe5903e2cd6252db2b154a747d3a6c2e60a1db3f4578c1f53ccdc96fafcbd9df5 | e8a1ea50eeaaa38f
+
+#### CAREERS
+| student_id  | course_code  | course_title | cfu | garde | date_registered
+|---  |---    |---  |--- |--- |---
+200023 | 02PQRST | Physics | 19 | 30L | 20-10-2018
+
+#### CV_APPLICATION
+| cv_id | list_exams | file_name | file_content |
+| ---  | --- | --- | --- |
+| 1 |	[{"studentId":200001,"courseCode":"01ABCDE","courseTitle":"Computer Science","cfu":10,"grade":"20","date":"02-03-2020"},{"studentId":200001,"courseCode":"02PQRST","courseTitle":"Physics","cfu":6,"grade":"30L","date":"20-10-2018"},{"studentId":200001,"courseCode":"02UVWXY","courseTitle":"Geometry","cfu":10,"grade":"28","date":"18-07-2022"}]|	PDIS.pdf |	BLOB |
+
+#### DEGREES
+| degree_code | degree_title
+|---  |---
+LM-1 | Computer Engineering
+
+#### EXTERNAL_COSUPERVISORS
+| id | name | surname | company | email |
+|--- |---   |---      |---      |---    |
+| 1 | Marco | Rossi | Reply |  marco.rossi@reply.com |
+
 #### STUDENTS
 | id  | surname  | name | gender | nationality | email | degree_code | enrollment_year
 |---  |---    |---  |--- |--- |--- |--- |---
@@ -148,21 +186,22 @@ professor: {
 |---  |---    |---  |--- |--- |---
 268553 | Rossi | Maria | <maria.rossi@polito.it> | AI | DAD
 
-#### CAREERS
-| student_id  | course_code  | course_title | cfu | garde | date_registered
-|---  |---    |---  |--- |--- |---
-200023 | 02PQRST | Physics | 19 | 30L | 20-10-2018
-
-#### DEGREES
-| degree_code | degree_title
-|---  |---
-LM-1 | Computer Engineering
 
 #### THESIS_PROPOSALS
 | id  | title  | supervisor | cosupervisors | keywords | type | groups | description | requirements | notes | expiration | level | cds
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
 
+
+#### THESIS_START_REQUEST
+| id | timestamp | status | thesis_title | supervisor | cosupervisors | thesis_description | studentid 
+|---  |--- | ---- | --- | ---- | --- | ---- | ---
+| 1 | 15/01/2024 14:39:46 | created | AI-Driven Healthcare Solutions | 268553, Maria Rossi | Luigi Bianchi, 268554, DAUIN | Develop AI-powered healthcare solutions for diagnosing diseases. | 200001 |
+
+#### VC_DATE
+| date | id |
+|---   |--- |
+| 11/12/2024 | 0 |
 
 *If you need a tool to explore the DB, you can try 'DB Browser for SQLITE' for Windows Desktop*
 
@@ -324,9 +363,23 @@ None yet...
   - Response: `200 OK` (success), `404 Not Found` (no proposal found), `500 Internal Server Error` (generic server error), `401 Unauthorized` (if a professor tries to delete a proposal not owned, should not happen from the client), `422 Unprocessable Content` (happens when trying to archive a proposal which already has an accepted application, should not happen from the client)
   - Response body: the number of archived proposals (should always be 1)
 
+- GET `/api/cv/:id/download`
+  - Description: downloads the cv file present on the cv_application table
+  - Request param: the id of the cv application
+  - Response: `200 OK` (success), `404 Not Found` (no cv application found), `500 Internal Server Error` (generic server error)
+  - Response body: the url to download the file
+
+### Thesis start request APIs:
+- POST `/api/newstartrequest`
+  - Description: used by a student to send a new thesis start request to the secretary
+  - Request body: an object containing info about the selected thesis
+    - {`thesisTitle`, `supervisor`, `cosupervisors`, `thesisDescription`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error), `422 Unprocessable Content`(body doesn't contain all the necessary info)
+  - Response body: the id of the last tuple created in the DB
+
+
 ### General and utils APIs:
 - POST `/api/notify`
-  - Description: used to build the email notification (with the internal function buildEmail) and send it
   - Description: used to build the email notification (with the internal function `buildEmail`) and send it
   - Request body: an object containing the details of the email to be sent and useful params to build it
     - {`subject`, `type`, `data`}

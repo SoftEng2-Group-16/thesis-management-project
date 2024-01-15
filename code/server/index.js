@@ -6,6 +6,9 @@ const http = require('http');
 const router = require('./routes/router.js');
 const session = require('express-session');
 
+//cron-related import to perform automatic archive of expired proposals
+const cron = require('node-cron');
+
 // init express
 const app = new express();
 const port = 3001;
@@ -32,6 +35,8 @@ const path = require('path');
 const certPath = path.join(__dirname, './group16-thesis-management-system.pem');
 const cert = fs.readFileSync(certPath, 'utf-8'); // read the certificate
 const bodyParser = require("body-parser"); //needed to read the token from saml
+
+
 
 //-------------------------------AUTH0 stuff for SAML2--------------------------------//
 
@@ -176,6 +181,86 @@ app.use(bodyParser.json({ limit: '200mb' }));
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
 
+/*
+  Cron utility functions, to launch the API calls needed to automatically archive a proposal (cannot 
+  use named functions as we do in the router, have to create http request 'manually')
+  Don't know why, moving them in a separate file breaks them.
+
+  Note on the logic: in servers, cron jobs are used to automatically perform some operations. If we didn't 
+  have the virtual clock functionality, we would simply configure a cron job to automatically move expired proposals
+  every day soon after midnight; however, since we implemented the VC by saving the selected date in the DB in order
+  to mantain its consistency, it wouldn't make sense to have it set up like that, because the date doesn't change at 00:00.
+
+  For testing purposes, we will set up a shorter interval for the cron job (change the string in the cron.schedule line) to
+  show it effectively works.
+*/
+const cronGetDate = () => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'localhost',
+      port: port,
+      path: '/api/initialdate',
+      method: 'GET',
+    };
+
+    const req = http.request(options, (res) => {
+      let data = '';
+
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        resolve(data.replace(/"/g, ''));
+      });
+
+      res.on('error', (error) => {
+        reject(error);
+      })
+    });
+
+    req.end();
+  });
+}
+
+const cronArchiveExpired = (initialDate) => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'localhost',
+      port: port,
+      path: '/api/clockchanged',
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const reqBody = JSON.stringify({
+      selectedTimestamp: initialDate,
+    });
+
+    const req = http.request(options, (res) => {
+      let data = '';
+
+      res.on('data', chunk => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        resolve(data);
+      });
+
+      res.on('error', (error) => {
+        reject(error);
+      });
+    });
+
+    req.write(reqBody);
+    req.end();
+  });
+}
+
+
 
 /* ROUTERS */
 app.use('/api', router);
@@ -184,6 +269,14 @@ const server = http.createServer(app);
 
 server.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
+  // cron job setup
+  cron.schedule('0 0 */1 * * *', async () => { //executes every hour, change it as needed
+    console.log('Cron job starting...');
+    const initialDate = await cronGetDate().catch(e => console.error("Cron job couldn't get date"));
+    const numberExpired = await cronArchiveExpired(initialDate).catch(e => console.error("Cron couldn't archive expired proposals"));
+    console.log(`Cron job finished, moved ${numberExpired} proposals...`);
+  });
 });
+
 
 module.exports = { app, server };

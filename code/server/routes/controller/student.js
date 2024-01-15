@@ -90,8 +90,7 @@ const getThesisProposals = async (req, res) => {
 const getAllExams = async (req, res) => {
     //same principle for the getApplications: for manual testing purposes at the moment the degree
     //code is taken as param; ideally, it should be taken from the req.user object
-    //const studentId= req.params.id
-    const studentId = req.user.id
+    const studentId = req.params.id;
 
     if (!studentId) {
         return res.status(403).json({ error: "problem with login" });
@@ -144,10 +143,34 @@ const insertApplicationWithCV = async (req, res) => {
         const idCV = await daoStudent.insertApplicationData(fileName, fileContent, exams);//retruns the new id created
         //then store the application with the cv id
         const changes = await daoStudent.addApplicationForThesis(proposalId, studentId, timestamp, status, teacherId, idCV);
+        
         return res.status(200).json(changes);
 
     } catch (e) {
         return res.status(500).json({ error: e.message });
+    }
+
+}
+
+const insertNewStartRequest = async (req,res) => {
+    const thesisTitle = req.body.thesisTitle;
+    const supervisor = req.body.supervisor;
+    const cosupervisors = req.body.cosupervisors;
+    const thesisDescription = req.body.thesisDescription;
+    const timestamp = dayjs().format("DD/MM/YYYY HH:mm:ss");
+    const status = 'created';
+    const studentId = req.user.id;
+
+    if (!thesisTitle || !supervisor || !cosupervisors || !thesisDescription) {
+        return res.status(422).json({error: "Missing data in request body!"});
+    }
+    
+    try {
+        const requestId = await daoStudent.insertStartRequest(thesisTitle, supervisor, cosupervisors.join('-'), thesisDescription, status, timestamp, studentId);
+        return res.status(201).json(requestId);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+
     }
 
 }
@@ -157,5 +180,6 @@ module.exports = {
     getApplicationsForStudent,
     getThesisProposals,
     insertApplicationWithCV,
-    getAllExams
+    getAllExams,
+    insertNewStartRequest
 };

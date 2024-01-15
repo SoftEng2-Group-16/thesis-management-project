@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, CardText } from 'react-bootstrap';
+import { GrAddCircle, GrSubtractCircle } from "react-icons/gr";
 import API from '../apis/professorAPI';
 import APIgeneral from '../apis/generalAPI.js'
 import MessageContext from "../messageCtx.jsx"
 import '../App.css';
+import ApplicationData from './ApplicationDataCV.jsx';
 
 function ApplicationDetails(props) {
   const { state } = useLocation();
@@ -12,10 +14,10 @@ function ApplicationDetails(props) {
   const { handleErrors } = useContext(MessageContext);
   const [applInfo, setApplInfo] = useState();
   const [statusStyle, setStatusStyle] = useState();
-
+  const [CVInfoDisplayed, setCVInfoDisplayed] = useState(false);
+  const [applicationCV, setApplicationCV] = useState(undefined);
   
   useEffect(() => {
-
     props.setMessage('');
     if (!state || !state.applicationDetails) {
       console.error('Application details are not available.');
@@ -71,6 +73,8 @@ function ApplicationDetails(props) {
     return <div>Data Unavailable</div>;
   }
 
+
+
   return (
     <Container className="mt-5">
       <Row >
@@ -91,16 +95,41 @@ function ApplicationDetails(props) {
               {/* Student related informations */}
               <Card className="mb-4">
                 <Card.Title className="border-bottom pb-2 mb-4">Student Informations</Card.Title>
-                <Card.Body>
-                  <Card.Text className="mb-2 text-start"><strong>Student ID:</strong> {applInfo.studentInfo.id}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Surname:</strong> {applInfo.studentInfo.surname}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Name:</strong> {applInfo.studentInfo.name}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Gender:</strong> {applInfo.studentInfo.gender}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Nationality:</strong> {applInfo.studentInfo.nationality}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Email:</strong> {applInfo.studentInfo.email}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Degree Code:</strong> {applInfo.studentInfo.degreeCode}</Card.Text>
-                  <Card.Text className="mb-2 text-start"><strong>Enrollment year:</strong> {applInfo.studentInfo.enrollmentYear}</Card.Text>
+                <Card.Body className="mb-2 text-start">
+                  <Card.Text><strong>Student ID:</strong> {applInfo.studentInfo.id}</Card.Text>
+                  <Card.Text><strong>Surname:</strong> {applInfo.studentInfo.surname}</Card.Text>
+                  <Card.Text><strong>Name:</strong> {applInfo.studentInfo.name}</Card.Text>
+                  <Card.Text><strong>Gender:</strong> {applInfo.studentInfo.gender}</Card.Text>
+                  <Card.Text><strong>Nationality:</strong> {applInfo.studentInfo.nationality}</Card.Text>
+                  <Card.Text><strong>Email:</strong> {applInfo.studentInfo.email}</Card.Text>
+                  <Card.Text><strong>Degree Code:</strong> {applInfo.studentInfo.degreeCode}</Card.Text>
+                  <Card.Text><strong>Enrollment year:</strong> {applInfo.studentInfo.enrollmentYear}</Card.Text>
+                  {props.user.role ==='teacher' && 
+                  <div className="mt-5 d-flex cv-details-button" onClick={() => setCVInfoDisplayed(!CVInfoDisplayed)}>
+
+                      {CVInfoDisplayed ? (
+                        <>
+                          <GrSubtractCircle className="mt-1"/>
+                          <div className="ms-1">
+                            Hide student's CV information
+                          </div> 
+                        </>
+                        ) : (
+                        <>
+                          <GrAddCircle  className="mt-1"/>
+                          <div className="ms-1">
+                            Show student's CV information
+                          </div> 
+                        </>
+                      )}
+                  </div>
+                  }
+                  {CVInfoDisplayed && (
+                    <ApplicationData userRole={props.user.role} studentId={applInfo.studentId} setApplicationCV={setApplicationCV} applicationInfo={applInfo}></ApplicationData>
+                  )}
                 </Card.Body>
+                {/* <div className="GrAddCircle"></div>
+                <Button variant="info" size="sm" >See CV information</Button> */}
               </Card>
 
               {/* Grouping Thesis related information */}

@@ -158,6 +158,19 @@ DELETE http://localhost:3001/api/deleteproposal/3
 ###
 GET http://localhost:3001/api/exams/200001
 
+# test student inserts new thesis start request
+###
+POST http://localhost:3001/api/newstartrequest
+content-type: application/json
+
+{
+    "thesisTitle": "Test title",
+    "supervisor": "Test supervisor",
+    "cosupervisors": ["Test cosupervisor"],
+    "thesisDescription": "Test description",
+    "studentId": 200001
+}
+
 ###
 POST http://localhost:3001/api/uploadCV
 Content-Type: multipart/form-data; boundary=boundary123
