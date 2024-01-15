@@ -440,24 +440,3 @@ exports.getCVFileByCVId = (cv_id) => {
         );
     });
 }
-
-exports.getCVDataByCVId = (cv_id) => {
-    return new Promise((resolve, reject) => {
-        const sql = 'SELECT list_exams FROM cv_application where cv_id = ?';
-        db.all(
-            sql,
-            [cv_id],
-            function (err, rows) {
-                if (err) {
-                    reject(err);
-                } else if (rows.length === 0) {
-                    resolve(
-                        { error: `No cv data found for CV id ${cv_id}` }
-                    );
-                } else {
-                    resolve(rows[0]);
-                }
-            }
-        );
-    });
-}

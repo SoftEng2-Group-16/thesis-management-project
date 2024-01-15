@@ -49,11 +49,6 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
         }
     }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
-    // useEffect(() => {
-    //   console.log("url", url);
-    //   const res = professorAPI.getCvFile(applicationInfo.cvId);
-    // }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
-
     const downloadCVFile = async () => {
         console.log("url", url);
     }
