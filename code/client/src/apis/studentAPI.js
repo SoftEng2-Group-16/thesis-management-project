@@ -77,5 +77,23 @@ const getExams = async (studentId) => {
   }
 }
 
-const studentAPI = { insertApplication, getThesisProposals, getApplications, insertApplicationWithCV, getExams };
+const insertStartRequest = async (request) => {
+  const response = await fetch(SERVER_URL + '/api/newstartrequest', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(request),
+  });
+
+  const res = await response.json();
+  if (response.ok) {
+    return res;
+  } else {
+    throw res;
+  }
+}
+
+const studentAPI = { insertApplication, getThesisProposals, getApplications, insertApplicationWithCV, getExams, insertStartRequest };
 export default studentAPI;
