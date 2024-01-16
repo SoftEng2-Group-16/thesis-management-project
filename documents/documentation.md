@@ -17,6 +17,7 @@
       - [DEGREES](#degrees)
       - [THESIS\_PROPOSALS](#thesis_proposals)
     - [Notification System](#notification-system)
+    - [Upload/Download file](#multer)
   - [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
   - [React Client Application Routes](#react-client-application-routes)
   - [Main Component](#main-component)
@@ -43,6 +44,10 @@
 
 *Sprint 3*:
 - Notification System
+
+*Sprint 4*:
+- Upload/Download file
+- Automatic archiviation of expired proposals
 
 ### Stories
 
@@ -227,6 +232,13 @@ The backend makes use of an internal method to build the email called `buildEmai
 
 - DEMO 3: a notification is sent to the student when a professor takes a decision about his application.
 
+### Multer
+
+- Multer Configuration
+
+  Multer, a Node.js middleware, is utilized for handling file uploads in the project. The configuration is set up in the multer-setup.js file. This configuration employs in-memory storage for uploaded files.
+
+
 ## Useful ideas and future development needs
 None yet...
 
@@ -397,7 +409,13 @@ None yet...
   - Description: fetches the last date used from the virtual clock system
   - Response: `200 OK` (success), `500 Internal Server Error` (failure)
   - Response body: a string containing the system date
-  
+
+- POST `/api/uploadCV`
+  - Description: used to manage the uplaod of a new application with the associated CV file
+  - Request body: the application data
+  - Request file: contains the file saved as a Blob 
+  - Response: `200 OK` (success), `500 Internal Server Error` (failure)
+  - Response body: the number new applications created (always 1)
 
 
 ## Testing
