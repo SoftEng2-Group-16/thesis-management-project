@@ -88,8 +88,6 @@ const getThesisProposals = async (req, res) => {
 }
 
 const getAllExams = async (req, res) => {
-    //same principle for the getApplications: for manual testing purposes at the moment the degree
-    //code is taken as param; ideally, it should be taken from the req.user object
     const studentId = req.params.id;
 
     if (!studentId) {

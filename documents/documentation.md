@@ -293,18 +293,7 @@ None yet...
   - Response: `401 Unauthorized`
     - response body {`error`:"Not authenticated"}
 
-### Proposals APIs:
-- POST `/api/newproposal`
-  - Description: inserts a new thesis proposal
-  - Request body: an object describing the proposal to insert
-    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
-`cds` } 
-  - Notes: 
-    - The server automatically finds the right groups for the proposal (based on the supervisor and internal co-supervisor's groups), so an empty array can be passed for the groups field
-    - The id is generated automatically, so any number can be passed for the id field
-  - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
-  - Response body: the `id` of the newly created proposal
-
+### Student APIs
 - GET `/api/thesis/student`
   - Description: retrieves all the thesis proposals the currently logged student can view
   - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
@@ -312,8 +301,51 @@ None yet...
     - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
 `cds` }
 
+- GET `/api/student/:id/exams`
+  - Description: retrieves all the exams the student has passed
+  - Response: `200 Ok` (success), `404 Not Found` (in case of no exams found), `403 Forbidden` (auth problem), `500 Internal Server Error` (generic error)
+  - Response body: an array of objects, each containing an exam
+    - { `studentId`, `courseCode`, `courseTitle`, `cfu`, `grade`, `date` }
+  
+- POST `/api/uploadCV`
+  - Description: used to manage the uplaod of a new application with the associated CV file
+  - Request body: the application data
+  - Request file: contains the file saved as a Blob 
+  - Response: `200 OK` (success), `500 Internal Server Error` (failure)
+  - Response body: the number new applications created (always 1)
+
+- POST `/api/newapplication`
+  - Description: inserts a new application for a thesis proposal (student)
+  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
+    - object{`studentId`, `proposalId`,`teacherId`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
+  - Response body: number, indicating the number of applications inserted (should always be 1)
+
+- POST `/api/newstartrequest`
+  - Description: used by a student to send a new thesis start request to the secretary
+  - Request body: an object containing info about the selected thesis
+    - {`thesisTitle`, `supervisor`, `cosupervisors`, `thesisDescription`}
+  - Response: `201 Created` (success), `500 Internal Server Error` (generic error), `422 Unprocessable Content`(body doesn't contain all the necessary info)
+  - Response body: the id of the last tuple created in the DB
+
+- GET `/api/student/applications/`
+  - Description: retrieves all the applications the currently logged student has sent (including status)
+  - Response: `200 OK` (success), `404 Not Found` (no applications found for the specific studentId), `500 Internal Server Error` (generic server error)
+  - Response body: an array of objects, each describing an application
+    - {`studentId`, `thesisId`, `timestamp`, `status`, `teacherId`}
+      
+    (Note: it will be an array even if the student only inserted one application)
+
+### Professor APIs
 - GET `/api/thesis/teacher`
   - Description: retrieves all the active thesis proposals for the currently logged teacher
+  - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
+  - Response body: an array of objects, each containing a thesis proposal
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` }
+
+- GET `/api/archive/thesis`
+  - Description: retrieves the thesis proposals the currently logged professors has archived
   - Response: `200 OK` (success), `404 Not Found` (in case of no proposals found),  `500 Internal Server Error` (generic error)
   - Response body: an array of objects, each containing a thesis proposal
     - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
@@ -324,6 +356,17 @@ None yet...
   - Request body: object containing the proposal with the new data and also the id of the proposal to update
   - Response: `200 Created` (success), `500 Internal Server Error` (generic error),`422 parameter error` (argument error)
   - Response body: the updated thesis proposal
+
+- POST `/api/newproposal`
+  - Description: inserts a new thesis proposal
+  - Request body: an object describing the proposal to insert
+    - { `id`, `title`, `supervisor`, `cosupervisors`, `keywords`, `type`, `groups`, `description`, `requirements`, `notes`, `expiration`, `level`,
+`cds` } 
+  - Notes: 
+    - The server automatically finds the right groups for the proposal (based on the supervisor and internal co-supervisor's groups), so an empty array can be passed for the groups field
+    - The id is generated automatically, so any number can be passed for the id field
+  - Response: `201 Created` (success), `500 Internal Server Error ` (insertion error)
+  - Response body: the `id` of the newly created proposal
 
 - DELETE `/api/teacher/deleteproposal/:proposalid`
   - Description: Deletes a thesis proposal based on the provided `proposalid`. Requires teacher authentication, allowing only the supervisor of the proposal to delete it.
@@ -346,24 +389,6 @@ None yet...
   - Description: retrieves all possible degrees a professore can insert a new thesis proposal for
   - Response: `200 OK` (success), `404 Not Found` (in case of no data found),  `500 Internal Server Error` (generic error)
   - Response body: an array containing all the possible degrees
-
-
-### Applications APIs:
-- POST `/api/newapplication`
-  - Description: inserts a new application for a thesis proposal (student)
-  - Request body: object containing the id of the student applying and the id of the thesis proposal and the id of the supervisorfor that thesis
-    - object{`studentId`, `proposalId`,`teacherId`}
-  - Response: `201 Created` (success), `500 Internal Server Error` (generic error)
-  - Response body: number, indicating the number of applications inserted (should always be 1)
-
-
-- GET `/api/student/applications/`
-  - Description: retrieves all the applications the currently logged student has sent (including status)
-  - Response: `200 OK` (success), `404 Not Found` (no applications found for the specific studentId), `500 Internal Server Error` (generic server error)
-  - Response body: an array of objects, each describing an application
-    - {`studentId`, `thesisId`, `timestamp`, `status`, `teacherId`}
-      
-    (Note: it will be an array even if the student only inserted one application)
 
 - GET `/api/teacher/applications`
   - Description: retrieves all the applications sent for proposals belonging to the logged professor
@@ -389,15 +414,10 @@ None yet...
   - Description: downloads the cv file present on the cv_application table
   - Request param: the id of the cv application
   - Response: `200 OK` (success), `404 Not Found` (no cv application found), `500 Internal Server Error` (generic server error)
-  - Response body: the url to download the file
+  - Response body: the url to download the file from
 
 ### Thesis start request APIs:
-- POST `/api/newstartrequest`
-  - Description: used by a student to send a new thesis start request to the secretary
-  - Request body: an object containing info about the selected thesis
-    - {`thesisTitle`, `supervisor`, `cosupervisors`, `thesisDescription`}
-  - Response: `201 Created` (success), `500 Internal Server Error` (generic error), `422 Unprocessable Content`(body doesn't contain all the necessary info)
-  - Response body: the id of the last tuple created in the DB
+
 
 
 ### General and utils APIs:
@@ -419,13 +439,6 @@ None yet...
   - Description: fetches the last date used from the virtual clock system
   - Response: `200 OK` (success), `500 Internal Server Error` (failure)
   - Response body: a string containing the system date
-
-- POST `/api/uploadCV`
-  - Description: used to manage the uplaod of a new application with the associated CV file
-  - Request body: the application data
-  - Request file: contains the file saved as a Blob 
-  - Response: `200 OK` (success), `500 Internal Server Error` (failure)
-  - Response body: the number new applications created (always 1)
 
 
 ## Testing
