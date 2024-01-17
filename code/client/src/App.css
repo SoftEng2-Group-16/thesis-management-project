@@ -3,8 +3,6 @@
   text-align: center;
 }
 
-
-
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -36,7 +34,7 @@
 
   padding-bottom: 80px;
   overflow: hidden;
-  background-color: #F7F7F7;
+  background-color: #f7f7f7;
   padding: 20px 40px;
   box-sizing: initial;
 
@@ -64,7 +62,7 @@
 }
 
 .form-button {
-  background: #B61601;
+  background: #b61601;
   color: #ffffff;
   cursor: pointer;
   margin: 0 auto;
@@ -75,23 +73,19 @@
 }
 
 .form-button:hover {
-  background: #FF6400;
+  background: #ff6400;
 }
-
-
 
 .datepicker-input {
   width: 60%;
   border: 1px solid white;
   border-radius: 5px;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
   color: white;
   text-align: center;
   font-size: 15px;
   cursor: pointer;
 }
-
-
 
 .top5 {
   margin-top: 5px;
@@ -117,12 +111,24 @@
   margin-top: 30px;
 }
 
-.top5 { margin-top:5px; }
-.top7 { margin-top:7px; }
-.top10 { margin-top:10px; }
-.top15 { margin-top:15px; }
-.top17 { margin-top:17px; }
-.top30 { margin-top:30px; }
+.top5 {
+  margin-top: 5px;
+}
+.top7 {
+  margin-top: 7px;
+}
+.top10 {
+  margin-top: 10px;
+}
+.top15 {
+  margin-top: 15px;
+}
+.top17 {
+  margin-top: 17px;
+}
+.top30 {
+  margin-top: 30px;
+}
 
 .selector {
   max-width: 160px;
@@ -137,7 +143,6 @@
 .cv-details-button:hover {
   text-decoration: underline;
 }
-
 
 /* ThesisPage.css */
 .thesis-card {
@@ -155,7 +160,8 @@
 }
 
 .active-toggle-button {
-  background-color: var(--orange) !important;
+  background-color: white !important;
+  color: var(--orange) !important;
   border-color: var(--orange) !important;
 }
 
@@ -165,7 +171,7 @@
 }
 
 .not-active-toggle-button {
-  background-color: #ffa570;
+  background-color: #db7133;
   border-color: #ffa570;
 }
 
@@ -177,11 +183,10 @@
 /* restyle */
 /* declare variables in root starting with --*/
 
-:root{
- --navy : #2a4b98;
- --orange : #ff8036;
+:root {
+  --navy: #2a4b98;
+  --orange: #ff8036;
 }
-  
 
 /* -------------------Navbar---------------------------- */
 
@@ -237,26 +242,23 @@
 }
 
 .nav-link {
-  background-color: var(--orange); 
-  color:  white;
+  background-color: var(--orange);
+  color: white;
   text-decoration: none;
   text-align: center;
-  transition: background-color 300ms ease-in
+  transition: background-color 300ms ease-in;
 }
-.nav-link:hover{
-  color:  white;
+.nav-link:hover {
+  color: white;
   text-decoration: none;
   background-color: rgba(42, 75, 152, 0.25);
 }
 
-
 /* Styles for active links in the lower part */
 .lower-navbar .nav-link.active {
   background-color: white;
-  color:  var(--orange);
+  color: var(--orange);
   font-size: 1.2rem; /* Adjust the font size as needed */
-
-
 }
 
 /* Styles for Logout button in the lower part */
@@ -265,17 +267,16 @@
   border-color: white;
 }
 
-.lower-navbar  {
+.lower-navbar {
   background-color: #ff8036;
   color: white;
 }
 
 .btn-outline-light:hover {
   background-color: white;
-  color:  #ff8036;
+  color: #ff8036;
 }
-.navbar-toggler{
-
+.navbar-toggler {
   border-radius: 4px; /* Optional: Add border-radius for rounded corners */
   background-color: white; /* Set the background color */
   padding: 10px;
@@ -283,8 +284,11 @@
 
 /* Styling for the Navbar collapse button when active (open) */
 .navbar-toggler.collapsed {
-
   border-radius: 4px; /* Optional: Add border-radius for rounded corners */
   background-color: white; /* Set the background color */
   padding: 10px;
+}
+
+.active-button {
+  background-color: white;
 }
