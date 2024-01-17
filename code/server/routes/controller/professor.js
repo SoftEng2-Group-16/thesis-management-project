@@ -212,6 +212,27 @@ const getOwnArchivedProposals = async (req, res) => {
     }
 }
 
+const checkErrorsforArchiveProposal = async (proposal, applications, userId) => {
+    if(proposal.error) {
+        return { errorStatus: 404, errorMessage: proposal.error };
+    }
+
+    if(applications.error) {
+        return { errorStatus: 404, errorMessage: applications.error };
+    }
+
+    if (applications.filter(a => a.status === "accepted").length !== 0) {
+        return { errorStatus: 422, errorMessage: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived` };
+    }
+
+    if (!proposal.supervisor.match(userId)) {
+        return { errorStatus: 401, errorMessage: `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED` }
+    }
+    
+    //if no errors
+    return { errorStatus: 0, errorMessage: "none" };
+}
+
 const archiveProposal = async (req,res)  => {
     const proposalId = req.body.proposalId;
     const userId = req.user.id;
@@ -219,17 +240,10 @@ const archiveProposal = async (req,res)  => {
     try {
         const proposal = await daoGeneral.getThesisProposalById(proposalId);
         const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
-
-        if (proposal.error || applications.error) {
-            return res.status(404).json(proposal);
-        }
-
-        if (applications.filter(a => a.status === "accepted").length !== 0) {
-            return res.status(422).json({ error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived` });
-        }
-
-        if (!proposal.supervisor.match(userId)) {
-            return res.status(401).json({ "error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED` })
+        const { errorStatus, errorMessage } = await checkErrorsforArchiveProposal(proposal, applications, userId);
+        
+        if( errorMessage != "none" && errorStatus !== 0) {
+            return res.status(errorStatus).json({error: errorMessage})
         } else {
             const changes = await daoTeacher.archiveProposal(new models.ThesisProposal(
                 proposal.id, //can be whatever, DB handles autoincrement id
