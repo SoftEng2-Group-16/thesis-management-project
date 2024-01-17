@@ -91,7 +91,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                 <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
             )}
             {userRole === 'teacher' && url != undefined && (
-                <Button href={url} target="_blank" onClick={downloadCVFile}>Download student's CV file</Button>
+                <Button href={url} target="_blank" >Download student's CV file</Button>
             )}
         </Card>
     )
