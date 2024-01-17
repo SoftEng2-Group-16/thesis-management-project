@@ -27,16 +27,16 @@ const transporter = nodemailer.createTransport({
 const buildEmail = (type, data) => {
   switch (type) {
       case 'application-decision': {
-        let { studentName, thesisTitle, decision } = data;
-        let text = `Dear ${studentName},\n\nYour application for the thesis "${thesisTitle}" has been ${decision === 'accepted' ? 'ACCEPTED' : 'REJECTED'}.\n\nBest regards,\nThe Thesis Management Team`;
-        let to = 'thesismanagementstudent@gmail.com';
+        const { studentName, thesisTitle, decision } = data;
+        const text = `Dear ${studentName},\n\nYour application for the thesis "${thesisTitle}" has been ${decision === 'accepted' ? 'ACCEPTED' : 'REJECTED'}.\n\nBest regards,\nThe Thesis Management Team`;
+        const to = 'thesismanagementstudent@gmail.com';
         return { text, to };
       }
     
       case 'application-sent': {
-        let { teacherName, studentName, studentId, thesisTitle } = data;
-        let text = `Dear ${teacherName},\n\nA new application request for you thesis "${thesisTitle}" has been submitted by ${studentName} (${studentId}).\n\nBest regards,\nThe Thesis Management Team`;
-        let to = "thesismanagementteacher@gmail.com"
+        const { teacherName, studentName, studentId, thesisTitle } = data;
+        const text = `Dear ${teacherName},\n\nA new application request for you thesis "${thesisTitle}" has been submitted by ${studentName} (${studentId}).\n\nBest regards,\nThe Thesis Management Team`;
+        const to = "thesismanagementteacher@gmail.com"
         return { text, to };
       }
 
