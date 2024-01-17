@@ -247,11 +247,14 @@ None yet...
 
 ## React Client Application Routes
 
-- Route `/thesis`: main page with the list of thesis. Different views for students and teachers
-- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
-- Route `/login`: to perform login
-- Route `/thesisRequest`: page with the form for the student to create a new thesis start request
-- Route `*`: for non existing pages
+- Route `/thesis`: main page with the list of thesis. It shows different views for students and professors. In the student side, the students are able to search for active thesis. In the professor side, it is possible to check the list of active proposals and separately the list of archived proposals.
+- Route `/thesis/:id`: indiviual page of a thesis proposal. Contains information about it, such as the description and the keywords associated with it. It also has different views for the student and the teacher. In the student side it is possible to apply to the thesis proposal and in the professor it is possible to perform actions on the proposal, such as archive or delete it.
+- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one.
+- Route `/login`: to perform login.
+- Route `/thesisRequest`: page with the form for the student to create a new thesis start request.
+- Route `/applications`: page with the current active applications. Different views for students and teachers.
+- Route `/application/:id`: page with information (student's information, thesis proposal information, time of submission, etc.) of a certain application, determined by the id parameter
+- Route `*`: for non existing pages.
 
 ## Main Component
 - `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
