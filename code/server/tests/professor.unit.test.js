@@ -557,7 +557,7 @@ describe("updateThesisProposal", () => {
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(503);
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: "problem with the authentication" });
   });
 

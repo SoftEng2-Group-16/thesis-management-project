@@ -1,7 +1,7 @@
 // studentController.test.js
 
 const dayjs = require('dayjs');
-const { insertNewApplication, getApplicationsForStudent, getThesisProposals, insertApplicationWithCV } = require('../routes/controller/student.js'); //import the api to mock
+const { insertNewApplication, getApplicationsForStudent, getThesisProposals, insertApplicationWithCV, insertNewStartRequest } = require('../routes/controller/student.js'); //import the api to mock
 const daoStudent = require('../daoStudent');
 const daoGeneral = require('../daoGeneral');
 const daoTeacher = require('../daoTeacher');
@@ -379,4 +379,88 @@ describe('insertApplicationWithCV', () => {
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith({error: "Internal Server Error"});
   });
+});
+
+describe('insertNewStartRequest', () => {
+  let mockRequest;
+  let mockResponse;
+  const error = {error: "Missing data in request body!"};
+
+  beforeEach(() => {
+    mockRequest = {
+      user: {
+        id: 200001
+      },
+      body: {
+        thesisTitle: 'Thesis title',
+        supervisor: '268555, Ferrari Giovanna',
+        cosupervisors: ['268553, Rossi Maria'],
+        thesisDescription: 'Thesis description'
+      }
+    };
+
+    mockResponse = {
+      status: jest.fn(() => mockResponse),
+      json: jest.fn()
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('Should insert a new thesis start request successfully', async () => {
+    daoStudent.insertStartRequest.mockResolvedValueOnce(1);
+
+    await insertNewStartRequest(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith(1);
+  });
+
+  test('Should handle request with missing title', async () => {
+    mockRequest.body.thesisTitle = undefined;
+
+    await insertNewStartRequest(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith(error);
+  });
+
+  test('Should handle request with missing supervisor', async () => {
+    mockRequest.body.supervisor = undefined;
+
+    await insertNewStartRequest(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith(error);
+  });
+
+  test('Should handle request with missing cosupervisors', async () => {
+    mockRequest.body.cosupervisors = undefined;
+
+    await insertNewStartRequest(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith(error);
+  });
+
+  test('Should handle request with missing thesisDescription', async () => {
+    mockRequest.body.thesisDescription = undefined;
+
+    await insertNewStartRequest(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(422);
+    expect(mockResponse.json).toHaveBeenCalledWith(error);
+  });
+
+  test('Should handle internal error', async () => {
+    daoStudent.insertStartRequest.mockRejectedValueOnce(new Error("Internal Server Error"));
+
+    await insertNewStartRequest(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: "Internal Server Error"});
+  });
+
 });

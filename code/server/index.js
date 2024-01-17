@@ -181,19 +181,21 @@ app.use(bodyParser.json({ limit: '200mb' }));
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
 
-/*
-  Cron utility functions, to launch the API calls needed to automatically archive a proposal (cannot 
-  use named functions as we do in the router, have to create http request 'manually')
-  Don't know why, moving them in a separate file breaks them.
+/**
+ * Cron utility functions, to launch the API calls needed to automatically archive a proposal (cannot 
+ * use named functions as we do in the router, have to create http request 'manually')
+ * Don't know why, moving them in a separate file breaks them.
+ * 
+ * Note on the logic: in servers, cron jobs are used to automatically perform some operations. If we didn't 
+ * have the virtual clock functionality, we would simply configure a cron job to automatically move expired proposals
+ * every day soon after midnight; however, since we implemented the VC by saving the selected date in the DB in order
+ * to mantain its consistency, it wouldn't make sense to have it set up like that, because the date doesn't change at 00:00.
+ * 
+ * For testing purposes, we will set up a shorter interval for the cron job (change the string in the cron.schedule line) to
+ * show it effectively works.
+ */
+  
 
-  Note on the logic: in servers, cron jobs are used to automatically perform some operations. If we didn't 
-  have the virtual clock functionality, we would simply configure a cron job to automatically move expired proposals
-  every day soon after midnight; however, since we implemented the VC by saving the selected date in the DB in order
-  to mantain its consistency, it wouldn't make sense to have it set up like that, because the date doesn't change at 00:00.
-
-  For testing purposes, we will set up a shorter interval for the cron job (change the string in the cron.schedule line) to
-  show it effectively works.
-*/
 const cronGetDate = () => {
   return new Promise((resolve, reject) => {
     const options = {

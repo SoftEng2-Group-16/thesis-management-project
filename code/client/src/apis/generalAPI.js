@@ -92,7 +92,6 @@ const sendEmail = async (emailData) => {
     const res = await response.json();
 
     if (response.ok) {
-      console.log('Email sent successfully. Email text:', res.emailText);
       return res;
     } else {
       throw res;

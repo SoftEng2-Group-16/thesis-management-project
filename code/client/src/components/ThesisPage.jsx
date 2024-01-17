@@ -131,9 +131,9 @@ function ThesisPage(props) {
     //the form data will contain the exams and all the application field as a json in body
     //and the cv file in the req.file
     const formData = new FormData();
-    if (!applicationCV) {
+    if (!applicationCV.filePDF) {
       //application cv is loaded the first time the student click to see the exam details
-      handleErrors({ error: "first look at your exams then you can send the CV" })
+      handleErrors({ error: "first load a cv file" })
       return;
     }
     formData.append('file', applicationCV.filePDF);
@@ -180,7 +180,6 @@ function ThesisPage(props) {
         navigate('/thesis');
       })
       .catch(e => {
-        console.log(e);
         handleErrors(e);
       });
   }
@@ -260,13 +259,9 @@ function ThesisPage(props) {
 
               {/*Only student can see his exams here, the professor will see them in the application */}
               <Row>
-                {props.user.role === 'student' && (
-                  <Button id="button-show-exams" className="mt-3" variant="secondary" onClick={() => setShowData(!showApplicationData)}>
-                    {showApplicationData ? 'Hide details' : 'Show exam details'}
-                  </Button>
-                )}
+                
                 {/*data to send with the application just for student */}
-                {props.user.role === 'student' && showApplicationData && (
+                {props.user.role === 'student'  && (
                   <ApplicationData setShowData={setShowData} setApplicationCV={setApplicationCV} handleErrors={handleErrors} userRole={props.user.role} studentId={props.user.id} />
                 )}
               </Row>
@@ -274,8 +269,8 @@ function ThesisPage(props) {
               {/* Apply button (visible only for students) */}
               {props.user.role === 'student' && (
                 <DropdownButton id="dropdown-item-button" title="Send Application" variant='success' className='mt-3 ms-2'>
-                  <Dropdown.Item id='button-apply' as="button" primary='success' onClick={handleApplyClick}>Apply</Dropdown.Item>
-                  <Dropdown.Item id='button-apply-cv' as="button" variant='success' onClick={handleApplyWithCV}>Apply + CV</Dropdown.Item>
+                  <Dropdown.Item id='button-apply' as="button" primary='success' onClick={() => openDialog('Confirm Apply', 'Are you sure you want to apply this proposal? This action cannot be undone.', handleApplyClick, 'Apply')}>Apply</Dropdown.Item>
+                  <Dropdown.Item id='button-apply-cv' as="button" variant='success' onClick={() => openDialog('Confirm Apply', 'Are you sure you want to apply this proposal? This action cannot be undone.', handleApplyWithCV, 'Apply')}>Apply + CV</Dropdown.Item>
                 </DropdownButton>
               )}
 

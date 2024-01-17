@@ -27,75 +27,74 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
             });
         if (applicationInfo != undefined) {
             professorAPI.getCvFile(applicationInfo.cvId)
-            .then((res) => {
-                setUrl(res.url);
-            })
-            .catch(e => {
-                // Handle errors
-                if (e.error && e.status !== 404) {
-                    handleErrors(e);
-                }
-            });
+                .then((res) => {
+                    setUrl(res.url);
+                })
+                .catch(e => {
+                    // Handle errors
+                    if (e.error && e.status !== 404) {
+                        handleErrors(e);
+                    }
+                });
         }
     }, []);
 
 
     useEffect(() => {
         //check if exam list is not null, only the exam list is mandatory when sending cv, in this case update the object for the cv
-        if (examList ) {
+        if (examList) {
             setApplicationCV(
                 { exams: examList, filePDF: selectedFile }
             )
         }
     }, [selectedFile, examList]);//called every time the selected file is updated or the exam list is loaded
 
-    const downloadCVFile = async () => {
-        console.log("url", url);
-    }
 
     return (
         <Card className='mt-3'>
-            <Card.Title className="border-bottom pb-2 mb-4">List of passed exams</Card.Title>
-            <Card.Body>
-                {examList && examList.length > 0 ? (  //show the list of passed exams if there are some
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>Course Code</th>
-                                <th>Title</th>
-                                <th>CFU</th>
-                                <th>Grade</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody className="align-middle">
-                            {examList.map((exam, index) => (
-                                <tr key={index} >
-                                    <td>{exam.courseCode}</td>
-                                    <td> {exam.courseTitle} </td>
-                                    <td>{exam.cfu}</td>
-                                    <td>{exam.grade}</td>
-                                    <td>{exam.date}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>)
-                    :
-                    <h2>no exam passed</h2>
-                }
+            {userRole === "teacher" && (
+                <>
+                    <Card.Title className="border-bottom pb-2 mb-4">List of passed exams</Card.Title>
+                    <Card.Body>
+                        {examList && examList.length > 0 ? (  //show the list of passed exams if there are some
+                            <Table responsive>
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Title</th>
+                                        <th>CFU</th>
+                                        <th>Grade</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="align-middle">
+                                    {examList.map((exam, index) => (
+                                        <tr key={index} >
+                                            <td>{exam.courseCode}</td>
+                                            <td> {exam.courseTitle} </td>
+                                            <td>{exam.cfu}</td>
+                                            <td>{exam.grade}</td>
+                                            <td>{exam.date}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>)
+                            :
+                            <h2>no exam passed</h2>
+                        }
 
-                { userRole === 'student' && (
-                    <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
-                )}
-                { userRole === 'teacher' && url != undefined && (
-                    <Button href={url} target="_blank" onClick={downloadCVFile}>Download student's CV file</Button>
-                )}
+                    </Card.Body>
+                </>
+            )}
 
-            </Card.Body>
+            {userRole === 'student' && (
+                <FileUploader setSelectedFile={setSelectedFile} selectedFile={selectedFile} setApplicationCV={setApplicationCV} />
+            )}
+            {userRole === 'teacher' && url != undefined && (
+                <Button href={url} target="_blank" onClick={downloadCVFile}>Download student's CV file</Button>
+            )}
         </Card>
-
     )
-
 }
 
 
