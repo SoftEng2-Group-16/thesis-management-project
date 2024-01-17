@@ -208,7 +208,6 @@ const ProposalForm = (props) => {
                 level: level,
                 cds: cds.map(obj => obj.value.split(' ')[0]), //should be just the code like LT-2
             };
-            console.log(newProposal);
             if (proposal && mode === 'edit') {
                 newProposal.id = proposal.id;//add the id of the proposal to update
                 editProposal(newProposal)

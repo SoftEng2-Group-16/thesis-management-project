@@ -180,7 +180,6 @@ function ThesisPage(props) {
         navigate('/thesis');
       })
       .catch(e => {
-        console.log(e);
         handleErrors(e);
       });
   }
