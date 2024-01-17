@@ -283,18 +283,28 @@ const archiveProposal = async (req,res)  => {
 }
 
 
+const checkInitialErrorsForUpdateProposal = async (bodyId, paramId, teacherId) => {
+    if(!teacherId) {
+        return { errorStatus: 401, errorMessage: "problem with the authentication" };
+    }
+    if(paramId !== bodyId) {
+        return { errorStatus: 422, errorMessage: "URL and body id mismatch" };
+    }
+
+    //no error
+    return { errorStatus: 0, errorMessage: "none" };
+}
+
 const updateThesisProposal = async (req, res) => {
-    
     const teacherId = req.user.id;
-    if (!teacherId) {
-        return res.status(503).json({ error: "problem with the authentication" });
+    const paramId = Number(req.params.thesisid);
+    const bodyId = req.body.id;
+
+    const { errorStatus, errorMessage } = await checkInitialErrorsForUpdateProposal(bodyId, paramId, teacherId);
+    if( errorMessage != "none" && errorStatus !== 0) {
+        return res.status(errorStatus).json({error: errorMessage})
     }
 
-
-    // Is the id in the body equal to the id in the url?
-    if (req.body.id !== Number(req.params.thesisid)) {
-        return res.status(422).json({ error: 'URL and body id mismatch' });
-    }
     //same logic of the insert
     const cosupervisors = req.body.cosupervisors;
     const supervisor = req.body.supervisor;
