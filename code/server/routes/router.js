@@ -45,7 +45,4 @@ router.put('/clockchanged', utils.rearrangeProposals)
 router.get('/initialdate', utils.getInitialDate);
 
 
-
-
-
 module.exports = router;
