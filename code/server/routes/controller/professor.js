@@ -384,10 +384,6 @@ const deleteProposal = async (req, res) => {
         if (thesis_proposal.error) {
             return res.status(404).json(thesis_proposal);
         } else {
-            let id = thesis_proposal.supervisor.split(',');
-            // if (id[0] !== teacherId) { //TODO: try to understand with this the deletion is giving error
-            //     return res.status(401).json("Unauthorized");
-            // }
             // delete all PENDING applications
             await daoGeneral.cancellPendingApplicationsForAThesis(proposalId, teacherId);
             // delete proposal
