@@ -16,6 +16,8 @@
       - [CAREERS](#careers)
       - [DEGREES](#degrees)
       - [THESIS\_PROPOSALS](#thesis_proposals)
+      - [APPLICATIONS](#applications)
+      - [CV\_APPLICATIONS](#cv_application)
     - [Notification System](#notification-system)
     - [Upload/Download file](#multer)
   - [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
@@ -197,6 +199,7 @@ LM-1 | Computer Engineering
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
 
+#### APPLICATIONS
 
 #### THESIS_START_REQUEST
 | id | timestamp | status | thesis_title | supervisor | cosupervisors | thesis_description | studentid 
