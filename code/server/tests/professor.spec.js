@@ -38,7 +38,7 @@ describe('Professor tests', () => {
   });
   
 
-  test.skip('a professor checks the first thesis', async () => {
+  test('a professor checks the first thesis', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -52,7 +52,7 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -87,7 +87,7 @@ describe('Professor tests', () => {
     await page.click("button.mt-3.ms-2.btn.btn-outline-danger")
   });
 
-  test.skip('a professor updates the first thesis', async () => {
+  test('a professor updates the Third thesis', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -101,7 +101,7 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -112,7 +112,7 @@ describe('Professor tests', () => {
     let cells = await page.$$(`${tableSelector} tr`);
     cells = cells; 
   
-    const rowIndex = 1;
+    const rowIndex = 3;
     const columnIndex = 2;
   
     // Select the cell using CSS selector (in this case the first thesis)
@@ -218,7 +218,7 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test.skip('a professor updates the first thesis but forgets to insert some needed data', async () => {
+  test('a professor updates the third thesis but forgets to insert some needed data', async () => {
 
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -233,7 +233,7 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -244,7 +244,7 @@ describe('Professor tests', () => {
     let cells = await page.$$(`${tableSelector} tr`);
     cells = cells; 
   
-    const rowIndex = 1;
+    const rowIndex = 3;
     const columnIndex = 2;
   
     // Select the cell using CSS selector (in this case the first thesis)
@@ -293,7 +293,7 @@ describe('Professor tests', () => {
 
   }, 1 * 60 * 1000);
 
-  test.skip('a professor copies the first thesis', async () => {
+  test('a professor tries to update a thesis with pending requests', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -307,7 +307,51 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+  
+    //use this part above as a login in every test since it's needed.
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+    
+    
+    let cells = await page.$$(`${tableSelector} tr`);
+    cells = cells; 
+  
+    const rowIndex = 1;
+    const columnIndex = 2;
+  
+    // Select the cell using CSS selector (in this case the first thesis)
+    const cellSelector = `${tableSelector} tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`;
+  
+    await page.click(cellSelector);
+    
+  
+    await page.click("a.mt-3.ms-2.btn.btn-outline-primary")
+
+    const alert = await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
+    //here i check if the data is changed. If not throw an error
+    if (!alert) {
+      throw new Error(`We can change a thesis with pending requests`);
+    }
+    
+  }, 1 * 60 * 1000);
+
+  test('a professor copies the first thesis', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 600});
+  
+    //this below is the mocked login for the professor
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'maria.rossi@polito.it');
+    await page.type('#password', '268553');
+    //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -358,7 +402,7 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test.skip('a professor copies the first thesis changing some parameters', async () => {
+  test('a professor copies the first thesis changing some parameters', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -372,7 +416,7 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -469,8 +513,7 @@ describe('Professor tests', () => {
 
     //it does not consider the headers so it's minus 1 for the textInSecondColumn
     const copiedPosition = textInSecondColumn.length -1;
-    console.log(textInSecondColumn[0]);
-    console.log(textInSecondColumn[copiedPosition]);
+
     if(((numberOfRows1 + 1) != numberOfRows2) || (textInSecondColumn[0] == textInSecondColumn[copiedPosition])){
       throw new Error("The thesis was not added or is a exact copy of the other one")
     }
@@ -504,7 +547,7 @@ describe('Professor tests', () => {
     
   }, 1 * 60 * 1000);
 
-  test.skip('a professor copies the first thesis changing some parameters', async () => {
+  test('a professor copies the first thesis changing some parameters but deleting some', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -518,7 +561,7 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -617,7 +660,7 @@ describe('Professor tests', () => {
     await page.type('#username', 'maria.rossi@polito.it');
     await page.type('#password', '268553');
     //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
-    const buttonSelector = 'button.c1939bbc3.cc78b8bf3.ce1155df5.c1d2ca6e3.c331afe93';
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
     await page.click(buttonSelector);
   
     //use this part above as a login in every test since it's needed.
@@ -651,9 +694,11 @@ describe('Professor tests', () => {
 
     //incrementing the counter for each pending request for the first thesis
     textInThirdColumn.forEach((value, index) => {
-
       if(value == thesisName){
-        if(textInSixthColumn[index] == "pending") counterPending++;
+
+        //we have also to count the rejected since in the end we don't know if previously it was rejected or pending
+        //this was made in order to have a more general and working test so that we can test it for every thesis proposal
+        if(textInSixthColumn[index] == "pending" || textInSixthColumn[index] == "rejected" ) counterPending++;
       }
     });
      
@@ -696,6 +741,7 @@ describe('Professor tests', () => {
     });
     //archive thesis
     await page.click('button.mt-3.ms-2.btn.btn-outline-warning');
+    await page.click('#dialog-button-confirm');
 
 
     await page.waitForSelector('table.table-striped.table-bordered.table-hover');
@@ -738,7 +784,6 @@ describe('Professor tests', () => {
     });
     //if it's 0 it's fine since we rejected all the pending requests    
     if(counterPending != 0) throw new Error("The applications were not rejected")
-    console.log(counterPending);
   }, 1 * 60 * 1000);
   
 });
