@@ -64,7 +64,7 @@ describe('tests for insertNewApplication', () => {
 
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
-      "Application already submitted, wait for professor response"
+      {"error": "Application already submitted, wait for professor response"}
     );
   });
 
@@ -75,7 +75,7 @@ describe('tests for insertNewApplication', () => {
     await insertNewApplication(mockRequest, mockResponse);
 
     expect(mockResponse.status).toHaveBeenCalledWith(500);
-    expect(mockResponse.json).toHaveBeenCalledWith(error.message);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: error.message });
   });
   test('should handle an already accepted application for the student', async () => {
     const acceptedThesis = [{ thesisid: 3 }, { thesisid: 3 }];
