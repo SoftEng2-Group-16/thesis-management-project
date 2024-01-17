@@ -77,7 +77,6 @@ const rearrangeProposals = async (req,res) => {
         //update the date in the db
         const updated = await daoUtils.updateVirtualClockDate(selectedTimestamp);
         if(updated != 1){
-            console.log(updated);
             return res.status(500).json({error: 'Problem while updating the date'});
         }
         
