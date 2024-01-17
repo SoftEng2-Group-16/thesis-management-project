@@ -16,6 +16,8 @@
       - [CAREERS](#careers)
       - [DEGREES](#degrees)
       - [THESIS\_PROPOSALS](#thesis_proposals)
+      - [APPLICATIONS](#applications)
+      - [CV\_APPLICATIONS](#cv_application)
     - [Notification System](#notification-system)
     - [Upload/Download file](#multer)
   - [Useful ideas and future development needs](#useful-ideas-and-future-development-needs)
@@ -197,6 +199,7 @@ LM-1 | Computer Engineering
 |---  |---    |---  |--- |--- |--- |--- |--- |--- |--- |--- |--- |---
 0 | Sustainable Energy Sources Research | 268560 | 12345,67890 | Renewable Energy, Sustainability, Research | Assigned | Energy Research Group, Sustainability Research Group | Conduct research on sustainable energy sources and their impact on the environment. | Environmental Science, Renewable Energy, Data Analysis | This project aims to explore renewable energy sources and their environmental effects. | 15-11-24 | bachelor | LT-3
 
+#### APPLICATIONS
 
 #### THESIS_START_REQUEST
 | id | timestamp | status | thesis_title | supervisor | cosupervisors | thesis_description | studentid 
@@ -244,19 +247,24 @@ None yet...
 
 ## React Client Application Routes
 
-- Route `/thesis`: main page with the list of thesis. Different views for students and teachers
-- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one
-- Route `/login`: to perform login
-- Route `/thesisRequest`: page with the form for the student to create a new thesis start request
-- Route `*`: for non existing pages
+- Route `/thesis`: main page with the list of thesis. It shows different views for students and professors. In the student side, the students are able to search for active thesis. In the professor side, it is possible to check the list of active proposals and separately the list of archived proposals.
+- Route `/thesis/:id`: indiviual page of a thesis proposal. Contains information about it, such as the description and the keywords associated with it. It also has different views for the student and the teacher. In the student side it is possible to apply to the thesis proposal and in the professor it is possible to perform actions on the proposal, such as archive or delete it.
+- Route `/proposal`: page with the Form to create a new thesis proposal or edit an old one.
+- Route `/login`: to perform login.
+- Route `/thesisRequest`: page with the form for the student to create a new thesis start request.
+- Route `/applications`: page with the current active applications. Different views for students and teachers.
+- Route `/application/:id`: page with information (student's information, thesis proposal information, time of submission, etc.) of a certain application, determined by the id parameter
+- Route `*`: for non existing pages.
 
-## Main Component
-- `Thesis Proposal`: after login it receives trough the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
+## Main Components
+- `Thesis Proposal`: after login it receives through the props *All USER DATA FROM THE SESSION*, based on the role, the component shows and behaves differently.
 - `Proposal Form`: This form is used to create a new Proposal adding all the necesssary field. If instead the teacher wants to update an existing proposal is sufficient to pass the old proposal object to this component.
 - `ThesisProposal`: This component is used to show the list of all the thesis proposals to an user. It has a Selector and a Select component that permits the user to write and get suggestions for the filtering process. By choosing which filters to apply the user can get the list of thesis that satisfy  his preferences.
-- `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there is only a go back button (for now, later we will add the fact that we can modify it only if he is the owner). If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis.
-- `Applications`: This component renders a table of thesis applications, dynamically adapting its display based on the user's role (teacher or student). It efficiently utilizes the ApplicationsTable component to provide a clean and intuitive interface for managing thesis applications within the application..
-- `ThesisRequest`: This form is used by the student to create a new thesis start request after discussing with a teacher. The collected datas are: the title of the thesis, its description, the supervisor and optionally a list of cosupervisors.
+- `ThesisPage`: This component is used to show to an user all the important data about a thesis proposal.  If the logged user is a professor there are five buttons (*Edit*, *Copy*, *Delete Proposal*, *Archive* and *Go Back*), each one refering to the task associated with its name. If the logged user is a student he has two buttons, one for going back and one for applyng to that specific thesis, where he can submit his CV file.
+- `StartRequest`: This form is used by the student to create a new thesis start request after discussing with a teacher. The collected datas are: the title of the thesis, its description, the supervisor and optionally a list of cosupervisors.
+- `Applications`: This component renders a table of thesis applications, dynamically adapting its display based on the user's role (teacher or student). It efficiently utilizes the ApplicationsTable component to provide a clean and intuitive interface for managing thesis applications within the application.
+- `ApplicationDetails`: This component displays the application's information. 
+- `ApplicationDataCV`: This component displays in the application page the information of the student's CV (list of passed exams). Additionally, in the professor side, it has a button that downloads the CV file uploaded by the student in his side.
 
 ## API Server
 

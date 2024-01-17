@@ -57,7 +57,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                     <Card.Title className="border-bottom pb-2 mb-4">List of passed exams</Card.Title>
                     <Card.Body>
                         {examList && examList.length > 0 ? (  //show the list of passed exams if there are some
-                            <Table>
+                            <Table responsive>
                                 <thead>
                                     <tr>
                                         <th>Course Code</th>
@@ -94,9 +94,7 @@ function ApplicationData({ setShowData, handleErrors, setApplicationCV, userRole
                 <Button href={url} target="_blank" onClick={downloadCVFile}>Download student's CV file</Button>
             )}
         </Card>
-
     )
-
 }
 
 
