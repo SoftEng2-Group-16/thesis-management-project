@@ -158,8 +158,23 @@ const archiveProposal = async (proposalId) => {
 }
 
 
+const getCvFile = async (CVId) => {
+  const response = await fetch(SERVER_URL + `/api/cv/${CVId}/download`, {
+    credentials: 'include',
+  });
+
+  const CvFile = await response;
+  if (response.ok) {
+    return CvFile;
+  } else {
+    throw CvFile;
+  }
+}
+
+
 const professorAPI = {
   getPossibleCosupervisors, getDegreesInfo, setDecision, insertProposal,
-  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals, archiveProposal, deleteProposal
+  getApplications, getOwnThesisProposals, editProposal, getOwnArchivedProposals, 
+  archiveProposal, deleteProposal, getCvFile
 }
 export default professorAPI;

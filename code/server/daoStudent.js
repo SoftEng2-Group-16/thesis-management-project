@@ -2,17 +2,17 @@ const db = require('./db');
 const dayjs = require('dayjs');
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
-const { Applications, Application, Student, ThesisProposal, Teacher } = require('./model');
+const { Applications, Application, Student, ThesisProposal, Teacher, Exam } = require('./model');
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 
-exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teacherId) => {
+exports.addApplicationForThesis = (thesisId, studentId, timestamp, status, teacherId,idCV) => {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid) VALUES (?,?,?,?,?)';
+        const sql = 'INSERT INTO applications (thesisid, studentid, timestamp, status,teacherid,cv_id) VALUES (?,?,?,?,?,?)';
         db.run(
             sql,
-            [thesisId, studentId, timestamp, status, teacherId],
+            [thesisId, studentId, timestamp, status, teacherId,idCV],
             function (err) {
                 if (err) {
                     reject(err);
@@ -134,6 +134,65 @@ exports.getMyThesisAccepted = (studentId) => {
                 } else {
                     const thesisId = rows;
                     resolve(thesisId);
+                }
+            }
+        );
+    });
+}
+
+exports.getExamsByStudentId = (studentId) => {
+
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * from careers where student_id=? ';
+        db.all(
+            sql,
+            [studentId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length === 0) {
+                    resolve(
+                        { error: `No exams found for student id ${studentId}` }
+                    );
+                } else {
+                    const exams = rows.map(row => (
+                        new Exam(row.student_id, row.course_code, row.course_title, row.cfu, row.grade, row.date_registered)
+                    ));
+                    resolve(exams);
+                }
+            });
+    });
+};
+
+
+exports.insertApplicationData = (fileName,fileContent,exams) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO cv_application (list_exams, file_name, file_content) VALUES (?,?,?)';
+        db.run(
+            sql,
+            [exams,fileName,fileContent],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            }
+        );
+    });
+}
+
+exports.insertStartRequest = (thesisTitle, supervisor, cosupervisors, thesisDescription, status, timestamp, studentId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO thesis_start_request (timestamp,status,thesis_title,supervisor,cosupervisors,thesis_description, studentid) VALUES (?,?,?,?,?,?,?)';
+        db.run(
+            sql,
+            [timestamp, status, thesisTitle, supervisor, cosupervisors, thesisDescription, studentId],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
                 }
             }
         );

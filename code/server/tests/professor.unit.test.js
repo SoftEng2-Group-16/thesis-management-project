@@ -6,6 +6,7 @@ const daoGeneral = require("../daoGeneral.js");
 const professorApi = require("../routes/controller/professor.js")
 
 
+
 jest.mock('../daoTeacher'); // Mock the daoTeacher module
 jest.mock('../daoStudent'); // Mock the daoTeacher module
 jest.mock('../daoGeneral'); // Mock the daoTeacher module
@@ -323,10 +324,41 @@ describe("decideApplication()", () => {
 
   test("should successfully accept an application", async () => {
     let res = { id: mockRequest.params.thesisId, status: 'accepted' };
+    const proposal = {
+      id: 1,
+      title: "AI-Driven Healthcare Solutions",
+      supervisor: "268553, Maria Rossi",
+      cosupervisors: [
+        "Luigi Bianchi, 268554, DAUIN"
+      ],
+      keywords: [
+        "Artificial Intelligence",
+        " Healthcare",
+        " Machine Learning"
+      ],
+      type: "Company Thesis",
+      groups: [
+        "SO",
+        "AI"
+      ],
+      description: "Develop AI-powered healthcare solutions for diagnosing diseases.",
+      requirements: "Machine Learning, Medical Science, Data Analysis",
+      notes: "This project focuses on leveraging AI for healthcare advancements.",
+      expiration: "20/11/2024",
+      level: "bachelor",
+      cds: [
+        "LT-2",
+        "LT-3"
+      ]
+    };
+  
 
     daoTeacher.acceptApplication.mockResolvedValue(res);
     daoGeneral.cancellPendingApplicationsForAThesis.mockResolvedValue();
     daoGeneral.cancellPendingApplicationsOfAStudent.mockResolvedValue();
+    daoGeneral.getThesisProposalById.mockResolvedValueOnce(proposal);
+    daoTeacher.archiveProposal.mockResolvedValueOnce();
+    daoTeacher.deleteProposal.mockResolvedValue();
 
     await professorApi.decideApplication(mockRequest, mockResponse);
 
@@ -543,7 +575,7 @@ describe("updateThesisProposal", () => {
   test("should successfully update a thesis proposal", async () => {
     daoTeacher.getGroupForTeacherById.mockResolvedValueOnce('cosupervisor Group');
     daoTeacher.getGroupForTeacherById.mockResolvedValueOnce('supervisor Group');
-    daoTeacher.getThesisAccepted.mockResolvedValueOnce([]);
+    daoTeacher.getAllApplicationsByThesisId.mockResolvedValueOnce([]);
     daoTeacher.updateThesisProposal.mockResolvedValueOnce(mockRequest.body);
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
@@ -556,7 +588,7 @@ describe("updateThesisProposal", () => {
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(503);
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: "problem with the authentication" });
   });
 
@@ -580,20 +612,31 @@ describe("updateThesisProposal", () => {
   });
 
   test("should handle already accepted thesis error", async () => {
-    const mockAcceptedThesis = [2];
+    const mockAcceptedThesis = [{status: "accepted"}];
     daoTeacher.getGroupForTeacherById.mockResolvedValue('Test Group');
-    daoTeacher.getThesisAccepted.mockResolvedValueOnce(mockAcceptedThesis);
+    daoTeacher.getAllApplicationsByThesisId.mockResolvedValueOnce(mockAcceptedThesis);
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(400);
-    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'already accepted thesis' });
+    expect(mockResponse.status).toHaveBeenCalledWith(405);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'already accepted/pending application for the thesis' });
+  });
+
+  test("should handle already pending thesis error", async () => {
+    const mockAcceptedThesis = [{status: "pending"}];
+    daoTeacher.getGroupForTeacherById.mockResolvedValue('Test Group');
+    daoTeacher.getAllApplicationsByThesisId.mockResolvedValueOnce(mockAcceptedThesis);
+
+    await professorApi.updateThesisProposal(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(405);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'already accepted/pending application for the thesis' });
   });
 
   test("should handle thesis not found error", async () => {
     let message = { error: 'thesis not found.' }
     daoTeacher.getGroupForTeacherById.mockResolvedValue('Test Group');
-    daoTeacher.getThesisAccepted.mockResolvedValueOnce([]);
+    daoTeacher.getAllApplicationsByThesisId.mockResolvedValueOnce([]);
     daoTeacher.updateThesisProposal.mockResolvedValueOnce(message);
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);
@@ -605,7 +648,7 @@ describe("updateThesisProposal", () => {
   test("should handle database error during thesis update", async () => {
     const mockError = new Error('Database error');
     daoTeacher.getGroupForTeacherById.mockResolvedValue('Test Group');
-    daoTeacher.getThesisAccepted.mockResolvedValueOnce([]);
+    daoTeacher.getAllApplicationsByThesisId.mockResolvedValueOnce([]);
     daoTeacher.updateThesisProposal.mockRejectedValueOnce(mockError);
 
     await professorApi.updateThesisProposal(mockRequest, mockResponse);

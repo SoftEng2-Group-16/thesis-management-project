@@ -153,3 +153,60 @@ content-type: application/json
 ###
 # test delete proposal
 DELETE http://localhost:3001/api/deleteproposal/3
+
+# test teacher gets own archived proposals
+###
+GET http://localhost:3001/api/exams/200001
+
+# test student inserts new thesis start request
+###
+POST http://localhost:3001/api/newstartrequest
+content-type: application/json
+
+{
+    "thesisTitle": "Test title",
+    "supervisor": "Test supervisor",
+    "cosupervisors": ["Test cosupervisor"],
+    "thesisDescription": "Test description",
+    "studentId": 200001
+}
+
+###
+POST http://localhost:3001/api/uploadCV
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="example.pdf"
+Content-Type: application/pdf
+
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<<
+/Title (Hello World)
+/Producer (Fake Producer)
+/Creator (Fake Creator)
+/CreationDate (D:20230101000000)
+/ModDate (D:20230101000000)
+>>
+endobj
+2 0 obj
+<< /Type /Catalog /Pages 3 0 R >>
+endobj
+3 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 3 0 R /Resources << /Font << /F1 5 0 R >> >> /MediaBox [0 0 595.276 841.890] >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000337 00000 n 
+0000000016 00000 n 
+0000000421 00000 n 
+0000000502 000
+

@@ -2,6 +2,7 @@ const daoStudent = require('../../daoStudent');
 const daoTeacher = require('../../daoTeacher');
 const daoGeneral = require('../../daoGeneral');
 const models = require('../../model');
+const { CustomValidation } = require('express-validator/src/context-items');
 
 const getPossibleCosupervisors = async (req, res) => {
     try {
@@ -210,6 +211,27 @@ const getOwnArchivedProposals = async (req, res) => {
     }
 }
 
+const checkErrorsforArchiveProposal = async (proposal, applications, userId) => {
+    if(proposal.error) {
+        return { errorStatus: 404, errorMessage: proposal.error };
+    }
+
+    if(applications.error) {
+        return { errorStatus: 404, errorMessage: applications.error };
+    }
+
+    if (applications.filter(a => a.status === "accepted").length !== 0) {
+        return { errorStatus: 422, errorMessage: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived` };
+    }
+
+    if (!proposal.supervisor.match(userId)) {
+        return { errorStatus: 401, errorMessage: `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED` }
+    }
+    
+    //if no errors
+    return { errorStatus: 0, errorMessage: "none" };
+}
+
 const archiveProposal = async (req,res)  => {
     const proposalId = req.body.proposalId;
     const userId = req.user.id;
@@ -217,17 +239,10 @@ const archiveProposal = async (req,res)  => {
     try {
         const proposal = await daoGeneral.getThesisProposalById(proposalId);
         const applications = await daoTeacher.getApplicationsByThesisId(proposal.id);
-
-        if (proposal.error || applications.error) {
-            return res.status(404).json(proposal);
-        }
-
-        if (applications.filter(a => a.status === "accepted").length !== 0) {
-            return res.status(422).json({ error: `Something went wrong: an application was accepted for proposal ${proposal.id}, should be already archived` });
-        }
-
-        if (!proposal.supervisor.match(userId)) {
-            return res.status(401).json({ "error": `User ${userId} cannot archive proposal ${proposal.id}: NOT OWNED` })
+        const { errorStatus, errorMessage } = await checkErrorsforArchiveProposal(proposal, applications, userId);
+        
+        if( errorMessage != "none" && errorStatus !== 0) {
+            return res.status(errorStatus).json({error: errorMessage})
         } else {
             const changes = await daoTeacher.archiveProposal(new models.ThesisProposal(
                 proposal.id, //can be whatever, DB handles autoincrement id
@@ -267,18 +282,28 @@ const archiveProposal = async (req,res)  => {
 }
 
 
+const checkInitialErrorsForUpdateProposal = async (bodyId, paramId, teacherId) => {
+    if(!teacherId) {
+        return { errorStatus: 401, errorMessage: "problem with the authentication" };
+    }
+    if(paramId !== bodyId) {
+        return { errorStatus: 422, errorMessage: "URL and body id mismatch" };
+    }
+
+    //no error
+    return { errorStatus: 0, errorMessage: "none" };
+}
+
 const updateThesisProposal = async (req, res) => {
-    
     const teacherId = req.user.id;
-    if (!teacherId) {
-        return res.status(503).json({ error: "problem with the authentication" });
+    const paramId = Number(req.params.thesisid);
+    const bodyId = req.body.id;
+
+    const { errorStatus, errorMessage } = await checkInitialErrorsForUpdateProposal(bodyId, paramId, teacherId);
+    if( errorMessage != "none" && errorStatus !== 0) {
+        return res.status(errorStatus).json({error: errorMessage})
     }
 
-
-    // Is the id in the body equal to the id in the url?
-    if (req.body.id !== Number(req.params.thesisid)) {
-        return res.status(422).json({ error: 'URL and body id mismatch' });
-    }
     //same logic of the insert
     const cosupervisors = req.body.cosupervisors;
     const supervisor = req.body.supervisor;
@@ -324,10 +349,10 @@ const updateThesisProposal = async (req, res) => {
     );
 
     try {
-        //**check if there is an already accepted application for this proposal */
-        const acceptedThesis = await daoTeacher.getThesisAccepted();
-        if (acceptedThesis.length > 0 && acceptedThesis.includes(proposal.id)) {
-            return res.status(400).json({ error: "already accepted thesis" })
+        //**check if there is an already accepted or pending application for this proposal */
+        const allApplications = await daoTeacher.getAllApplicationsByThesisId();
+        if (allApplications.length > 0 && allApplications.some(appl=>appl.status==="pending" || appl.status==="accepted")) {
+            return res.status(405).json({ error: "already accepted/pending application for the thesis" })
         }
         const result = await daoTeacher.updateThesisProposal(proposal.id, proposal);
         if (result.error)
@@ -358,16 +383,35 @@ const deleteProposal = async (req, res) => {
         if (thesis_proposal.error) {
             return res.status(404).json(thesis_proposal);
         } else {
-            let id = thesis_proposal.supervisor.split(',');
-            // if (id[0] !== teacherId) { //TODO: try to understand with this the deletion is giving error
-            //     return res.status(401).json("Unauthorized");
-            // }
             // delete all PENDING applications
             await daoGeneral.cancellPendingApplicationsForAThesis(proposalId, teacherId);
             // delete proposal
             const changes = await daoTeacher.deleteProposal(proposalId);
 
             return res.status(200).json(changes);
+        }
+    } catch (e) {
+        return res.status(500).json(e.message);
+    }
+}
+
+const getCVFile = async (req, res) => {
+    const cvId = req.params.id;
+    try {
+        const cvData = await daoTeacher.getCVFileByCVId(cvId);
+        if (cvData.error) {
+            return res.status(404).json(cvData);
+        } else {
+            const filename = cvData.file_name;
+            const fileContent = cvData.file_content;
+
+            res.writeHead(200, {
+                'Content-Type': 'application/pdf',
+                'Content-disposition': 'attachment;filename=' + filename,
+                'Content-Length': fileContent.length
+            });
+            res.end(Buffer.from(fileContent, 'binary'));
+            return res;
         }
     } catch (e) {
         return res.status(500).json(e.message);
@@ -384,5 +428,6 @@ module.exports = {
     getOwnArchivedProposals,
     deleteProposal,
     archiveProposal,
-    updateThesisProposal
+    updateThesisProposal,
+    getCVFile
 }
