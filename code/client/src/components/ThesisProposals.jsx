@@ -47,7 +47,9 @@ function ThesisProposals(props) {
         }
       } catch (error) {
         console.error(error);
+        console.log("here");
         setNoProposals(true);
+        setThesis([])
       }
     };
 
