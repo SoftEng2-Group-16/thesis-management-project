@@ -507,7 +507,209 @@ describe('Student test', () => {
     if(secondLiText != "Description is required") throw new Error("The error notification is wrong");
     if(thirdLiText != "A teacher can not be both supervisor and cosupervisor") throw new Error("The error notification is wrong");
   
-  }, 1 * 60 * 1000)
+  }, 1 * 60 * 1000);
+
+  test('here a student sends a thesis request forgetting the title and adding as a cosupervisor the supervisor', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 1024});
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    
+    //await page.click(cellSelector);
+    await page.click('a[href="/thesisRequest"]');
+      //inserting the description
+      await page.click("#description")
+      await page.type("#description",'Description about this new incredible thesis proposal');
+      //inserting the supervisor
+      await page.click("div.select__control.css-13cymwt-control")
+      await page.type("div.select__control.css-13cymwt-control",'sof');
+      await page.keyboard.press('Enter');
+      //Inserting as cosupervisor the same supervisor
+      await page.click("div.col-sm-7")
+      await page.type("div.col-sm-7",'sof');
+      await page.keyboard.press('Enter');
+      //since it remains selected the user can write again (but it will give us an error anyways)
+      await page.type("div.col-sm-7",'ren');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn.btn-primary');
+      await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
+      const firstLiText = await page.$eval('ul li:nth-child(1)', li => li.textContent);
+      const secondLiText = await page.$eval('ul li:nth-child(2)', li => li.textContent);
+      if(firstLiText != "Title is required") throw new Error("The error notification is wrong");
+      if(secondLiText != "A teacher can not be both supervisor and cosupervisor") throw new Error("The error notification is wrong");
+  }, 1 * 60 * 1000);
+
+  test('here a student sends a thesis request forgetting the description and adding as a cosupervisor the supervisor', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 1024});
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    
+    //await page.click(cellSelector);
+    await page.click('a[href="/thesisRequest"]');
+      //inserting the title
+      await page.click("#title")
+      await page.type("#title",'New Title');
+      //inserting the supervisor
+      await page.click("div.select__control.css-13cymwt-control")
+      await page.type("div.select__control.css-13cymwt-control",'sof');
+      await page.keyboard.press('Enter');
+      //Inserting as cosupervisor the same supervisor
+      await page.click("div.col-sm-7")
+      await page.type("div.col-sm-7",'sof');
+      await page.keyboard.press('Enter');
+      //since it remains selected the user can write again (but it will give us an error anyways)
+      await page.type("div.col-sm-7",'ren');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn.btn-primary');
+      await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
+      const firstLiText = await page.$eval('ul li:nth-child(1)', li => li.textContent);
+      const secondLiText = await page.$eval('ul li:nth-child(2)', li => li.textContent);
+      if(firstLiText != "Description is required") throw new Error("The error notification is wrong");
+      if(secondLiText != "A teacher can not be both supervisor and cosupervisor") throw new Error("The error notification is wrong");
+  }, 1 * 60 * 1000);
+
+  test('here a student sends a thesis request forgetting the description and the supervisor', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 1024});
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    
+    //await page.click(cellSelector);
+    await page.click('a[href="/thesisRequest"]');
+      //inserting the title
+      await page.click("#title")
+      await page.type("#title",'N');
+      //Inserting as cosupervisor the same supervisor
+      await page.click("div.col-sm-7")
+      await page.type("div.col-sm-7",'sof');
+      await page.keyboard.press('Enter');
+      //since it remains selected the user can write again (but it will give us an error anyways)
+      await page.type("div.col-sm-7",'ren');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn.btn-primary');
+      await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
+      const firstLiText = await page.$eval('ul li:nth-child(1)', li => li.textContent);
+      const secondLiText = await page.$eval('ul li:nth-child(2)', li => li.textContent);
+      if(firstLiText != "Supervisor is required") throw new Error("The error notification is wrong");
+      if(secondLiText != "Description is required") throw new Error("The error notification is wrong");
+  }, 1 * 60 * 1000);
+
+    test('here a student sends a thesis request forgetting the title and the supervisor', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 1024});
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    
+    //await page.click(cellSelector);
+    await page.click('a[href="/thesisRequest"]');
+      //inserting the title
+      await page.click("#description")
+      await page.type("#description",'N');
+      //Inserting as cosupervisor the same supervisor
+      await page.click("div.col-sm-7")
+      await page.type("div.col-sm-7",'sof');
+      await page.keyboard.press('Enter');
+      //since it remains selected the user can write again (but it will give us an error anyways)
+      await page.type("div.col-sm-7",'ren');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn.btn-primary');
+      await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
+      const firstLiText = await page.$eval('ul li:nth-child(1)', li => li.textContent);
+      const secondLiText = await page.$eval('ul li:nth-child(2)', li => li.textContent);
+      if(firstLiText != "Title is required") throw new Error("The error notification is wrong");
+      if(secondLiText != "Supervisor is required") throw new Error("The error notification is wrong");
+  }, 1 * 60 * 1000);
+
+  test('here a student sends a thesis request forgetting the title and description', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 1024});
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    
+    //await page.click(cellSelector);
+    await page.click('a[href="/thesisRequest"]');
+      //inserting the supervisor
+      await page.click("div.select__control.css-13cymwt-control")
+      await page.type("div.select__control.css-13cymwt-control",'sof');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn.btn-primary');
+      await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
+      const firstLiText = await page.$eval('ul li:nth-child(1)', li => li.textContent);
+      const secondLiText = await page.$eval('ul li:nth-child(2)', li => li.textContent);
+      if(firstLiText != "Title is required") throw new Error("The error notification is wrong");
+      if(secondLiText != "Description is required") throw new Error("The error notification is wrong");
+  }, 1 * 60 * 1000);
 });
 
 
