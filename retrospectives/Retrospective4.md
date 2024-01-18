@@ -45,23 +45,23 @@ sections:
 ## QUALITY MEASURES 
 
 - Unit Testing:
-  - Total hours estimated - `` 
+  - Total hours estimated - `7h30m` 
   - Total hours spent - `8h20m`
-  - Nr of automated unit test cases - ``
-  - Coverage (if available) - `%`
+  - Nr of automated unit test cases - `76`
+  - Coverage (if available) - `88.1%`
 - E2E testing:
-  - Total hours estimated - ``
+  - Total hours estimated - `13h30m`
   - Total hours spent - `12h30m`
 - Code review 
   - Total hours estimated - ``
-  - Total hours spent - ``
+  - Total hours spent - `9h25m`
 - Technical Debt management:
   - Total hours estimated- `45m`
   - Total hours spent- `45m`
   - Hours estimated for remediation by SonarQube: `43m`
   - Hours estimated for remediation by SonarQube only for the selected and planned issues: `43m` 
   - Hours spent on remediation: `45m` 
-  - debt ratio (as reported by SonarQube under "Measures-Maintainability"): `0,2%`
+  - debt ratio (as reported by SonarQube under "Measures-Maintainability"): `0.2%`
   - rating for each quality characteristic reported in SonarQube under "Measures" (namely reliability, security, maintainability ): `Reliability`: `A`, `Security`: `A`, `Mantainability`: `A`
   
 
@@ -88,3 +88,6 @@ sections:
 
 - One thing you are proud of as a Team!!
   - Our presentations were always well prepared and the work organization always on point
+
+- Licence chose: MIT
+  - We chose MIT licence since we want everyone to use our software freely
