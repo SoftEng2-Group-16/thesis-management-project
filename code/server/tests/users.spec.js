@@ -1,3 +1,5 @@
+const { type } = require('os');
+const expect = require('chai').expect;
 const puppeteer = require('puppeteer');
 jest.setTimeout(30000);
 
@@ -46,6 +48,210 @@ describe('User interactions test', () => {
     }
   });
 
+  test('here a student filters the thesis list with nothing and then resets it', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({ width: 1080, height: 1024 });
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+
+    const tableElement = await page.$(tableSelector);
+    if (tableElement) {
+      // Calcola il numero di righe della tabella
+      const rowCount = await page.$$eval(`${tableSelector} tbody tr`, rows => rows.length);
+
+      // Stampare il titolo della tesi nella prima riga
+      const firstRowTitle = await page.$eval(`${tableSelector} tbody tr:first-child td:nth-child(2) a`, link => link.textContent);
+
+    } else {
+      throw new Error('Tabella non trovata sulla pagina.');
+    }
+
+    // Check if the selector and search button exist
+    const selectorExists = await page.$('.selector');
+    const searchButtonExists = await page.$('button.btn-outline-success');
+
+    // Assert that the selector and search button exist
+    expect(selectorExists).to.not.be.null;
+    expect(searchButtonExists).to.not.be.null;
+    if (selectorExists && searchButtonExists) {
+      // Interact with the selector 
+      await page.select('.selector', 'title');
+      // Interact with the search button
+      await page.click('button.btn-outline-success');
+      // Wait for the results to load 
+      await page.waitForSelector('table.table-striped.table-bordered.table-hover',{ visible: true, timeout: 1000 }).catch(() => null);
+      // Get the number of rows after the search
+      const rowCountAfterSearch = await page.$$eval('.table-responsive table tbody tr', rows => rows.length, { visible: true, timeout: 1000 }).catch(() => null);
+
+      // Assert that the search produced the expected results
+      expect(rowCountAfterSearch).to.equal(0);
+    } else {
+      console.error('Selector or search button not found on the page.');
+    }
+
+    //reset the searching result
+    const initialRowCount = await page.$$eval('table.table-striped.table-bordered.table-hover tbody tr', rows => rows.length);
+    const resetButton = await page.$('#reset-button');
+    await page.waitForTimeout(2000);
+    if (resetButton) {
+      page.click('#reset-button')
+    } else {
+      throw new Error('Element not found');
+    }
+
+    // Wait for the number of rows to change
+    await page.waitForFunction((initialRowCount) => {
+      const currentRowCount = document.querySelectorAll('table.table-striped.table-bordered.table-hover tbody tr').length;
+      return currentRowCount !== initialRowCount;
+    }, {}, initialRowCount);
+
+    // Get the number of rows after the search
+    const rowCountAfterReset = await page.$$eval('.table-responsive table tbody tr', rows => rows.length);
+    // Assert that the search produced the expected results
+    expect(rowCountAfterReset).to.equal(5);
+
+
+  }, 1 * 60 * 1000);
+
+  test('here a student filters the thesis list by groups and then checks the results', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({ width: 1080, height: 1024 });
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+
+    const tableElement = await page.$(tableSelector);
+    if (tableElement) {
+      // Calcola il numero di righe della tabella
+      const rowCount = await page.$$eval(`${tableSelector} tbody tr`, rows => rows.length);
+
+      // Stampare il titolo della tesi nella prima riga
+      const firstRowTitle = await page.$eval(`${tableSelector} tbody tr:first-child td:nth-child(2) a`, link => link.textContent);
+
+    } else {
+      throw new Error('Tabella non trovata sulla pagina.');
+    }
+
+    // Check if the selector and search button exist
+    const selectorExists = await page.$('.selector');
+    const searchButtonExists = await page.$('button.btn-outline-success');
+
+    // Assert that the selector and search button exist
+    expect(selectorExists).to.not.be.null;
+    expect(searchButtonExists).to.not.be.null;
+    if (selectorExists && searchButtonExists) {
+      // Interact with the selector 
+      await page.select('.selector', 'groups');
+      // Interact with the search button
+      await page.click("div.css-w9q2zk-Input2")
+      await page.type("div.css-w9q2zk-Input2",'AI');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn-outline-success');
+      // Wait for the results to load 
+      await page.waitForSelector('table.table-striped.table-bordered.table-hover',{ visible: true, timeout: 1000 }).catch(() => null);
+      // Get the number of rows after the search
+      const rowCountAfterSearch = await page.$$eval('.table-responsive table tbody tr', rows => rows.length, { visible: true, timeout: 1000 }).catch(() => null);
+
+      // Assert that the search produced the expected results
+      expect(rowCountAfterSearch).to.equal(4);
+    } else {
+      console.error('Selector or search button not found on the page.');
+    }
+
+  }, 1 * 60 * 1000);
+
+  test('here a student filters the thesis list by groups and then checks the results', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({ width: 1080, height: 1024 });
+
+    //this below is the mocked login for the student
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'mario.rossi@studenti.polito.it');
+    await page.type('#password', '200001');
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+
+    //use this part above as a login in every test since it's needed.
+
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+
+    const tableElement = await page.$(tableSelector);
+    if (tableElement) {
+      // Calcola il numero di righe della tabella
+      const rowCount = await page.$$eval(`${tableSelector} tbody tr`, rows => rows.length);
+
+      // Stampare il titolo della tesi nella prima riga
+      const firstRowTitle = await page.$eval(`${tableSelector} tbody tr:first-child td:nth-child(2) a`, link => link.textContent);
+
+    } else {
+      throw new Error('Table not found');
+    }
+
+    // Check if the selector and search button exist
+    const selectorExists = await page.$('.selector');
+    const searchButtonExists = await page.$('button.btn-outline-success');
+
+    // Assert that the selector and search button exist
+    expect(selectorExists).to.not.be.null;
+    expect(searchButtonExists).to.not.be.null;
+    if (selectorExists && searchButtonExists) {
+      // Interact with the search button
+      //just renew and ferr to get the thesis about renewable energy with supervisor Ferrari
+      await page.click("div.css-w9q2zk-Input2")
+      await page.type("div.css-w9q2zk-Input2",'ReNew'); //to show that is not case sensitive
+      await page.keyboard.press('Enter');
+      await page.click("div.css-w9q2zk-Input2")
+      await page.type("div.css-w9q2zk-Input2",'ferr');
+      await page.keyboard.press('Enter');
+      await page.click('button.btn-outline-success');
+      // Wait for the results to load 
+      await page.waitForSelector('table.table-striped.table-bordered.table-hover',{ visible: true, timeout: 1000 }).catch(() => null);
+      // Get the number of rows after the search
+      const rowCountAfterSearch = await page.$$eval('.table-responsive table tbody tr', rows => rows.length, { visible: true, timeout: 1000 }).catch(() => null);
+
+      // Assert that the search produced the expected results
+      expect(rowCountAfterSearch).to.equal(1);
+    } else {
+      console.error('Selector or search button not found on the page.');
+    }
+
+  }, 1 * 60 * 1000);
+
   test('Students checks the pending application', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
@@ -86,8 +292,7 @@ describe('User interactions test', () => {
   
 
     if(firstApplication == 'pending') {
-        console.log("both pending")
-    } else console.error("Something went wrong")
+    } else throw new Error("Something went wrong")
 
   });
   

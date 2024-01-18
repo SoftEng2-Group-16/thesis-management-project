@@ -31,7 +31,6 @@ describe('Professor tests', () => {
       // Write the content to the destination file asynchronously
       await fs.writeFile(destinationPath, sourceContent);
 
-      console.log(`Database restored`);
     } catch (error) {
       console.error('Error copying database:', error.message);
     }
@@ -786,4 +785,117 @@ describe('Professor tests', () => {
     if(counterPending != 0) throw new Error("The applications were not rejected")
   }, 1 * 60 * 1000);
   
+  test('a professor checks a student exams from his application', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 600});
+  
+    //this below is the mocked login for the professor
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'maria.rossi@polito.it');
+    await page.type('#password', '268553');
+    //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+  
+    //use this part above as a login in every test since it's needed.
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+    await page.click('a[href="/applications"]');
+
+    await page.waitForSelector('table.table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+    let cells = await page.$$(`${tableSelector} tr`);
+    cells = cells; 
+    //the first application
+    const rowIndex = 1;
+    const columnIndex = 3;
+ 
+    // Select the first application
+    const cellSelector = `${tableSelector} tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`;
+ 
+ 
+    await page.click(cellSelector);
+
+    await page.waitForSelector('div.thesis-card.card');
+    
+    await page.evaluate(() => {
+       window.scrollTo(0, document.body.scrollHeight);
+    });
+    //this click opens the List of exams passed by the student
+    let divText = await page.$eval('div.ms-1', div => div.textContent);
+    if(divText != "Show student's CV information") 
+      throw new Error("Wrong text for the show student CV div");
+    await page.click("div.ms-1");
+    divText = await page.$eval('div.ms-1', div => div.textContent);
+    if(divText != "Hide student's CV information") 
+    throw new Error("Wrong text for the hide student CV div");
+
+    //the first proposal does not have a CV attached so we wait one second searching for that button
+    //if the button is present this means that there is an error 
+    //so element1 need to be null in order to pass the test
+    const element1 = await page.waitForSelector('a.btn.btn-primary', { visible: true, timeout: 1000 }).catch(() => null);
+    if(element1)throw new Error("This proposal has not a attached a CV, but there is the button");
+  }, 1 * 60 * 1000);
+
+  test('a professor checks a student exams from his application and his CV attached as a PDF', async () => {
+    // Navigate the page to a URL
+    await page.goto('http://localhost:5173/');
+
+
+    // Set screen size
+    await page.setViewport({width: 1080, height: 600});
+  
+    //this below is the mocked login for the professor
+    //here we wait for the page to re-render the saml login
+    await page.waitForSelector('#username');
+    // use # for the id
+    await page.type('#username', 'maria.rossi@polito.it');
+    await page.type('#password', '268553');
+    //if there is no id use the css selector (hover over the conttent and find it, it's the first element)
+    const buttonSelector = 'button.c4900dc2e.cac92d701.c7024c898.c8f0f67a1.cb9ac0d3a';
+    await page.click(buttonSelector);
+  
+    //use this part above as a login in every test since it's needed.
+    await page.waitForSelector('table.table-striped.table-bordered.table-hover');
+
+    await page.click('a[href="/applications"]');
+
+    await page.waitForSelector('table.table.table-striped.table-bordered.table-hover');
+    const tableSelector = 'table.table-striped.table-bordered.table-hover';
+    let cells = await page.$$(`${tableSelector} tr`);
+    cells = cells; 
+    //the second application
+    const rowIndex = 2;
+    const columnIndex = 3;
+ 
+    // Select the first application
+    const cellSelector = `${tableSelector} tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`;
+ 
+ 
+    await page.click(cellSelector);
+
+    await page.waitForSelector('div.thesis-card.card');
+    
+    await page.evaluate(() => {
+       window.scrollTo(0, document.body.scrollHeight);
+    });
+    //this click opens the List of exams passed by the student
+    await page.click("div.ms-1");
+    //the first proposal does not have a CV attached so we wait one second searching for that button
+    //if the button is present this means that there is an error 
+    //so element1 need to be null in order to pass the test
+    const element1 = await page.waitForSelector('a.btn.btn-primary');
+    if(!element1)throw new Error("This proposal has not a attached a CV, but there is the button");
+    //the download of the thesis by clicking the button was done by manually
+    //enable the commented code below to allow the download of the CV
+    //it cannot be closed by the testing browser and is downloaded on the testing machine
+
+    /*await page.click('a.btn.btn-primary');
+    await page.waitForTimeout(7000);*/
+  }, 1 * 60 * 1000);
 });
