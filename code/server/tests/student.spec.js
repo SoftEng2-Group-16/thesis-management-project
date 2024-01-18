@@ -34,7 +34,7 @@ describe('Student test', () => {
     }
   });
 
-  test.skip('here a students tries to apply but then cancels the confirmation dialog', async () => {
+  test('here a students tries to apply but then cancels the confirmation dialog', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -92,7 +92,7 @@ describe('Student test', () => {
     if(!applySelector) throw new Error("He is not on the thesis page");
   }, 1 * 60 * 1000);
    
-  test.skip('here a students tries to apply for a thesis that he has already applied for', async () => {
+  test('here a students tries to apply for a thesis that he has already applied for', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -149,7 +149,7 @@ describe('Student test', () => {
     if(!applySelector) throw new Error("No notification to the student");
   }, 1 * 60 * 1000);
  
-  test.skip('here a student applies for a thesis that he did not apply for succesfully', async () => {
+  test('here a student applies for a thesis that he did not apply for succesfully', async () => {
       // Navigate the page to a URL
       await page.goto('http://localhost:5173/');
   
@@ -184,7 +184,7 @@ describe('Student test', () => {
       if(!applySelector) throw new Error("No notification to the student");
   }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request filling everything', async () => {
+  test('here a student sends a thesis request filling everything', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -217,11 +217,11 @@ describe('Student test', () => {
       await page.type("div.select__control.css-13cymwt-control",'sof');
       await page.keyboard.press('Enter');
       //Inserting the cosupervisors
-      await page.click("div.select__control.css-13cymwt-control:nth-child(2)")
-      await page.type("div.select__control.css-13cymwt-control:nth-child(2)",'ant');
+      await page.click("div.col-sm-7")
+      await page.type("div.col-sm-7",'ant');
       await page.keyboard.press('Enter');
       //since it remains selected the user can write again
-      await page.type("div.select__control.css-13cymwt-control:nth-child(2)",'ren');
+      await page.type("div.col-sm-7",'ren');
       await page.keyboard.press('Enter');
 
       await page.click('button.btn.btn-primary');
@@ -230,7 +230,7 @@ describe('Student test', () => {
 
   }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request filling everything except the cosupervisors', async () => {
+  test('here a student sends a thesis request filling everything except the cosupervisors', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -269,7 +269,7 @@ describe('Student test', () => {
 
   }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request forgetting the supervisor', async () => {
+  test('here a student sends a thesis request forgetting the supervisor', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -306,7 +306,7 @@ describe('Student test', () => {
 
   }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request forgetting the description', async () => {
+  test('here a student sends a thesis request forgetting the description', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -344,7 +344,7 @@ describe('Student test', () => {
 
   }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request forgetting the title', async () => {
+  test('here a student sends a thesis request forgetting the title', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -382,7 +382,7 @@ describe('Student test', () => {
 
   }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request forgetting everything', async () => {
+  test('here a student sends a thesis request forgetting everything', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -417,7 +417,7 @@ describe('Student test', () => {
 
   }, 1 * 60 * 1000)
 
-  test.skip('here a student sends a thesis request filling everything but adding as a cosupervisor the supervisor', async () => {
+  test('here a student sends a thesis request filling everything but adding as a cosupervisor the supervisor', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
 
@@ -450,22 +450,20 @@ describe('Student test', () => {
       await page.type("div.select__control.css-13cymwt-control",'sof');
       await page.keyboard.press('Enter');
       //Inserting as cosupervisor the same supervisor
-      await page.click("div.basic-multi-select.css-b62m3t-container:nth-child(2)")
-      await page.type("div.basic-multi-select.css-b62m3t-container:nth-child(2)",'sof');
+      await page.click("div.col-sm-7")
+      await page.type("div.col-sm-7",'sof');
       await page.keyboard.press('Enter');
       //since it remains selected the user can write again (but it will give us an error anyways)
-      await page.type("div.basic-multi-select.css-b62m3t-container:nth-child(2)",'ren');
+      await page.type("div.col-sm-7",'ren');
       await page.keyboard.press('Enter');
-      await page.waitForTimeout(6000);
       await page.click('button.btn.btn-primary');
-
       await page.waitForSelector('div.fade.alert.alert-danger.alert-dismissible.show');
       const firstLiText = await page.$eval('ul li:nth-child(1)', li => li.textContent);
       if(firstLiText != "A teacher can not be both supervisor and cosupervisor") throw new Error("The error notification is wrong");
 
     }, 1 * 60 * 1000);
 
-  test.skip('here a student sends a thesis request adding only the supervisor and making him also the cosupervisor', async () => {
+  test('here a student sends a thesis request adding only the supervisor and making him also the cosupervisor', async () => {
     // Navigate the page to a URL
     await page.goto('http://localhost:5173/');
   
@@ -492,11 +490,11 @@ describe('Student test', () => {
     await page.type("div.select__control.css-13cymwt-control",'sof');
     await page.keyboard.press('Enter');
     //Inserting as cosupervisor the same supervisor
-    await page.click("div.basic-multi-select.css-b62m3t-container:nth-child(2)")
-    await page.type("div.basic-multi-select.css-b62m3t-container:nth-child(2)",'sof');
+    await page.click("div.col-sm-7")
+    await page.type("div.col-sm-7",'sof');
     await page.keyboard.press('Enter');
     //since it remains selected the user can write again (but it will give us an error anyways)
-    await page.type("div.basic-multi-select.css-b62m3t-container:nth-child(2)",'ren');
+    await page.type("div.col-sm-7",'ren');
     await page.keyboard.press('Enter');
     //confirming
     await page.click('button.btn.btn-primary');
