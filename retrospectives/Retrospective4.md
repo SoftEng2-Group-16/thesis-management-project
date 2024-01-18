@@ -38,20 +38,20 @@ sections:
 
 > place technical tasks corresponding to story `#0` and leave out story points (not applicable in this case)
 
-- Hours per task (average, standard deviation): average est. `` - spent ``; standard deviation est. `` - spent ``
-- Total task estimation error ratio: sum of total hours estimation / sum of total hours spent -1: `-`
+- Hours per task (average, standard deviation): average est. `` 2h 36m``; standard deviation est. `` 2h `` ; average spent `` 2h 35m`` ; standard deviation spent `` 1h 54m``
+- Total task estimation error ratio: sum of total hours estimation / sum of total hours spent -1: `0,004347826`
 
   
 ## QUALITY MEASURES 
 
 - Unit Testing:
   - Total hours estimated - `` 
-  - Total hours spent - ``
+  - Total hours spent - `8h20m`
   - Nr of automated unit test cases - ``
   - Coverage (if available) - `%`
 - E2E testing:
   - Total hours estimated - ``
-  - Total hours spent - ``
+  - Total hours spent - `12h30m`
 - Code review 
   - Total hours estimated - ``
   - Total hours spent - ``
@@ -71,7 +71,7 @@ sections:
 - What caused your errors in estimation (if any)?
   - We needed less time than expected to complete all the e2e testing but we spendend more time time planned dealing with the general front end appearence
 - What lessons did you learn (both positive and negative) in this sprint?
-  - **Positive**: we learn how to stick to the 
+  - **Positive**: we learned how to stick to the scrum process while being all dislocated during the holdays
   - **Negative**: 
 
 - Which improvement goals set in the previous retrospective were you able to achieve? 
