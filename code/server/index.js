@@ -272,7 +272,7 @@ const server = http.createServer(app);
 server.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
   // cron job setup
-  cron.schedule('0 0 */1 * * *', async () => { //executes every hour, change it as needed
+  cron.schedule('15 0 0 * * *', async () => { //executes every day, few seconds after midnight
     console.log('Cron job starting...');
     const initialDate = await cronGetDate().catch(e => console.error("Cron job couldn't get date"));
     const numberExpired = await cronArchiveExpired(initialDate).catch(e => console.error("Cron couldn't archive expired proposals"));
