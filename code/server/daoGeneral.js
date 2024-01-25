@@ -81,24 +81,59 @@ exports.getProposalFromArchivedById = (thesisId) => {
 
 exports.cancellPendingApplicationsForAThesis = (thesisId, teacherId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE applications SET status = "canceled" WHERE thesisid = ?  AND teacherId = ? and status="pending" ';
-    db.run(
-      sql,
-      [thesisId, teacherId],
-      function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          /* const updatedApplication = {
-            id: thesisId,
-            status: 'canceled',
-          }; */
-          resolve(this.changes);
-        }
+    const selectSql = `
+      SELECT
+        students.email,
+        students.name AS student_name,
+        thesis_proposals.title AS thesis_title
+      FROM
+        applications
+      JOIN
+        students ON applications.studentId = students.id
+      JOIN
+        thesis_proposals ON applications.thesisId = thesis_proposals.id
+      WHERE
+        applications.thesisid = ? AND
+        applications.teacherId = ? AND
+        applications.status = "pending"`;
+
+    db.all(selectSql, [thesisId, teacherId], (selectErr, rows) => {
+      if (selectErr) {
+        reject(selectErr);
+        return;
       }
-    );
+
+      const emails = rows.map(row => row.email);
+      const studentNames = rows.map(row => row.student_name);
+      const thesisTitle = rows.length > 0 ? rows[0].thesis_title : null;
+
+      const updateSql = `
+        UPDATE
+          applications
+        SET
+          status = "canceled"
+        WHERE
+          thesisid = ? AND
+          teacherId = ? AND
+          status = "pending"`;
+
+      db.run(updateSql, [thesisId, teacherId], function (updateErr) {
+        if (updateErr) {
+          reject(updateErr);
+        } else {
+          resolve({
+            changes: this.changes,
+            canceledEmails: emails,
+            canceledStudentNames: studentNames,
+            canceledThesisName: thesisTitle
+          });
+        }
+      });
+    });
   });
 };
+
+
 
 exports.cancellPendingApplicationsOfAStudent = (studentId) => {
   return new Promise((resolve, reject) => {

@@ -28,7 +28,7 @@ const buildEmail = (type, data) => {
   switch (type) {
       case 'application-decision': {
         const { studentName, thesisTitle, decision } = data;
-        const text = `Dear ${studentName},\n\nYour application for the thesis "${thesisTitle}" has been ${decision === 'accepted' ? 'ACCEPTED' : 'REJECTED'}.\n\nBest regards,\nThe Thesis Management Team`;
+        const text = `Dear ${studentName},\n\nYour application for the thesis "${thesisTitle}" has been ${decision === 'accepted' ? 'ACCEPTED' : decision === 'canceled' ? 'CANCELED' : 'REJECTED'}.\n\nBest regards,\nThe Thesis Management Team`;
         const to = 'thesismanagementstudent@gmail.com';
         return { text, to };
       }
@@ -64,9 +64,30 @@ const sendEmail = async (req, res) => {
     console.log('Email sent:', info.response);
     res.status(200).json({ success: true, message: 'Email sent successfully.' });
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.log('Error sending email:', error);
     res.status(500).json({ success: false, error: 'Internal server error.' });
   }
 };
 
-module.exports = { sendEmail, buildEmail };
+const sendEmailInternal = async (emailData) => {
+  const { subject, type, ...data } = emailData; //...data since we will have different kinds of notifications
+
+  // Use these parameters to build the email text and recipient's email address
+  const { text, to } = buildEmail(type, data);
+
+  const mailOptions = {
+    from: 'thesismanagementnoreply@gmail.com',
+    to,
+    subject,
+    text,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+  } catch (error) {
+    console.log('Error sending email:', error);
+  }
+};
+
+module.exports = { sendEmail, buildEmail, sendEmailInternal };

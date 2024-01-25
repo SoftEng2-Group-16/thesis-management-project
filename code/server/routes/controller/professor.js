@@ -2,6 +2,7 @@ const daoStudent = require('../../daoStudent');
 const daoTeacher = require('../../daoTeacher');
 const daoGeneral = require('../../daoGeneral');
 const models = require('../../model');
+const emailSender = require('../controller/general.js');
 const { CustomValidation } = require('express-validator/src/context-items');
 
 const getPossibleCosupervisors = async (req, res) => {
@@ -140,9 +141,32 @@ const decideApplication = async (req, res) => {
 
     if (decision === "accepted") {
         try {
+
+            // here, need to fetch all emails of pending application for this thesis to send notifications "rejected" or "canceled"
+            // can make use of the first dao mdethod to get the emails
+            // also need other data{ studentName, thesisTitle, decision = canceled } 
+
+
             const application = await daoTeacher.acceptApplication(thesisId, teacherId, studentId);
-            await daoGeneral.cancellPendingApplicationsForAThesis(thesisId, teacherId);
+            const { changes, canceledEmails, canceledStudentNames, canceledThesisName } = await daoGeneral.cancellPendingApplicationsForAThesis(thesisId, teacherId);
+            console.log(canceledEmails, canceledStudentNames,canceledThesisName)
             await daoGeneral.cancellPendingApplicationsOfAStudent(studentId);
+            console.log("cancel for single student done")
+            for (let i = 0; i < canceledEmails.length; i++) {
+                
+                const emailData = {
+                    subject: `Application Canceled`,
+                    type: 'application-decision',
+                    studentName: canceledStudentNames[i],
+                    thesisTitle: canceledThesisName,
+                    decision: 'canceled',
+                }
+                 await emailSender.sendEmailInternal(emailData );
+                
+            }
+           
+
+
             //archive the thesis proposal so other students cannot apply to it
             const proposal = await daoGeneral.getThesisProposalById(thesisId)
                 .then(p => {
@@ -166,6 +190,7 @@ const decideApplication = async (req, res) => {
             await daoTeacher.deleteProposal(proposal.id);
             return res.status(200).json(application);
         } catch (e) {
+            console.log(e)
             return res.status(500).json(e.message);
         }
     }
