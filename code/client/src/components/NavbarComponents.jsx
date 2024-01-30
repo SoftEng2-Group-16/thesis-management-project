@@ -9,6 +9,8 @@ import { useState } from 'react';
 
 function NavHeader(props) {
   const [showClock, setShowClock] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
   const navigate = useNavigate();
 
   const handleDateChange = (newDate) => {
@@ -23,7 +25,10 @@ function NavHeader(props) {
   }
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="d-flex navbar-expand-lg justify-content-center flex-column">
+    <Navbar 
+    expanded={expanded}
+    onToggle={() => setExpanded(!expanded)}
+    expand="lg" className="d-flex navbar-expand-lg justify-content-center flex-column">
       {/* Upper Row for Clock and Navbar.Brand */}
       <div className="d-flex align-items-center w-100 mb-3">
         <div className="d-flex align-items-left">

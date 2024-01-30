@@ -80,7 +80,6 @@ function StudentApplications({ applications, user }) {
             <Row className="mt-5">
                 <Row className="d-flex justify-content-center mb-4">
                     <Col lg={9} xs={12} md={12} sm={12} className="text-start">
-                        <h2> Thesis applications </h2>
                     </Col>
                 </Row>
                 <Row className="d-flex justify-content-center">
@@ -135,7 +134,6 @@ function ProfessorApplications({ applications, user }) {
             <Row className="mt-5">
                 <Row className="d-flex justify-content-center mb-4">
                     <Col lg={9} xs={12} md={12} sm={12} className="text-start">
-                        <h2> Thesis applications </h2>
                     </Col>
                 </Row>
                 <Row className="d-flex justify-content-center">
